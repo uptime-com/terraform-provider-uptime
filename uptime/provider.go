@@ -25,6 +25,7 @@ func Provider() *schema.Provider {
 			"uptime_check_malware": resourceUptimeCheckMalware(),
 			"uptime_check_ntp": resourceUptimeCheckNTP(),
 			"uptime_check_ssl_cert": resourceUptimeCheckSSLCert(),
+			"uptime_check_transaction": resourceUptimeCheckTransaction(),
 			"uptime_check_whois": resourceUptimeCheckWhois(),
 		},
 		ConfigureFunc: configureProvider,
