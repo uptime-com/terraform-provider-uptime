@@ -25,6 +25,7 @@ func Provider() *schema.Provider {
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"uptime_tag":                    resourceUptimeCheckTag(),
+            "uptime_check_api":              resourceUptimeCheckAPI(),
 			"uptime_check_dns":              resourceUptimeCheckDNS(),
 			"uptime_check_domain_blacklist": resourceUptimeCheckDomainBlacklist(),
 			"uptime_check_http":             resourceUptimeCheckHTTP(),
