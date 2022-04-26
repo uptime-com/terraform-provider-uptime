@@ -1,7 +1,7 @@
 package uptime
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	uptime "github.com/uptime-com/rest-api-clients/golang/uptime"
 )
 
@@ -9,7 +9,7 @@ func resourceUptimeCheckDomainBlacklist() *schema.Resource {
 	return &schema.Resource{
 
 		Create: checkCreateFunc(blacklistCheck),
-		Read: checkReadFunc(blacklistCheck),
+		Read:   checkReadFunc(blacklistCheck),
 		Update: checkUpdateFunc(blacklistCheck),
 		Delete: checkDeleteFunc(blacklistCheck),
 		Importer: &schema.ResourceImporter{
@@ -18,11 +18,11 @@ func resourceUptimeCheckDomainBlacklist() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			// Required attributes: Common
 			"address": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 			"contact_groups": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -31,20 +31,20 @@ func resourceUptimeCheckDomainBlacklist() *schema.Resource {
 
 			// Optional attributes: Common
 			"name": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"tags": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"notes": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
-			Default: "Managed by Terraform",
+				Default:  "Managed by Terraform",
 			},
 		},
 	}
@@ -53,7 +53,7 @@ func resourceUptimeCheckDomainBlacklist() *schema.Resource {
 // BlacklistCheck implements the CheckType interface for Uptime.com Domain Blacklist checks.
 type BlacklistCheck struct{}
 
-func (BlacklistCheck) typeStr() string {return "BLACKLIST"}
+func (BlacklistCheck) typeStr() string { return "BLACKLIST" }
 
 func (BlacklistCheck) getSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {}
 

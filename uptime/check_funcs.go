@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	uptime "github.com/uptime-com/rest-api-clients/golang/uptime"
-	"github.com/hashicorp/terraform/helper/schema"
 )
 
 // CheckType is an interface specifying the required methods for a valid parameter
@@ -49,11 +49,11 @@ func getCommonCheckAttrs(d *schema.ResourceData, c *uptime.Check) {
 
 }
 
-func checkBuildFunc(ct CheckType) (func (d *schema.ResourceData) *uptime.Check) {
+func checkBuildFunc(ct CheckType) func(d *schema.ResourceData) *uptime.Check {
 	return func(d *schema.ResourceData) *uptime.Check {
 		check := &uptime.Check{
-			CheckType: ct.typeStr(),
-			Address: d.Get("address").(string),
+			CheckType:     ct.typeStr(),
+			Address:       d.Get("address").(string),
 			ContactGroups: expandSetAttr(d.Get("contact_groups")),
 		}
 
@@ -64,7 +64,7 @@ func checkBuildFunc(ct CheckType) (func (d *schema.ResourceData) *uptime.Check) 
 	}
 }
 
-func checkCreateFunc(ct CheckType) (schema.CreateFunc) {
+func checkCreateFunc(ct CheckType) schema.CreateFunc {
 	buildFunc := checkBuildFunc(ct)
 
 	return func(d *schema.ResourceData, meta interface{}) error {
@@ -86,10 +86,10 @@ func checkCreateFunc(ct CheckType) (schema.CreateFunc) {
 	}
 }
 
-func checkReadFunc(ct CheckType) (schema.ReadFunc) {
+func checkReadFunc(ct CheckType) schema.ReadFunc {
 	typeStr := ct.typeStr()
 
-	return func (d *schema.ResourceData, meta interface{}) error {
+	return func(d *schema.ResourceData, meta interface{}) error {
 
 		client := meta.(*uptime.Client)
 		ctx := context.Background()
@@ -117,7 +117,7 @@ func checkReadFunc(ct CheckType) (schema.ReadFunc) {
 
 }
 
-func checkUpdateFunc (ct CheckType) (schema.UpdateFunc) {
+func checkUpdateFunc(ct CheckType) schema.UpdateFunc {
 	buildFunc := checkBuildFunc(ct)
 
 	return func(d *schema.ResourceData, meta interface{}) error {
@@ -142,10 +142,10 @@ func checkUpdateFunc (ct CheckType) (schema.UpdateFunc) {
 	}
 }
 
-func checkDeleteFunc(ct CheckType) (schema.DeleteFunc) {
+func checkDeleteFunc(ct CheckType) schema.DeleteFunc {
 	typeStr := ct.typeStr()
 
-	return func (d *schema.ResourceData, meta interface{}) error {
+	return func(d *schema.ResourceData, meta interface{}) error {
 		client := meta.(*uptime.Client)
 		ctx := context.Background()
 

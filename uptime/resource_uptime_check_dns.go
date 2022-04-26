@@ -3,14 +3,14 @@ package uptime
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	uptime "github.com/uptime-com/rest-api-clients/golang/uptime"
 )
 
 func resourceUptimeCheckDNS() *schema.Resource {
 	return &schema.Resource{
 		Create: checkCreateFunc(dnsCheck),
-		Read: checkReadFunc(dnsCheck),
+		Read:   checkReadFunc(dnsCheck),
 		Update: checkUpdateFunc(dnsCheck),
 		Delete: checkDeleteFunc(dnsCheck),
 		Importer: &schema.ResourceImporter{
@@ -19,11 +19,11 @@ func resourceUptimeCheckDNS() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			// Required attributes: Common
 			"address": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 			"contact_groups": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -32,20 +32,20 @@ func resourceUptimeCheckDNS() *schema.Resource {
 
 			// Required attributes: Specific
 			"dns_record_type": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
 					v := val.(string)
 					valid := map[string]bool{
-						"A": true,
-						"AAAA": true,
+						"A":     true,
+						"AAAA":  true,
 						"CNAME": true,
-						"MX": true,
-						"NS": true,
-						"PTR": true,
-						"SOA": true,
-						"TXT": true,
-						"ANY": true,
+						"MX":    true,
+						"NS":    true,
+						"PTR":   true,
+						"SOA":   true,
+						"TXT":   true,
+						"ANY":   true,
 					}
 					if _, ok := valid[v]; !ok {
 						errs = append(errs, fmt.Errorf("Invalid DNS Record Type %v", v))
@@ -54,11 +54,11 @@ func resourceUptimeCheckDNS() *schema.Resource {
 				},
 			},
 			"interval": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Required: true,
 			},
 			"locations": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -67,44 +67,44 @@ func resourceUptimeCheckDNS() *schema.Resource {
 
 			// Optional attributes: Common
 			"name": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"tags": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"notes": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
-			        Default: "Managed by Terraform",
+				Default:  "Managed by Terraform",
 			},
 			"include_in_global_metrics": {
-				Type: schema.TypeBool,
+				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
 			// Optional attributes: Specific
 			"sensitivity": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 			"threshold": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 			"dns_server": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"expect_string": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 		},
@@ -114,7 +114,7 @@ func resourceUptimeCheckDNS() *schema.Resource {
 // DNSCheck implements the CheckType interface for Uptime.com DNS server checks.
 type DNSCheck struct{}
 
-func (DNSCheck) typeStr() string {return "DNS"}
+func (DNSCheck) typeStr() string { return "DNS" }
 
 func (DNSCheck) getSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {
 	if attr, ok := d.GetOk("dns_record_type"); ok {
@@ -125,7 +125,7 @@ func (DNSCheck) getSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {
 		c.Interval = attr.(int)
 	}
 
-	if attr, ok := d.GetOk("locations"); ok{
+	if attr, ok := d.GetOk("locations"); ok {
 		c.Locations = expandSetAttr(attr)
 	}
 

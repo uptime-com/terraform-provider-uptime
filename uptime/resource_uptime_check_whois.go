@@ -2,17 +2,16 @@ package uptime
 
 import (
 	"fmt"
-	"strings"
 
+	"github.com/asaskevich/govalidator"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	uptime "github.com/uptime-com/rest-api-clients/golang/uptime"
-	"github.com/hashicorp/terraform/helper/schema"
 )
-
 
 func resourceUptimeCheckWhois() *schema.Resource {
 	return &schema.Resource{
 		Create: checkCreateFunc(whoisCheck),
-		Read: checkReadFunc(whoisCheck),
+		Read:   checkReadFunc(whoisCheck),
 		Update: checkUpdateFunc(whoisCheck),
 		Delete: checkDeleteFunc(whoisCheck),
 		Importer: &schema.ResourceImporter{
@@ -21,12 +20,12 @@ func resourceUptimeCheckWhois() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			// Required attributes: Common
 			"address": {
-				Type: schema.TypeString,
-				Required: true,
+				Type:         schema.TypeString,
+				Required:     true,
 				ValidateFunc: validateDomain,
 			},
 			"contact_groups": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -35,31 +34,31 @@ func resourceUptimeCheckWhois() *schema.Resource {
 
 			// Required attributes: Specific
 			"days_before_expiry": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Required: true,
 			},
 
 			// Optional attributes: Common
 			"name": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"tags": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"notes": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
-				Default: "Managed by Terraform",
+				Default:  "Managed by Terraform",
 			},
 
 			// Optional attributes: Specific
 			"expect_string": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
@@ -70,27 +69,17 @@ func resourceUptimeCheckWhois() *schema.Resource {
 func validateDomain(val interface{}, key string) (warns []string, errs []error) {
 	urlStr := val.(string)
 
-	parts := strings.Split(urlStr, ".")
-	if len(parts) > 1 {
-		parts = parts[len(parts)-2:]
+	if govalidator.IsDNSName(urlStr) != true {
+		errs = append(errs, fmt.Errorf("Invalid domain: %s", urlStr))
 	}
-	domain := strings.Join(parts, ".")
 
-	if urlStr != domain {
-		if domain != "" {
-			errs = append(errs, fmt.Errorf("Invalid domain: %s. Did you mean %s?", urlStr, domain))
-		} else {
-
-			errs = append(errs, fmt.Errorf("Invalid domain: %s", urlStr))
-		}
-	}
 	return
 }
 
 // WhoisCheck implements the CheckType interface for Uptime.com Whois/Domain Expiry checks.
 type WhoisCheck struct{}
 
-func (WhoisCheck) typeStr() string {return "WHOIS"}
+func (WhoisCheck) typeStr() string { return "WHOIS" }
 
 func (WhoisCheck) getSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {
 	if attr, ok := d.GetOk("days_before_expiry"); ok {

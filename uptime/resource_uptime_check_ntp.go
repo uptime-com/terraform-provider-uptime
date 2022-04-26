@@ -3,14 +3,14 @@ package uptime
 import (
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	uptime "github.com/uptime-com/rest-api-clients/golang/uptime"
-	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceUptimeCheckNTP() *schema.Resource {
 	return &schema.Resource{
 		Create: checkCreateFunc(ntpCheck),
-		Read: checkReadFunc(ntpCheck),
+		Read:   checkReadFunc(ntpCheck),
 		Update: checkUpdateFunc(ntpCheck),
 		Delete: checkDeleteFunc(ntpCheck),
 		Importer: &schema.ResourceImporter{
@@ -19,11 +19,11 @@ func resourceUptimeCheckNTP() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			// Required attributes: Common
 			"address": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 			"contact_groups": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -32,11 +32,11 @@ func resourceUptimeCheckNTP() *schema.Resource {
 
 			// Required attributes: Specific
 			"interval": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Required: true,
 			},
 			"locations": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -45,33 +45,33 @@ func resourceUptimeCheckNTP() *schema.Resource {
 
 			// Optional attributes: Common
 			"name": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"tags": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"notes": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
-				Default: "Managed by Terraform",
+				Default:  "Managed by Terraform",
 			},
 			"include_in_global_metrics": {
-				Type: schema.TypeBool,
+				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
 			// Optional attributes: Specific
 			"ip_version": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
-				ValidateFunc: func (val interface{}, key string) (warns []string, errs []error) {
+				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
 					v := val.(string)
 					valid := map[string]bool{
 						"IPV4": true,
@@ -84,21 +84,20 @@ func resourceUptimeCheckNTP() *schema.Resource {
 				},
 			},
 			"sensitivity": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 			"threshold": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 			"port": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
-
 		},
 	}
 }
@@ -106,7 +105,7 @@ func resourceUptimeCheckNTP() *schema.Resource {
 // NTPCheck implements the CheckType interface for Uptime.com NTP checks.
 type NTPCheck struct{}
 
-func (NTPCheck) typeStr() string {return "NTP"}
+func (NTPCheck) typeStr() string { return "NTP" }
 
 func (NTPCheck) getSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {
 	if attr, ok := d.GetOk("interval"); ok {

@@ -3,8 +3,8 @@ package uptime
 import (
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	uptime "github.com/uptime-com/rest-api-clients/golang/uptime"
-	"github.com/hashicorp/terraform/helper/schema"
 
 	"strings"
 )
@@ -12,7 +12,7 @@ import (
 func resourceUptimeCheckHTTP() *schema.Resource {
 	return &schema.Resource{
 		Create: checkCreateFunc(httpCheck),
-		Read: checkReadFunc(httpCheck),
+		Read:   checkReadFunc(httpCheck),
 		Update: checkUpdateFunc(httpCheck),
 		Delete: checkDeleteFunc(httpCheck),
 		Importer: &schema.ResourceImporter{
@@ -21,11 +21,11 @@ func resourceUptimeCheckHTTP() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			// Required attributes: Common
 			"address": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 			"contact_groups": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -34,11 +34,11 @@ func resourceUptimeCheckHTTP() *schema.Resource {
 
 			// Required attributes: Specific
 			"interval": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Required: true,
 			},
 			"locations": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -47,33 +47,33 @@ func resourceUptimeCheckHTTP() *schema.Resource {
 
 			// Optional attributes: Common
 			"name": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"tags": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"notes": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
-				Default: "Managed by Terraform",
+				Default:  "Managed by Terraform",
 			},
 			"include_in_global_metrics": {
-				Type: schema.TypeBool,
+				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
 			// Optional attributes: Specific
 			"ip_version": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
-				ValidateFunc: func (val interface{}, key string) (warns []string, errs []error) {
+				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
 					v := val.(string)
 					valid := map[string]bool{
 						"IPV4": true,
@@ -86,42 +86,42 @@ func resourceUptimeCheckHTTP() *schema.Resource {
 				},
 			},
 			"expect_string": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 			"send_string": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 			"sensitivity": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 			"threshold": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 			"username": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"password": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"headers": {
-				Type: schema.TypeMap,
+				Type:     schema.TypeMap,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"port": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
@@ -132,7 +132,7 @@ func resourceUptimeCheckHTTP() *schema.Resource {
 // HTTPCheck implements the CheckType interface for Uptime.com HTTP checks.
 type HTTPCheck struct{}
 
-func (HTTPCheck) typeStr() string {return "HTTP"}
+func (HTTPCheck) typeStr() string { return "HTTP" }
 
 func (HTTPCheck) getSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {
 	if attr, ok := d.GetOk("interval"); ok {

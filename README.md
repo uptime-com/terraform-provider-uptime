@@ -1,13 +1,15 @@
 # Terraform Provider for Uptime.com
 ## Requirements
 * Terraform v0.12.0 or higher
-* Go v1.12 or higher
+* Go v1.12 or higher ([installation instructions](https://go.dev/doc/install))
 
 ## Installation
-### Downloading the provider
-First, install the provider to your local machine:
+### Download & build the provider
+First, download and build the provider on your local machine:
 ```
-go get -u -v github.com/uptime-com/terraform-provider-uptime
+git clone https://github.com/uptime-com/terraform-provider-uptime.git
+cd terraform-provider-uptime
+go build -o ~/go/bin/terraform-provider-uptime
 ```
 
 ### Installing
@@ -21,10 +23,23 @@ ln -s ~/go/bin/terraform-provider-uptime ~/.terraform.d/plugins/darwin_amd64/ter
 For Linux machines, follow the OS X process, replacing `darwin` with `linux`.
 
 For a Windows machine, in PowerShell:
-```
+```powershell
 New-Item %APPDATA%\terraform.d\plugins\windows_amd64 -Type 'directory' -Force
 cmd /c mklink /d $env:GOPATH\bin\terraform-provider-uptime %APPDATA%\terraform.d\plugins\windows_amd64\terraform-provider-uptime
 ```
+
+### Rate Limits
+Terraform has a tendency to use many API requests when managing a large group of Uptime.com checks. If this becomes a problem, please contact Uptime.com support to request a rate limit increase.
+
+## Credits
+Contributions are welcome! Please feel free to fork and submit a pull request with any improvements.
+
+terraform-provider-uptime was originally created by [Kyle Gentle](https://github.com/kylegentle), with support from Elias Laham and the Dev Team at Uptime.com.
+
+### Contributors
+- [Kyle Gentle](https://github.com/kylegentle)
+- [Liam Kinne](https://github.com/liamkinne)
+
 
 ## Resources
 (Section is incomplete)
@@ -32,7 +47,7 @@ cmd /c mklink /d $env:GOPATH\bin\terraform-provider-uptime %APPDATA%\terraform.d
 #### uptime\_check\_ntp
 Example:
 
-```
+```go
 resource "uptime_check_ntp" "google" {
     name = "Google Public NTP"
     address = "time.google.com"
@@ -71,5 +86,3 @@ Optional attributes:
 
 * **port**, *number*: port where service is running
 
-## Credits
-terraform-provider-uptime was originally created by [Kyle Gentle](https://github.com/kylegentle), with support from Elias Laham and the Dev Team at Uptime.com.

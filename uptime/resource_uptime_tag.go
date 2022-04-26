@@ -6,14 +6,14 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	uptime "github.com/uptime-com/rest-api-clients/golang/uptime"
 )
 
 func resourceUptimeCheckTag() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceUptimeCheckTagCreate,
-		Read: resourceUptimeCheckTagRead,
+		Read:   resourceUptimeCheckTagRead,
 		Update: resourceUptimeCheckTagUpdate,
 		Delete: resourceUptimeCheckTagDelete,
 		Importer: &schema.ResourceImporter{
@@ -21,20 +21,20 @@ func resourceUptimeCheckTag() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"tag": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 			"color_hex": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 		},
 	}
 }
 
-func buildUptimeCheckTag(d *schema.ResourceData) (*uptime.Tag) {
+func buildUptimeCheckTag(d *schema.ResourceData) *uptime.Tag {
 	checkTag := &uptime.Tag{
-		Tag: d.Get("tag").(string),
+		Tag:      d.Get("tag").(string),
 		ColorHex: d.Get("color_hex").(string),
 	}
 	return checkTag

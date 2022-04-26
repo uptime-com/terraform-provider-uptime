@@ -3,14 +3,14 @@ package uptime
 import (
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	uptime "github.com/uptime-com/rest-api-clients/golang/uptime"
-	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceUptimeCheckSSLCert() *schema.Resource {
 	return &schema.Resource{
 		Create: checkCreateFunc(sslCheck),
-		Read: checkReadFunc(sslCheck),
+		Read:   checkReadFunc(sslCheck),
 		Update: checkUpdateFunc(sslCheck),
 		Delete: checkDeleteFunc(sslCheck),
 		Importer: &schema.ResourceImporter{
@@ -19,11 +19,11 @@ func resourceUptimeCheckSSLCert() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			// Required attributes: Common
 			"address": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 			"contact_groups": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -32,7 +32,7 @@ func resourceUptimeCheckSSLCert() *schema.Resource {
 
 			// Required attributes: Specific
 			"protocol": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
 					p := val.(string)
@@ -40,9 +40,9 @@ func resourceUptimeCheckSSLCert() *schema.Resource {
 						"http": true,
 						"pop3": true,
 						"imap": true,
-						"ftp": true,
+						"ftp":  true,
 						"xmpp": true,
-						"irc": true,
+						"irc":  true,
 						"ldap": true,
 					}
 					if _, ok := valid[p]; !ok {
@@ -52,31 +52,31 @@ func resourceUptimeCheckSSLCert() *schema.Resource {
 				},
 			},
 			"days_before_expiry": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Required: true,
 			},
 
 			// Optional attributes: Common
 			"name": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"tags": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"notes": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
-			        Default: "Managed by Terraform",
+				Default:  "Managed by Terraform",
 			},
 
 			// Optional attributes: Specific
 			"port": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Optional: true,
 			},
 		},
@@ -86,7 +86,7 @@ func resourceUptimeCheckSSLCert() *schema.Resource {
 // SSLCheck implements the CheckType interface for Uptime.com SSL Cert checks.
 type SSLCheck struct{}
 
-func (SSLCheck) typeStr() string {return "SSL_CERT"}
+func (SSLCheck) typeStr() string { return "SSL_CERT" }
 
 func (SSLCheck) getSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {
 	if attr, ok := d.GetOk("protocol"); ok {

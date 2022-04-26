@@ -1,7 +1,7 @@
 package uptime
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 // Takes the result of flatmap.Expand for a slice of strings
