@@ -51,16 +51,18 @@ func getCommonCheckAttrs(d *schema.ResourceData, c *uptime.Check) {
 
 func checkBuildFunc(ct CheckType) func(d *schema.ResourceData) *uptime.Check {
 	return func(d *schema.ResourceData) *uptime.Check {
-		check := &uptime.Check{
+		check := uptime.Check{
 			CheckType:     ct.typeStr(),
-			Address:       d.Get("address").(string),
 			ContactGroups: expandSetAttr(d.Get("contact_groups")),
 		}
+		if ct.typeStr() != "Heartbeat" {
+			check.Address = d.Get("address").(string)
+		}
 
-		getCommonCheckAttrs(d, check)
-		ct.getSpecificAttrs(d, check)
+		getCommonCheckAttrs(d, &check)
+		ct.getSpecificAttrs(d, &check)
 
-		return check
+		return &check
 	}
 }
 
