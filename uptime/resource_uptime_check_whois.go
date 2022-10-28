@@ -5,15 +5,16 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	uptime "github.com/uptime-com/rest-api-clients/golang/uptime"
+	"github.com/uptime-com/uptime-client-go"
 )
 
 func resourceUptimeCheckWhois() *schema.Resource {
+	var check WhoisCheck
 	return &schema.Resource{
-		Create: checkCreateFunc(whoisCheck),
-		Read:   checkReadFunc(whoisCheck),
-		Update: checkUpdateFunc(whoisCheck),
-		Delete: checkDeleteFunc(whoisCheck),
+		Create: checkCreateFunc(check),
+		Read:   checkReadFunc(check),
+		Update: checkUpdateFunc(check),
+		Delete: checkDeleteFunc(check),
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -77,7 +78,9 @@ func validateDomain(val interface{}, key string) (warns []string, errs []error) 
 }
 
 // WhoisCheck implements the CheckType interface for Uptime.com Whois/Domain Expiry checks.
-type WhoisCheck struct{}
+type WhoisCheck struct {
+	CheckType
+}
 
 func (WhoisCheck) typeStr() string { return "WHOIS" }
 
@@ -95,5 +98,3 @@ func (WhoisCheck) setSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {
 	d.Set("days_before_expiry", c.Threshold)
 	d.Set("expect_string", c.ExpectString)
 }
-
-var whoisCheck WhoisCheck

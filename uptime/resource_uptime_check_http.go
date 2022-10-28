@@ -2,11 +2,10 @@ package uptime
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	uptime "github.com/uptime-com/rest-api-clients/golang/uptime"
-
-	"strings"
+	"github.com/uptime-com/uptime-client-go"
 )
 
 func resourceUptimeCheckHTTP() *schema.Resource {
