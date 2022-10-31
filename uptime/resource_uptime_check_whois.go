@@ -61,7 +61,7 @@ func resourceUptimeCheckWhois() *schema.Resource {
 			"expect_string": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Computed: true,
+				Default:  "expires: check",
 			},
 		},
 	}
