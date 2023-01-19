@@ -1,0 +1,13 @@
+version: 3
+
+method:  timestamp
+
+tasks:
+  docs:
+    desc: Update generated documentation
+    cmds:
+      - go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.13
+    generates:
+      - docs/index.md
+    sources:
+      - ./**/*.go
