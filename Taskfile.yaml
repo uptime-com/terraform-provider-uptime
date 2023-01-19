@@ -11,3 +11,8 @@ tasks:
       - docs/index.md
     sources:
       - ./**/*.go
+
+  snapshot:
+    desc: Build a local single-target snapshot
+    cmds:
+      - go run github.com/goreleaser/goreleaser@v1 build --snapshot --single-target --rm-dist
