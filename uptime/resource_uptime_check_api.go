@@ -8,7 +8,7 @@ import (
 func resourceUptimeCheckAPI() *schema.Resource {
 	return &schema.Resource{
 		Create: checkCreateFunc(apiCheck),
-		Read: checkReadFunc(apiCheck),
+		Read:   checkReadFunc(apiCheck),
 		Update: checkUpdateFunc(apiCheck),
 		Delete: checkDeleteFunc(apiCheck),
 		Importer: &schema.ResourceImporter{
@@ -17,11 +17,11 @@ func resourceUptimeCheckAPI() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			// Required attributes: Common
 			"address": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 			"contact_groups": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -30,52 +30,52 @@ func resourceUptimeCheckAPI() *schema.Resource {
 
 			// Required attributes: Specific
 			"interval": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Required: true,
 			},
 			"locations": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"script": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 
 			// Optional attributes: Common
 			"name": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"tags": {
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"notes": {
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
-				Default: "Managed by Terraform",
+				Default:  "Managed by Terraform",
 			},
 			"include_in_global_metrics": {
-				Type: schema.TypeBool,
+				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
 			// Optional attributes: Specific
 			"sensitivity": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 			"threshold": {
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
@@ -86,7 +86,7 @@ func resourceUptimeCheckAPI() *schema.Resource {
 // APICheck implements the CheckType interface for Uptime.com API checks.
 type APICheck struct{}
 
-func (APICheck) typeStr() string {return "API"}
+func (APICheck) typeStr() string { return "API" }
 
 func (APICheck) getSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {
 	if attr, ok := d.GetOk("interval"); ok {
