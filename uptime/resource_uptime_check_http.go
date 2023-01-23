@@ -180,7 +180,6 @@ func (HTTPCheck) setSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {
 	d.Set("sensitivity", c.Sensitivity)
 	d.Set("threshold", c.Threshold)
 	d.Set("username", c.Username)
-	d.Set("password", c.Password)
 	d.Set("port", c.Port)
 
 	hs := headersStringToMap(c.Headers)
