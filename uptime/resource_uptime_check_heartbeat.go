@@ -30,6 +30,12 @@ func resourceUptimeCheckHeartbeat() *schema.Resource {
 				Required: true,
 			},
 
+			// Computed attributes: Specific
+			"url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
 			// Optional attributes: Common
 			"name": {
 				Type:     schema.TypeString,
@@ -81,6 +87,7 @@ func (HeartbeatCheck) getSpecificAttrs(d *schema.ResourceData, c *uptime.Check) 
 
 func (HeartbeatCheck) setSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {
 	d.Set("interval", c.Interval)
+	d.Set("url", c.HeartbeatURL)
 }
 
 var heartbeatCheck HeartbeatCheck
