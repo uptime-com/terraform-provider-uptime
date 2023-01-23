@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.14.0
-	github.com/uptime-com/uptime-client-go v1.3.0
+	github.com/uptime-com/uptime-client-go v1.3.1-0.20230123093957-dfe808156343
 )
 
 require (
