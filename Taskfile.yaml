@@ -2,8 +2,16 @@ version: 3
 
 method:  timestamp
 
+
 tasks:
-  docs:
+
+  generate:
+    desc: Generate
+    deps:
+      - generate:docs
+      - generate:oapi
+
+  generate:docs:
     desc: Update generated documentation
     cmds:
       - go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.13
@@ -11,6 +19,22 @@ tasks:
       - docs/index.md
     sources:
       - ./**/*.go
+
+  generate:oapi:
+    desc: Generate Uptime.com API client from OpenAPI spec
+    vars:
+      OPENAPI_URL: https://uptime.com/api/v1/openapi/
+    cmds:
+      - |
+        GOBIN="${PWD}/.task/bin"
+        VERSION="$(cat go.mod | grep github\.com\/deepmap\/oapi-codegen | awk '{ print $2 }')"
+        go install "github.com/deepmap/oapi-codegen/cmd/oapi-codegen@${VERSION}"
+      - |
+        $PWD/.task/bin/oapi-codegen \
+          -generate types,client,spec \
+          -package uptimeapi \
+          -o internal/uptimeapi/uptimeapi.gen.go \
+          {{ .OPENAPI_URL }}
 
   snapshot:
     desc: Build a local single-target snapshot
