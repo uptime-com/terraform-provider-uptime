@@ -9,11 +9,11 @@ import (
 	"time"
 )
 
-type httpRequestDoerMock struct {
+type httpClientMock struct {
 	mock.Mock
 }
 
-func (m *httpRequestDoerMock) Do(req *http.Request) (*http.Response, error) {
+func (m *httpClientMock) Do(req *http.Request) (*http.Response, error) {
 	args := m.Called(req)
 	err := args.Error(1)
 	if err != nil {
@@ -26,7 +26,7 @@ func TestWithRateLimit(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	d := &httpRequestDoerMock{}
+	d := &httpClientMock{}
 	defer d.AssertExpectations(t)
 
 	c, err := NewClient("https://example.com", WithHTTPClient(d), WithRateLimitEvery(100*time.Millisecond))
@@ -45,4 +45,25 @@ func TestWithRateLimit(t *testing.T) {
 	}
 
 	require.GreaterOrEqual(t, time.Since(started), 300*time.Millisecond)
+}
+
+func TestWithToken(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	d := &httpClientMock{}
+	defer d.AssertExpectations(t)
+
+	c, err := NewClient("https://example.com", WithHTTPClient(d), WithToken("foo-bar-baz"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	d.On("Do", mock.Anything).Run(func(args mock.Arguments) {
+		r := args.Get(0).(*http.Request)
+		require.Equal(t, "Token foo-bar-baz", r.Header.Get("Authorization"))
+	}).Return(&http.Response{}, nil).Once()
+
+	_, err = c.GetAuthMe(ctx)
+	require.NoError(t, err)
 }
