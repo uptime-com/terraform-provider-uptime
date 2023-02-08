@@ -16,8 +16,6 @@ import (
 )
 
 func TestTagResourceData_ToAPI(t *testing.T) {
-	t.Parallel()
-
 	t.Run("without nils", func(t *testing.T) {
 		expected := uptimeapi.CheckTag{
 			Pk:       ptr(1),
@@ -55,8 +53,6 @@ func TestTagResourceData_ToAPI(t *testing.T) {
 }
 
 func TestTagResourceData_FromAPI(t *testing.T) {
-	t.Parallel()
-
 	t.Run("with nils", func(t *testing.T) {
 		expected := tagResourceData{
 			Tag:      "one",

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -13,36 +12,20 @@ import (
 )
 
 type tagResourceData struct {
-	ID       *string `tfsdk:"id"`
+	ID       *string `tfsdk:"id"            api:"Pk"`
 	Tag      string  `tfsdk:"tag"`
 	ColorHex string  `tfsdk:"color_hex"`
-	URL      *string `tfsdk:"url"`
+	URL      *string `tfsdk:"url"           api:"Url"`
 }
 
 func (t *tagResourceData) ToAPI() uptimeapi.CheckTag {
-	var pk = new(int)
-	if t.ID != nil {
-		*pk = must(strconv.Atoi(*t.ID))
-	}
-	return uptimeapi.CheckTag{
-		Pk:       pk,
-		Tag:      t.Tag,
-		ColorHex: t.ColorHex,
-		Url:      t.URL,
-	}
+	obj := uptimeapi.CheckTag{}
+	mirror(&obj, t)
+	return obj
 }
 
 func (t *tagResourceData) FromAPI(obj uptimeapi.CheckTag) {
-	var id = new(string)
-	if obj.Pk != nil {
-		*id = strconv.Itoa(*obj.Pk)
-	}
-	*t = tagResourceData{
-		ID:       id,
-		Tag:      obj.Tag,
-		ColorHex: obj.ColorHex,
-		URL:      obj.Url,
-	}
+	mirror(t, obj)
 }
 
 var _ resource.Resource = &tagResourceImpl{}
