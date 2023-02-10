@@ -35,11 +35,11 @@ type tagResourceImpl struct {
 	api uptimeapi.ClientInterface
 }
 
-func (t *tagResourceImpl) Metadata(_ context.Context, rq resource.MetadataRequest, rs *resource.MetadataResponse) {
+func (r *tagResourceImpl) Metadata(_ context.Context, rq resource.MetadataRequest, rs *resource.MetadataResponse) {
 	rs.TypeName = rq.ProviderTypeName + "_tag"
 }
 
-func (t *tagResourceImpl) Schema(_ context.Context, _ resource.SchemaRequest, rs *resource.SchemaResponse) {
+func (r *tagResourceImpl) Schema(_ context.Context, _ resource.SchemaRequest, rs *resource.SchemaResponse) {
 	rs.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
@@ -58,13 +58,13 @@ func (t *tagResourceImpl) Schema(_ context.Context, _ resource.SchemaRequest, rs
 	}
 }
 
-func (t *tagResourceImpl) Create(ctx context.Context, rq resource.CreateRequest, rs *resource.CreateResponse) {
+func (r *tagResourceImpl) Create(ctx context.Context, rq resource.CreateRequest, rs *resource.CreateResponse) {
 	data := new(tagResourceData)
 	if diag := rq.Config.Get(ctx, &data); diag.HasError() {
 		rs.Diagnostics.Append(diag...)
 		return
 	}
-	res, err := t.api.PostServicetaglist(ctx, data.ToAPI())
+	res, err := r.api.PostServicetaglist(ctx, data.ToAPI())
 	if err != nil {
 		rs.Diagnostics.AddError("Create failed", err.Error())
 		return
@@ -93,13 +93,13 @@ func (t *tagResourceImpl) Create(ctx context.Context, rq resource.CreateRequest,
 	return
 }
 
-func (t *tagResourceImpl) Read(ctx context.Context, rq resource.ReadRequest, rs *resource.ReadResponse) {
+func (r *tagResourceImpl) Read(ctx context.Context, rq resource.ReadRequest, rs *resource.ReadResponse) {
 	var data tagResourceData
 	if diag := rq.State.Get(ctx, &data); diag.HasError() {
 		rs.Diagnostics.Append(diag...)
 		return
 	}
-	api := uptimeapi.ClientWithResponses{ClientInterface: t.api}
+	api := uptimeapi.ClientWithResponses{ClientInterface: r.api}
 	obj, err := api.GetServiceTagDetailWithResponse(ctx, *data.ID)
 	if err != nil {
 		rs.Diagnostics.AddError("Read failed", err.Error())
@@ -117,7 +117,7 @@ func (t *tagResourceImpl) Read(ctx context.Context, rq resource.ReadRequest, rs 
 	return
 }
 
-func (t *tagResourceImpl) Update(ctx context.Context, rq resource.UpdateRequest, rs *resource.UpdateResponse) {
+func (r *tagResourceImpl) Update(ctx context.Context, rq resource.UpdateRequest, rs *resource.UpdateResponse) {
 	data := new(tagResourceData)
 	if diag := rq.State.Get(ctx, data); diag.HasError() {
 		rs.Diagnostics.Append(diag...)
@@ -128,7 +128,7 @@ func (t *tagResourceImpl) Update(ctx context.Context, rq resource.UpdateRequest,
 		rs.Diagnostics.Append(diag...)
 		return
 	}
-	res, err := t.api.PutServiceTagDetail(ctx, id, data.ToAPI())
+	res, err := r.api.PutServiceTagDetail(ctx, id, data.ToAPI())
 	if err != nil {
 		rs.Diagnostics.AddError("Update failed", err.Error())
 		return
@@ -162,21 +162,21 @@ func (t *tagResourceImpl) Update(ctx context.Context, rq resource.UpdateRequest,
 	return
 }
 
-func (t *tagResourceImpl) Delete(ctx context.Context, rq resource.DeleteRequest, rs *resource.DeleteResponse) {
+func (r *tagResourceImpl) Delete(ctx context.Context, rq resource.DeleteRequest, rs *resource.DeleteResponse) {
 	var data tagResourceData
 	if diag := rq.State.Get(ctx, &data); diag.HasError() {
 		rs.Diagnostics.Append(diag...)
 		return
 	}
-	_, err := t.api.DeleteServiceTagDetail(ctx, *data.ID)
+	_, err := r.api.DeleteServiceTagDetail(ctx, *data.ID)
 	if err != nil {
 		rs.Diagnostics.AddError("Delete failed", err.Error())
 		return
 	}
 }
 
-func (t *tagResourceImpl) ImportState(ctx context.Context, rq resource.ImportStateRequest, rs *resource.ImportStateResponse) {
-	api := uptimeapi.ClientWithResponses{ClientInterface: t.api}
+func (r *tagResourceImpl) ImportState(ctx context.Context, rq resource.ImportStateRequest, rs *resource.ImportStateResponse) {
+	api := uptimeapi.ClientWithResponses{ClientInterface: r.api}
 	obj, err := api.GetServicetaglistWithResponse(ctx, &uptimeapi.GetServicetaglistParams{
 		Search: &rq.ID,
 	})
