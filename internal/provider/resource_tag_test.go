@@ -10,85 +10,9 @@ import (
 
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/stretchr/testify/require"
 
 	"github.com/uptime-com/terraform-provider-uptime/internal/uptimeapi"
 )
-
-func TestTagResourceData_ToAPI(t *testing.T) {
-	t.Run("without nils", func(t *testing.T) {
-		expected := uptimeapi.CheckTag{
-			Pk:       ptr(1),
-			Tag:      "one",
-			ColorHex: "#ff0000",
-			Url:      ptr("https://uptime.com"),
-		}
-
-		data := tagResourceData{
-			ID:       ptr("1"),
-			Tag:      "one",
-			ColorHex: "#ff0000",
-			URL:      ptr("https://uptime.com"),
-		}
-
-		actual := data.ToAPI()
-		require.Equal(t, expected, actual)
-	})
-
-	t.Run("with nils", func(t *testing.T) {
-		expected := uptimeapi.CheckTag{
-			Tag:      "one",
-			ColorHex: "#ff0000",
-		}
-
-		data := tagResourceData{
-			Tag:      "one",
-			ColorHex: "#ff0000",
-		}
-
-		actual := data.ToAPI()
-		require.Equal(t, expected, actual)
-	})
-
-}
-
-func TestTagResourceData_FromAPI(t *testing.T) {
-	t.Run("with nils", func(t *testing.T) {
-		expected := tagResourceData{
-			Tag:      "one",
-			ColorHex: "#ff0000",
-		}
-
-		obj := uptimeapi.CheckTag{
-			Tag:      "one",
-			ColorHex: "#ff0000",
-		}
-
-		var actual tagResourceData
-		actual.FromAPI(obj)
-		require.Equal(t, expected, actual)
-	})
-
-	t.Run("without nils", func(t *testing.T) {
-		expected := tagResourceData{
-			ID:       ptr("1"),
-			Tag:      "one",
-			ColorHex: "#ff0000",
-			URL:      ptr("https://uptime.com"),
-		}
-
-		obj := uptimeapi.CheckTag{
-			Pk:       ptr(1),
-			Tag:      "one",
-			ColorHex: "#ff0000",
-			Url:      ptr("https://uptime.com"),
-		}
-
-		var actual tagResourceData
-		actual.FromAPI(obj)
-		require.Equal(t, expected, actual)
-	})
-}
 
 func TestAccTagResource(t *testing.T) {
 	api, err := uptimeapi.NewClientWithResponses("https://uptime.com", uptimeapi.WithToken(os.Getenv("UPTIME_TOKEN")))

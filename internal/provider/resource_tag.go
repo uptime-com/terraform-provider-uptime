@@ -5,27 +5,29 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/uptime-com/terraform-provider-uptime/internal/uptimeapi"
 )
 
 type tagResourceData struct {
-	ID       *string `tfsdk:"id"            api:"Pk"`
-	Tag      string  `tfsdk:"tag"`
-	ColorHex string  `tfsdk:"color_hex"`
-	URL      *string `tfsdk:"url"           api:"Url"`
+	ID       types.Int64  `tfsdk:"id"            map:"Pk"`
+	Tag      types.String `tfsdk:"tag"           map:"Tag"`
+	ColorHex types.String `tfsdk:"color_hex"     map:"ColorHex"`
+	URL      types.String `tfsdk:"url"           map:"Url"`
 }
 
-func (t *tagResourceData) ToAPI() uptimeapi.CheckTag {
+func (t *tagResourceData) ToAPI(ctx context.Context) (uptimeapi.CheckTag, diag.Diagnostics) {
 	obj := uptimeapi.CheckTag{}
-	mirror(&obj, t)
-	return obj
+	diags := fromTerraform(ctx, &obj, t)
+	return obj, diags
 }
 
-func (t *tagResourceData) FromAPI(obj uptimeapi.CheckTag) {
-	mirror(t, obj)
+func (t *tagResourceData) FromAPI(obj uptimeapi.CheckTag) diag.Diagnostics {
+	return toTerraform(t, obj)
 }
 
 var _ resource.Resource = &tagResourceImpl{}
@@ -42,7 +44,7 @@ func (r *tagResourceImpl) Metadata(_ context.Context, rq resource.MetadataReques
 func (r *tagResourceImpl) Schema(_ context.Context, _ resource.SchemaRequest, rs *resource.SchemaResponse) {
 	rs.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
+			"id": schema.Int64Attribute{
 				Computed: true,
 			},
 			"tag": schema.StringAttribute{
@@ -64,7 +66,12 @@ func (r *tagResourceImpl) Create(ctx context.Context, rq resource.CreateRequest,
 		rs.Diagnostics.Append(diag...)
 		return
 	}
-	res, err := r.api.PostServicetaglist(ctx, data.ToAPI())
+	api, diags := data.ToAPI(ctx)
+	if diags.HasError() {
+		rs.Diagnostics.Append(diags...)
+		return
+	}
+	res, err := r.api.PostServicetaglist(ctx, api)
 	if err != nil {
 		rs.Diagnostics.AddError("Create failed", err.Error())
 		return
@@ -77,16 +84,21 @@ func (r *tagResourceImpl) Create(ctx context.Context, rq resource.CreateRequest,
 
 	// Uptime.com API doesn't really follow own OpenAPI spec. Generated client code is not usable. Have to manually
 	// redefine partial response JSON structure here.
-	var obj struct {
+	obj := struct {
 		Result uptimeapi.CheckTag `json:"results"`
-	}
+	}{}
 	err = json.NewDecoder(res.Body).Decode(&obj)
 	if err != nil {
 		rs.Diagnostics.AddError("Failed to decode response", err.Error())
 		return
 	}
-	data.FromAPI(obj.Result)
-	if diags := rs.State.Set(ctx, data); diags.HasError() {
+	diags = data.FromAPI(obj.Result)
+	if diags.HasError() {
+		rs.Diagnostics.Append(diags...)
+		return
+	}
+	diags = rs.State.Set(ctx, data)
+	if diags.HasError() {
 		rs.Diagnostics.Append(diags...)
 		return
 	}
@@ -100,7 +112,7 @@ func (r *tagResourceImpl) Read(ctx context.Context, rq resource.ReadRequest, rs 
 		return
 	}
 	api := uptimeapi.ClientWithResponses{ClientInterface: r.api}
-	obj, err := api.GetServiceTagDetailWithResponse(ctx, *data.ID)
+	obj, err := api.GetServiceTagDetailWithResponse(ctx, data.ID.String())
 	if err != nil {
 		rs.Diagnostics.AddError("Read failed", err.Error())
 		return
@@ -118,17 +130,22 @@ func (r *tagResourceImpl) Read(ctx context.Context, rq resource.ReadRequest, rs 
 }
 
 func (r *tagResourceImpl) Update(ctx context.Context, rq resource.UpdateRequest, rs *resource.UpdateResponse) {
-	data := new(tagResourceData)
-	if diag := rq.State.Get(ctx, data); diag.HasError() {
+	prev := new(tagResourceData)
+	if diag := rq.State.Get(ctx, prev); diag.HasError() {
 		rs.Diagnostics.Append(diag...)
 		return
 	}
-	id := *data.ID
-	if diag := rq.Config.Get(ctx, data); diag.HasError() {
+	next := new(tagResourceData)
+	if diag := rq.Config.Get(ctx, next); diag.HasError() {
 		rs.Diagnostics.Append(diag...)
 		return
 	}
-	res, err := r.api.PutServiceTagDetail(ctx, id, data.ToAPI())
+	api, diags := next.ToAPI(ctx)
+	if diags.HasError() {
+		rs.Diagnostics.Append(diags...)
+		return
+	}
+	res, err := r.api.PutServiceTagDetail(ctx, prev.ID.String(), api)
 	if err != nil {
 		rs.Diagnostics.AddError("Update failed", err.Error())
 		return
@@ -149,13 +166,13 @@ func (r *tagResourceImpl) Update(ctx context.Context, rq resource.UpdateRequest,
 		rs.Diagnostics.AddError("Failed to decode response", err.Error())
 		return
 	}
-	data.FromAPI(obj.Result)
+	prev.FromAPI(obj.Result)
 
 	if res.StatusCode != http.StatusOK {
 		rs.Diagnostics.AddError("Bad response status", res.Status)
 		return
 	}
-	if diag := rs.State.Set(ctx, data); diag.HasError() {
+	if diag := rs.State.Set(ctx, prev); diag.HasError() {
 		rs.Diagnostics.Append(diag...)
 		return
 	}
@@ -168,7 +185,7 @@ func (r *tagResourceImpl) Delete(ctx context.Context, rq resource.DeleteRequest,
 		rs.Diagnostics.Append(diag...)
 		return
 	}
-	_, err := r.api.DeleteServiceTagDetail(ctx, *data.ID)
+	_, err := r.api.DeleteServiceTagDetail(ctx, data.ID.String())
 	if err != nil {
 		rs.Diagnostics.AddError("Delete failed", err.Error())
 		return
