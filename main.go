@@ -9,6 +9,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
+
 	"github.com/uptime-com/terraform-provider-uptime/internal/provider"
 )
 

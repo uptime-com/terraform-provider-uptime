@@ -24,7 +24,7 @@ type HttpRequestDoer interface {
 var _ provider.Provider = &providerImpl{}
 
 type providerImpl struct {
-	client  uptimeapi.ClientInterface
+	api     uptimeapi.ClientInterface
 	version string
 }
 
@@ -103,12 +103,12 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 		opts = append(opts, uptimeapi.WithRateLimitEvery(every))
 	}
 
-	c, err := uptimeapi.NewClientWithResponses(endpoint, opts...)
+	api, err := uptimeapi.NewClientWithResponses(endpoint, opts...)
 	if err != nil {
 		rs.Diagnostics.AddError("Failed to initialize API client", err.Error())
 		return
 	}
-	p.client = c
+	p.api = api
 }
 
 func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.DataSource {
@@ -117,7 +117,8 @@ func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.Data
 
 func (p *providerImpl) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		func() resource.Resource { return &tagResourceImpl{api: p.client} },
+		func() resource.Resource { return &checkAPIResourceImpl{api: p.api} },
+		func() resource.Resource { return &tagResourceImpl{api: p.api} },
 	}
 }
 

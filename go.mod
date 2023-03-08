@@ -6,16 +6,16 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/caarlos0/env/v7 v7.0.0
 	github.com/deepmap/oapi-codegen v1.12.4
+	github.com/dustinkirkland/golang-petname v0.0.0-20191129215211-8e5a1ed0cff0
 	github.com/getkin/kin-openapi v0.114.0
 	github.com/hashicorp/terraform-plugin-framework v1.1.1
 	github.com/hashicorp/terraform-plugin-go v0.14.3
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.24.1
+	github.com/joho/godotenv v1.5.0
 	github.com/stretchr/testify v1.8.1
 	github.com/uptime-com/uptime-client-go v1.3.1-0.20230123093957-dfe808156343
 	golang.org/x/time v0.0.0-20220411224347-583f2d630306
 )
-
-require github.com/hashicorp/terraform-plugin-docs v0.13.0 // indirect, keep
 
 require (
 	github.com/agext/levenshtein v1.2.2 // indirect

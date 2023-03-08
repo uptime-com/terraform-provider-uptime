@@ -45,7 +45,7 @@ func TestAccTagResource(t *testing.T) {
 		}
 	})
 	resource.Test(t, resource.TestCase{
-		PreCheck:                 func() { testAccPreCheck(t) },
+		PreCheck:                 func() { _ = testAccAPIClient(t) },
 		ProtoV6ProviderFactories: protoV6ProviderFactories(),
 		Steps: []resource.TestStep{
 			{

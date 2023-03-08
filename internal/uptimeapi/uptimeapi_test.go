@@ -2,6 +2,7 @@ package uptimeapi
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"strconv"
 	"testing"
@@ -60,6 +61,36 @@ func TestCleanup(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	t.Run("contact groups", func(t *testing.T) {
+		res, err := api.GetContactgrouplist(ctx, &GetContactgrouplistParams{PageSize: ptr(10000)})
+		if err != nil {
+			t.Fatal(err)
+		}
+		require.Equal(t, 200, res.StatusCode)
+		defer res.Body.Close()
+
+		obj := struct {
+			Count   int `json:"count"`
+			Results []struct {
+				Pk int `json:"pk"`
+			}
+		}{}
+		err = json.NewDecoder(res.Body).Decode(&obj)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if obj.Count == 0 {
+			t.Skip("no checks to delete")
+		}
+
+		for i := range obj.Results {
+			_, err := api.DeleteContactGroupDetailWithResponse(ctx, strconv.Itoa(obj.Results[i].Pk))
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+	})
 
 	t.Run("checks", func(t *testing.T) {
 		res, err := api.GetServicelistWithResponse(ctx, &GetServicelistParams{PageSize: ptr(10000)})
