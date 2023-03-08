@@ -17,7 +17,7 @@ func resourceUptimeCheckTag() *schema.Resource {
 		Update: resourceUptimeCheckTagUpdate,
 		Delete: resourceUptimeCheckTagDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: resourceUptimeCheckTagImport,
 		},
 		Schema: map[string]*schema.Schema{
 			"tag": {
@@ -28,6 +28,10 @@ func resourceUptimeCheckTag() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -36,6 +40,7 @@ func buildUptimeCheckTag(d *schema.ResourceData) *uptime.Tag {
 	checkTag := &uptime.Tag{
 		Tag:      d.Get("tag").(string),
 		ColorHex: d.Get("color_hex").(string),
+		URL:      d.Get("url").(string),
 	}
 	return checkTag
 }
