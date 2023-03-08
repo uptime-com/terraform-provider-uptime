@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  testacc:
+    image:       golang:1.20-bullseye
+    command:     go test -v ./... -run ^TestAcc.+$
+    working_dir: /app
+    volumes:
+      - .:/app
+      - pkg:/go/pkg
+    restart:     "no"
+    env_file:
+      - .env
+    environment:
+      TF_ACC: 1
+
+volumes:
+  pkg:
