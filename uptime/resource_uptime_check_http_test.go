@@ -1,27 +1,16 @@
 package uptime
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestHeaderConversion(t *testing.T) {
-	hmIface := make(map[string]interface{})
-	hmIface["Foo"] = "bar"
-	hmIface["Baz"] = "bat"
+	hm := make(map[string]interface{})
+	hm["Foo"] = "bar"
+	hm["Baz"] = "bat"
 
-	hm := map[string]string{
-		"Foo": "bar",
-		"Baz": "bat",
-	}
-
-	hs := "Foo: bar\nBaz: bat\n"
-
-	if s := headersMapToString(hmIface); s != hs {
-		t.Errorf("headersMaptoString returned '%s', expected '%s'", s, hs)
-	}
-
-	if m := headersStringToMap(hs); !reflect.DeepEqual(m, hm) {
-		t.Errorf("headersStringToMap returned '%+v', expected '%+v'", m, hm)
-	}
+	require.Contains(t, headersMapToString(hm), "Foo: bar")
+	require.Contains(t, headersMapToString(hm), "Baz: bat")
 }

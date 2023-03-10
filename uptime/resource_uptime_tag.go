@@ -2,10 +2,12 @@ package uptime
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/uptime-com/uptime-client-go"
 )
@@ -17,7 +19,7 @@ func resourceUptimeCheckTag() *schema.Resource {
 		Update: resourceUptimeCheckTagUpdate,
 		Delete: resourceUptimeCheckTagDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: resourceUptimeCheckTagImport,
 		},
 		Schema: map[string]*schema.Schema{
 			"tag": {
@@ -28,6 +30,10 @@ func resourceUptimeCheckTag() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -36,6 +42,7 @@ func buildUptimeCheckTag(d *schema.ResourceData) *uptime.Tag {
 	checkTag := &uptime.Tag{
 		Tag:      d.Get("tag").(string),
 		ColorHex: d.Get("color_hex").(string),
+		URL:      d.Get("url").(string),
 	}
 	return checkTag
 }
@@ -114,6 +121,28 @@ func resourceUptimeCheckTagDelete(d *schema.ResourceData, meta interface{}) erro
 
 	d.SetId("")
 	return nil
+}
+
+func resourceUptimeCheckTagImport(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	client := meta.(*uptime.Client)
+
+	log.Printf("[INFO] Importing Uptime tag: %s", d.Id())
+
+	pk := pkFromResourceData(d)
+	tag, res, err := client.Tags.Get(ctx, pk)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", res.StatusCode)
+	}
+
+	e := multierror.Append(new(multierror.Error),
+		d.Set("tag", tag.Tag),
+		d.Set("color_hex", tag.ColorHex),
+		d.Set("url", tag.URL),
+	)
+	return []*schema.ResourceData{d}, e.ErrorOrNil()
 }
 
 func setResourceIDFromTag(d *schema.ResourceData, t *uptime.Tag) {
