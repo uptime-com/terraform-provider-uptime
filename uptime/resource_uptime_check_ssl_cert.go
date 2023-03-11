@@ -17,6 +17,11 @@ func resourceUptimeCheckSSLCert() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		Schema: map[string]*schema.Schema{
+			"url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
 			// Required attributes: Common
 			"address": {
 				Type:     schema.TypeString,
@@ -37,16 +42,17 @@ func resourceUptimeCheckSSLCert() *schema.Resource {
 				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
 					p := val.(string)
 					valid := map[string]bool{
-						"http": true,
-						"pop3": true,
-						"imap": true,
-						"ftp":  true,
-						"xmpp": true,
-						"irc":  true,
-						"ldap": true,
+						"https": true,
+						"http":  true,
+						"pop3":  true,
+						"imap":  true,
+						"ftp":   true,
+						"xmpp":  true,
+						"irc":   true,
+						"ldap":  true,
 					}
 					if _, ok := valid[p]; !ok {
-						errs = append(errs, fmt.Errorf("Invalid protocol for SSL Cert check: %s", p))
+						errs = append(errs, fmt.Errorf("invalid protocol for SSL Cert check: %s", p))
 					}
 					return
 				},
