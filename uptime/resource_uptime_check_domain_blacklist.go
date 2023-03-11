@@ -16,6 +16,11 @@ func resourceUptimeCheckDomainBlacklist() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		Schema: map[string]*schema.Schema{
+			"url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
 			// Required attributes: Common
 			"address": {
 				Type:     schema.TypeString,
