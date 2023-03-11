@@ -68,6 +68,12 @@ func resourceUptimeCheckAPI() *schema.Resource {
 				Computed: true,
 			},
 
+			// Computed attributes: Common
+			"url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
 			// Optional attributes: Specific
 			"sensitivity": {
 				Type:     schema.TypeInt,
