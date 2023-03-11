@@ -38,10 +38,10 @@ func TestAccIntegrationOpsGenieResource(t *testing.T) {
 			{
 				Config: fmt.Sprintf(`
 					resource "uptime_integration_opsgenie" "create-update" {
-						name               = "%s"
-						contact_groups     = ["nobody", "noone"]
-						api_endpoint      = "https://api.opsgenie.com/v2"
-						api_key           = "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+						name           = "%s"
+						contact_groups = ["nobody", "noone"]
+						api_endpoint   = "https://api.opsgenie.com/v2"
+						api_key        = "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
 					}
 				`, tags["update"]),
 				Check: resource.ComposeAggregateTestCheckFunc(
