@@ -2,6 +2,7 @@ package uptime
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -128,6 +129,12 @@ func resourceUptimeCheckHTTP() *schema.Resource {
 			"port": {
 				Type:     schema.TypeInt,
 				Optional: true,
+				Computed: true,
+			},
+
+			// Computed attributes
+			"url": {
+				Type:     schema.TypeString,
 				Computed: true,
 			},
 		},
