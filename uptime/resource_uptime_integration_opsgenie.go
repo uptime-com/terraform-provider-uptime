@@ -20,6 +20,11 @@ func resourceUptimeIntegrationOpsgenie() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		Schema: map[string]*schema.Schema{
+			"url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
