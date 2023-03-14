@@ -136,12 +136,6 @@ func resourceUptimeCheckHTTP() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
-
-			// Computed attributes
-			"url": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 		},
 	}
 }
