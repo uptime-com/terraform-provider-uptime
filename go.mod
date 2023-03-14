@@ -9,7 +9,7 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.14.3
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.25.0
 	github.com/stretchr/testify v1.7.2
-	github.com/uptime-com/uptime-client-go v1.3.1-0.20230123093957-dfe808156343
+	github.com/uptime-com/uptime-client-go v1.3.1-0.20230310120055-3c19239df8a6
 )
 
 require (
