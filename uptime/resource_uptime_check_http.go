@@ -19,6 +19,11 @@ func resourceUptimeCheckHTTP() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		Schema: map[string]*schema.Schema{
+			"url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
 			// Required attributes: Common
 			"address": {
 				Type:     schema.TypeString,
@@ -129,12 +134,6 @@ func resourceUptimeCheckHTTP() *schema.Resource {
 			"port": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				Computed: true,
-			},
-
-			// Computed attributes
-			"url": {
-				Type:     schema.TypeString,
 				Computed: true,
 			},
 		},

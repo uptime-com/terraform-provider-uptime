@@ -28,6 +28,7 @@ func setCommonCheckAttrs(d *schema.ResourceData, c *uptime.Check) {
 	d.Set("name", c.Name)
 	d.Set("notes", c.Notes)
 	d.Set("tags", c.Tags)
+	d.Set("url", c.URL)
 }
 
 func getCommonCheckAttrs(d *schema.ResourceData, c *uptime.Check) {
