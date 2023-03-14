@@ -50,6 +50,7 @@ func TestAccCheckHttpResource(t *testing.T) {
 					resource.TestCheckResourceAttr("uptime_check_http.create-update", "contact_groups.#", "1"),
 					resource.TestCheckResourceAttr("uptime_check_http.create-update", "contact_groups.0", "nobody"),
 					resource.TestCheckResourceAttr("uptime_check_http.create-update", "interval", "5"),
+					resource.TestCheckResourceAttrSet("uptime_check_http.create-update", "num_retries"),
 					func(state *terraform.State) error {
 						return nil
 					},
@@ -63,6 +64,7 @@ func TestAccCheckHttpResource(t *testing.T) {
 						contact_groups = ["nobody", "noone"]
 						interval       = 10
 						locations      = ["Serbia"]
+						num_retries    = 3
 					}
 				`, tags["update"]),
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -75,6 +77,7 @@ func TestAccCheckHttpResource(t *testing.T) {
 					resource.TestCheckResourceAttr("uptime_check_http.create-update", "interval", "10"),
 					resource.TestCheckResourceAttr("uptime_check_http.create-update", "locations.#", "1"),
 					resource.TestCheckResourceAttr("uptime_check_http.create-update", "locations.0", "Serbia"),
+					resource.TestCheckResourceAttr("uptime_check_http.create-update", "num_retries", "3"),
 				),
 			},
 		},

@@ -39,7 +39,7 @@ jobs:
         env:
           TF_ACC:       'yup'
           UPTIME_TOKEN: '${{ secrets.UPTIME_TOKEN }}'
-        run:  go test -v ./... -run ^TestAcc
+        run:  go test -v ./... -run ^TestAcc[A-Z]
 
   release:
     if:      startsWith(github.ref, 'refs/tags/v')

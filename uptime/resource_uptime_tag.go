@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/uptime-com/uptime-client-go"
 )
@@ -137,12 +136,12 @@ func resourceUptimeCheckTagImport(ctx context.Context, d *schema.ResourceData, m
 		return nil, fmt.Errorf("unexpected status code: %d", res.StatusCode)
 	}
 
-	e := multierror.Append(new(multierror.Error),
+	err = accumulateErrors(
 		d.Set("tag", tag.Tag),
 		d.Set("color_hex", tag.ColorHex),
 		d.Set("url", tag.URL),
 	)
-	return []*schema.ResourceData{d}, e.ErrorOrNil()
+	return []*schema.ResourceData{d}, err
 }
 
 func setResourceIDFromTag(d *schema.ResourceData, t *uptime.Tag) {

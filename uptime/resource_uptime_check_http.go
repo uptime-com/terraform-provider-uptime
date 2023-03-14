@@ -2,6 +2,7 @@ package uptime
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -109,6 +110,11 @@ func resourceUptimeCheckHTTP() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"num_retries": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+			},
 			"username": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -128,6 +134,12 @@ func resourceUptimeCheckHTTP() *schema.Resource {
 			"port": {
 				Type:     schema.TypeInt,
 				Optional: true,
+				Computed: true,
+			},
+
+			// Computed attributes
+			"url": {
+				Type:     schema.TypeString,
 				Computed: true,
 			},
 		},
@@ -161,6 +173,9 @@ func (HTTPCheck) getSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {
 	if attr, ok := d.GetOk("threshold"); ok {
 		c.Threshold = attr.(int)
 	}
+	if attr, ok := d.GetOk("num_retries"); ok {
+		c.NumRetries = attr.(int)
+	}
 	if attr, ok := d.GetOk("username"); ok {
 		c.Username = attr.(string)
 	}
@@ -177,18 +192,23 @@ func (HTTPCheck) getSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {
 }
 
 func (HTTPCheck) setSpecificAttrs(d *schema.ResourceData, c *uptime.Check) {
-	d.Set("interval", c.Interval)
-	d.Set("locations", c.Locations)
-	d.Set("ip_version", c.IPVersion)
-	d.Set("expect_string", c.ExpectString)
-	d.Set("send_string", c.SendString)
-	d.Set("sensitivity", c.Sensitivity)
-	d.Set("threshold", c.Threshold)
-	d.Set("username", c.Username)
-	d.Set("port", c.Port)
-
-	hs := headersStringToMap(c.Headers)
-	d.Set("headers", hs)
+	err := accumulateErrors(
+		d.Set("interval", c.Interval),
+		d.Set("locations", c.Locations),
+		d.Set("ip_version", c.IPVersion),
+		d.Set("expect_string", c.ExpectString),
+		d.Set("send_string", c.SendString),
+		d.Set("sensitivity", c.Sensitivity),
+		d.Set("num_retries", c.NumRetries),
+		d.Set("threshold", c.Threshold),
+		d.Set("username", c.Username),
+		d.Set("port", c.Port),
+		d.Set("headers", headersStringToMap(c.Headers)),
+		d.Set("url", c.URL),
+	)
+	if err != nil {
+		log.Fatalln("Error setting HTTP check attributes: ", err)
+	}
 }
 
 var httpCheck HTTPCheck

@@ -30,6 +30,7 @@ description: |-
 - `ip_version` (String)
 - `name` (String)
 - `notes` (String)
+- `num_retries` (Number)
 - `password` (String, Sensitive)
 - `port` (Number)
 - `send_string` (String)

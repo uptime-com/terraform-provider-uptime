@@ -1,6 +1,7 @@
 package uptime
 
 import (
+	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -17,4 +18,13 @@ func expandStringList(configured []interface{}) []string {
 // Expand a schema.Set into a slice of strings
 func expandSetAttr(set interface{}) []string {
 	return expandStringList(set.(*schema.Set).List())
+}
+
+func accumulateErrors(errs ...error) (err error) {
+	for i := range errs {
+		if errs[i] != nil {
+			err = multierror.Append(err, errs[i])
+		}
+	}
+	return err
 }
