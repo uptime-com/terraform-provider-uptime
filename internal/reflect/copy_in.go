@@ -1,9 +1,13 @@
 package reflect
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"io"
+	"net/textproto"
 	"reflect"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -90,10 +94,22 @@ func (w *copyInWalker) handle() error {
 		}
 		w.v.Set(reflect.ValueOf(types.SetValueMust(typ, slc)))
 	case types.Map:
-		if v.Kind() != reflect.Map {
-			return fmt.Errorf("map expected, got %T: %s", v.Interface(), w.Path())
+		var (
+			typ attr.Type
+			m   map[string]attr.Value
+		)
+		switch w.tag.Extra {
+		case "headers":
+			if v.Kind() != reflect.String {
+				return fmt.Errorf("string expected, got %T: %s", v.Interface(), w.Path())
+			}
+			typ, m, err = w.typeMapHeaders(v)
+		default:
+			if v.Kind() != reflect.Map {
+				return fmt.Errorf("map expected, got %T: %s", v.Interface(), w.Path())
+			}
+			typ, m, err = w.typeMap(v)
 		}
-		typ, m, err := w.typeMap(v)
 		if err != nil {
 			return err
 		}
@@ -164,4 +180,22 @@ func (w *copyInWalker) typeMap(v *reflect.Value) (typ attr.Type, m map[string]at
 		err = fmt.Errorf("unsupported map element type: %T: %s", v.Interface(), w.Path())
 	}
 	return typ, m, err
+}
+
+func (w *copyInWalker) typeMapHeaders(v *reflect.Value) (attr.Type, map[string]attr.Value, error) {
+	header, err := textproto.NewReader(bufio.NewReader(strings.NewReader(v.String()))).ReadMIMEHeader()
+	if err != nil && !errors.Is(err, io.EOF) {
+		return nil, nil, err
+	}
+	m := make(map[string]attr.Value)
+	t := types.ListType{ElemType: types.StringType}
+	for key := range header {
+		values := header.Values(key)
+		elems := make([]attr.Value, 0, len(values))
+		for _, s := range values {
+			elems = append(elems, types.StringValue(s))
+		}
+		m[key] = types.ListValueMust(types.StringType, elems)
+	}
+	return t, m, nil
 }

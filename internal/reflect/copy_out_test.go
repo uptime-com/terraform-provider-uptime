@@ -165,5 +165,36 @@ func TestCopyOut(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, "", dst.Foo)
 		})
+		t.Run("extra", func(t *testing.T) {
+			t.Run("headers", func(t *testing.T) {
+				type SrcType struct {
+					Foo types.Map `ref:",extra=headers"`
+				}
+				type DstType struct {
+					Foo string
+				}
+				src := SrcType{
+					Foo: types.MapValueMust(
+						types.ListType{ElemType: types.StringType},
+						map[string]attr.Value{
+							"Foo": types.ListValueMust(types.StringType, []attr.Value{
+								types.StringValue("A"),
+								types.StringValue("B"),
+							}),
+							"Bar": types.ListValueMust(types.StringType, []attr.Value{
+								types.StringValue("C"),
+							}),
+						},
+					),
+				}
+				dst := DstType{}
+				err := CopyOut(&dst, src)
+				require.NoError(t, err)
+				require.Contains(t, dst.Foo, "Foo: A\r\n")
+				require.Contains(t, dst.Foo, "Foo: B\r\n")
+				require.Contains(t, dst.Foo, "Bar: C\r\n")
+			})
+		})
+
 	})
 }

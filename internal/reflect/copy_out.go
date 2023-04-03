@@ -1,9 +1,11 @@
 package reflect
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -91,10 +93,18 @@ func (w *copyOutWalker) handle() error {
 		}
 		return w.sliceTo(x, v)
 	case types.Map:
-		if v.Kind() != reflect.Map {
-			return fmt.Errorf("map expected, got %T: %s", v.Interface(), w.Path())
+		switch w.tag.Extra {
+		case "headers":
+			if v.Kind() != reflect.String {
+				return fmt.Errorf("string expected, got %T: %s", v.Interface(), w.Path())
+			}
+			return w.mapToHeaders(x, v)
+		default:
+			if v.Kind() != reflect.Map {
+				return fmt.Errorf("map expected, got %T: %s", v.Interface(), w.Path())
+			}
+			return w.mapTo(x, v)
 		}
-		return w.mapTo(x, v)
 	case types.Number:
 		return errors.New("not implemented")
 	case types.Object:
@@ -180,5 +190,27 @@ func (w *copyOutWalker) mapTo(x mapElementable, v *reflect.Value) error {
 	default:
 		return fmt.Errorf("unsupported map element type: %T, %s", et, w.Path())
 	}
+	return nil
+}
+
+func (w *copyOutWalker) mapToHeaders(x mapElementable, v *reflect.Value) error {
+	header := make(http.Header)
+	for key, attr := range x.Elements() {
+		values, ok := attr.(types.List)
+		if !ok {
+			return fmt.Errorf("types.ListType{types.StringType} element expected, got %T: %s", attr, w.Path())
+		}
+		if values.ElementType(nil) != types.StringType {
+			return fmt.Errorf("types.ListType{types.StringType} element expected, got %T: %s", attr, w.Path())
+		}
+		for _, e := range values.Elements() {
+			header.Add(key, e.(types.String).ValueString())
+		}
+	}
+	buf := bytes.NewBuffer(nil)
+	if err := header.Write(buf); err != nil {
+		return nil
+	}
+	v.SetString(buf.String())
 	return nil
 }
