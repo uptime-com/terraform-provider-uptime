@@ -107,6 +107,10 @@ In order to run acceptance tests Uptime.com API token is required.
     export UPTIME_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     go test -v ./uptime/... -run ^TestAcc.+$
 
+In order to get detailed HTTP requests/responses info, set `UPTIME_TRACE` environment variable to `1`.
+
+    export UPTIME_TRACE=1
+
 You can run those in Docker as well.
 
     cat > .env <<EOF
