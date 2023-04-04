@@ -1,7 +1,6 @@
 package main
 
 //go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.13.0
-//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 -generate types,client,spec -package uptimeapi -o internal/uptimeapi/uptimeapi.gen.go https://uptime.com/api/v1/openapi/
 
 import (
 	"context"
