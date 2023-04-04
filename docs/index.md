@@ -18,5 +18,6 @@ description: |-
 ### Optional
 
 - `endpoint` (String)
-- `rate_limit_ms` (Number)
+- `rate_limit` (Number) The rate limit to use for API calls in requests per second, defaults to 0.5
 - `token` (String, Sensitive)
+- `trace` (Boolean)

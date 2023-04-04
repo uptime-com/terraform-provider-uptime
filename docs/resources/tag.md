@@ -17,12 +17,15 @@ description: |-
 
 ### Required
 
-- `color_hex` (String)
 - `tag` (String)
+
+### Optional
+
+- `color_hex` (String)
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (Number) The ID of this resource.
 - `url` (String)
 
 

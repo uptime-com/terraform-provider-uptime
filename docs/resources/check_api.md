@@ -17,24 +17,25 @@ description: |-
 
 ### Required
 
-- `address` (String)
 - `contact_groups` (Set of String)
-- `interval` (Number)
 - `locations` (Set of String)
 - `script` (String)
 
 ### Optional
 
 - `include_in_global_metrics` (Boolean)
+- `interval` (Number)
+- `is_paused` (Boolean)
 - `name` (String)
 - `notes` (String)
+- `num_retries` (Number)
 - `sensitivity` (Number)
 - `tags` (Set of String)
 - `threshold` (Number)
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (Number) The ID of this resource.
 - `url` (String)
 
 
