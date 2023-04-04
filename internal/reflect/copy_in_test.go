@@ -106,22 +106,74 @@ func TestCopyIn(t *testing.T) {
 		}), dst.Foo)
 	})
 	t.Run("types.Map", func(t *testing.T) {
+		t.Run("types.String", func(t *testing.T) {
+			type SrcType struct {
+				Foo map[string]string
+			}
+			type DstType struct {
+				Foo types.Map
+			}
+			src := SrcType{
+				Foo: map[string]string{"foo": "foo", "bar": "bar"},
+			}
+			dst := DstType{}
+			err := CopyIn(&dst, src)
+			require.NoError(t, err)
+			require.Equal(t, types.MapValueMust(types.StringType, map[string]attr.Value{
+				"foo": types.StringValue("foo"),
+				"bar": types.StringValue("bar"),
+			}), dst.Foo)
+		})
+		t.Run("headers", func(t *testing.T) {
+			type SrcType struct {
+				Foo string
+			}
+			type DstType struct {
+				Foo types.Map `ref:",extra=headers"`
+			}
+			src := SrcType{
+				Foo: "Foo: A\r\nFoo: B\r\nBar: C\r\n",
+			}
+			dst := DstType{}
+			err := CopyIn(&dst, src)
+			require.NoError(t, err)
+			require.Equal(t,
+				types.MapValueMust(
+					types.ListType{ElemType: types.StringType},
+					map[string]attr.Value{
+						"Foo": types.ListValueMust(types.StringType, []attr.Value{
+							types.StringValue("A"),
+							types.StringValue("B"),
+						}),
+						"Bar": types.ListValueMust(types.StringType, []attr.Value{
+							types.StringValue("C"),
+						}),
+					},
+				),
+				dst.Foo,
+			)
+		})
+	})
+	t.Run("types.Object", func(t *testing.T) {
+		type SrcTypeFoo struct {
+			Bar string
+			Baz int
+		}
 		type SrcType struct {
-			Foo map[string]string
+			Foo SrcTypeFoo
 		}
 		type DstType struct {
-			Foo types.Map
+			Foo types.Object
 		}
 		src := SrcType{
-			Foo: map[string]string{"foo": "foo", "bar": "bar"},
+			Foo: SrcTypeFoo{
+				Bar: "Bar",
+				Baz: 100500,
+			},
 		}
 		dst := DstType{}
 		err := CopyIn(&dst, src)
 		require.NoError(t, err)
-		require.Equal(t, types.MapValueMust(types.StringType, map[string]attr.Value{
-			"foo": types.StringValue("foo"),
-			"bar": types.StringValue("bar"),
-		}), dst.Foo)
 	})
 	t.Run("options", func(t *testing.T) {
 		t.Run("path", func(t *testing.T) {
@@ -165,37 +217,6 @@ func TestCopyIn(t *testing.T) {
 			err := CopyIn(&dst, src)
 			require.NoError(t, err)
 			require.Equal(t, types.StringNull(), dst.Foo)
-		})
-		t.Run("extra", func(t *testing.T) {
-			t.Run("headers", func(t *testing.T) {
-				type SrcType struct {
-					Foo string
-				}
-				type DstType struct {
-					Foo types.Map `ref:",extra=headers"`
-				}
-				src := SrcType{
-					Foo: "Foo: A\r\nFoo: B\r\nBar: C\r\n",
-				}
-				dst := DstType{}
-				err := CopyIn(&dst, src)
-				require.NoError(t, err)
-				require.Equal(t,
-					types.MapValueMust(
-						types.ListType{ElemType: types.StringType},
-						map[string]attr.Value{
-							"Foo": types.ListValueMust(types.StringType, []attr.Value{
-								types.StringValue("A"),
-								types.StringValue("B"),
-							}),
-							"Bar": types.ListValueMust(types.StringType, []attr.Value{
-								types.StringValue("C"),
-							}),
-						},
-					),
-					dst.Foo,
-				)
-			})
 		})
 	})
 }

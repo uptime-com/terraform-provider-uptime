@@ -123,6 +123,30 @@ func TestCopyOut(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, map[string]string{"Foo": "Foo", "Bar": "Bar"}, dst.Foo)
 	})
+	t.Run("types.Object", func(t *testing.T) {
+		type SrcType struct {
+			Foo types.Object
+		}
+		type DstType struct {
+			Foo struct {
+				Bar string
+			}
+		}
+		src := SrcType{
+			Foo: types.ObjectValueMust(
+				map[string]attr.Type{
+					"bar": types.StringType,
+				},
+				map[string]attr.Value{
+					"bar": types.StringValue("Baz"),
+				},
+			),
+		}
+		dst := DstType{}
+		err := CopyOut(&dst, src)
+		require.NoError(t, err)
+		require.Equal(t, "Baz", dst.Foo.Bar)
+	})
 	t.Run("options", func(t *testing.T) {
 		t.Run("path", func(t *testing.T) {
 			type SrcType struct {
@@ -195,6 +219,5 @@ func TestCopyOut(t *testing.T) {
 				require.Contains(t, dst.Foo, "Bar: C\r\n")
 			})
 		})
-
 	})
 }

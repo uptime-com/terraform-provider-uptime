@@ -9,193 +9,226 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/gobeam/stringy"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/mitchellh/reflectwalk"
 )
 
 func CopyIn(dst any, src any) error {
-	return reflectwalk.Walk(dst, &copyInWalker{
-		src: src,
+	return reflectwalk.Walk(dst, &pathWalker{
+		PathWalker: &copyInWalker{
+			src: src,
+		},
 	})
 }
 
 type copyInWalker struct {
-	pathWalker
 	src any
-	err error
 }
 
-func (w *copyInWalker) Exit(loc reflectwalk.Location) error {
-	if loc == reflectwalk.Struct && len(w.path) > 0 {
-		err := w.handle()
-		if err != nil {
-			w.err = errors.Join(w.err, err)
-		}
+func (w *copyInWalker) Walk(path string, tag Tag, t reflect.Value) error {
+	if _, ok := t.Interface().(attr.Value); !ok {
+		return nil // skip value which isn't an attribute
 	}
-	if loc == reflectwalk.WalkLoc && w.err != nil {
-		return w.err
-	}
-	return w.pathWalker.Exit(loc)
-}
-
-func (w *copyInWalker) handle() error {
-	if w.tag.Skip {
+	if tag.Skip {
 		return nil
 	}
-	path := w.Path()
-	if w.tag.Path != "" {
-		path = w.tag.Path
+	if tag.Path != "" {
+		path = tag.Path
 	}
-	v, err := FindByPath(w.src, path)
+	f, err := FindByPath(w.src, path)
 	if err != nil {
-		if errors.Is(err, ErrNotFound) && w.tag.Opt {
+		if errors.Is(err, ErrNotFound) && tag.Opt {
 			return nil
 		}
 		return err
 	}
-	switch w.v.Interface().(type) {
-	case types.String:
-		if v.Kind() != reflect.String {
-			return fmt.Errorf("string expected, got %T: %s", v.Interface(), w.Path())
-		}
-		w.v.Set(reflect.ValueOf(types.StringValue(v.String())))
-	case types.Bool:
-		if v.Kind() != reflect.Bool {
-			return fmt.Errorf("bool expected, got %T: %s", v.Interface(), w.Path())
-		}
-		w.v.Set(reflect.ValueOf(types.BoolValue(v.Bool())))
-	case types.Int64:
-		if v.Kind() != reflect.Int {
-			return fmt.Errorf("int expected, got %T: %s", v.Interface(), w.Path())
-		}
-		w.v.Set(reflect.ValueOf(types.Int64Value(v.Int())))
-	case types.Float64:
-		if v.Kind() != reflect.Float64 {
-			return fmt.Errorf("float64 expected, got %T: %s", v.Interface(), w.Path())
-		}
-		w.v.Set(reflect.ValueOf(types.Float64Value(v.Float())))
-	case types.List:
-		if v.Kind() != reflect.Slice {
-			return fmt.Errorf("slice expected, got %T: %s", v.Interface(), w.Path())
-		}
-		typ, slc, err := w.typeSlice(v)
-		if err != nil {
-			return err
-		}
-		w.v.Set(reflect.ValueOf(types.ListValueMust(typ, slc)))
-	case types.Set:
-		if v.Kind() != reflect.Slice {
-			return fmt.Errorf("slice expected, got %T: %s", v.Interface(), w.Path())
-		}
-		typ, slc, err := w.typeSlice(v)
-		if err != nil {
-			return err
-		}
-		w.v.Set(reflect.ValueOf(types.SetValueMust(typ, slc)))
-	case types.Map:
-		var (
-			typ attr.Type
-			m   map[string]attr.Value
-		)
-		switch w.tag.Extra {
-		case "headers":
-			if v.Kind() != reflect.String {
-				return fmt.Errorf("string expected, got %T: %s", v.Interface(), w.Path())
-			}
-			typ, m, err = w.typeMapHeaders(v)
-		default:
-			if v.Kind() != reflect.Map {
-				return fmt.Errorf("map expected, got %T: %s", v.Interface(), w.Path())
-			}
-			typ, m, err = w.typeMap(v)
-		}
-		if err != nil {
-			return err
-		}
-		w.v.Set(reflect.ValueOf(types.MapValueMust(typ, m)))
-	case types.Number:
-		return errors.New("not implemented")
-	case types.Object:
-		return errors.New("not implemented")
+	err = w.copyIn(*f, t, tag)
+	if err != nil {
+		return fmt.Errorf("%s: copy in error: %w", path, err)
 	}
 	return nil
 }
 
-func (w *copyInWalker) typeSlice(v *reflect.Value) (typ attr.Type, slc []attr.Value, err error) {
-	switch v.Type().Elem().Kind() {
+func (w *copyInWalker) copyIn(f reflect.Value, t reflect.Value, tag Tag) error {
+	switch t.Interface().(type) {
+	case types.String:
+		if f.Kind() != reflect.String {
+			return fmt.Errorf("string expected, got %T", f.Interface())
+		}
+		t.Set(reflect.ValueOf(types.StringValue(f.String())))
+	case types.Bool:
+		if f.Kind() != reflect.Bool {
+			return fmt.Errorf("bool expected, got %T", f.Interface())
+		}
+		t.Set(reflect.ValueOf(types.BoolValue(f.Bool())))
+	case types.Int64:
+		if f.Kind() != reflect.Int {
+			return fmt.Errorf("int expected, got %T", f.Interface())
+		}
+		t.Set(reflect.ValueOf(types.Int64Value(f.Int())))
+	case types.Float64:
+		if f.Kind() != reflect.Float64 {
+			return fmt.Errorf("float64 expected, got %T", f.Interface())
+		}
+		t.Set(reflect.ValueOf(types.Float64Value(f.Float())))
+	case types.List, types.Set:
+		err := w.copyInSlice(f, t)
+		if err != nil {
+			return err
+		}
+	case types.Map:
+		switch tag.Extra {
+		case "headers":
+			err := w.copyInHeadersMap(f, t)
+			if err != nil {
+				return err
+			}
+		default:
+			return w.copyInMap(f, t)
+		}
+	case types.Number:
+		return errors.New("not implemented")
+	case types.Object:
+		err := w.copyInObject(f, t)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (w *copyInWalker) copyInSlice(f, t reflect.Value) error {
+	if f.Kind() != reflect.Slice {
+		return fmt.Errorf("slice expected, got %T", f.Interface())
+	}
+	var (
+		typ attr.Type
+		els []attr.Value
+	)
+	switch f.Type().Elem().Kind() {
 	case reflect.String:
 		typ = types.StringType
-		for i := 0; i < v.Len(); i++ {
-			slc = append(slc, types.StringValue(v.Index(i).String()))
+		for i := 0; i < f.Len(); i++ {
+			els = append(els, types.StringValue(f.Index(i).String()))
 		}
 	case reflect.Bool:
 		typ = types.BoolType
-		for i := 0; i < v.Len(); i++ {
-			slc = append(slc, types.BoolValue(v.Index(i).Bool()))
+		for i := 0; i < f.Len(); i++ {
+			els = append(els, types.BoolValue(f.Index(i).Bool()))
 		}
 	case reflect.Int:
 		typ = types.Int64Type
-		for i := 0; i < v.Len(); i++ {
-			slc = append(slc, types.Int64Value(v.Index(i).Int()))
+		for i := 0; i < f.Len(); i++ {
+			els = append(els, types.Int64Value(f.Index(i).Int()))
 		}
 	case reflect.Float64:
 		typ = types.Float64Type
-		for i := 0; i < v.Len(); i++ {
-			slc = append(slc, types.Float64Value(v.Index(i).Float()))
+		for i := 0; i < f.Len(); i++ {
+			els = append(els, types.Float64Value(f.Index(i).Float()))
 		}
 	default:
-		err = fmt.Errorf("unsupported slice element type: %T: %s", v.Interface(), w.Path())
+		return fmt.Errorf("unsupported slice element type: %T", f.Interface())
 	}
-	return
+	switch t.Interface().(type) {
+	case types.List:
+		t.Set(reflect.ValueOf(types.ListValueMust(typ, els)))
+	case types.Set:
+		t.Set(reflect.ValueOf(types.SetValueMust(typ, els)))
+	default:
+		return fmt.Errorf("unsupported destination type: %T", t.Interface())
+	}
+	return nil
 }
 
-func (w *copyInWalker) typeMap(v *reflect.Value) (typ attr.Type, m map[string]attr.Value, err error) {
-	if v.Type().Key().Kind() != reflect.String {
-		return nil, nil, fmt.Errorf("unsupported map key type: %T: %s", v.Interface(), w.Path())
+func (w *copyInWalker) copyInMap(f, t reflect.Value) error {
+	if f.Type().Key().Kind() != reflect.String {
+		return fmt.Errorf("unsupported map key type: %T", f.Interface())
 	}
-	m = make(map[string]attr.Value)
-	switch v.Type().Elem().Kind() {
+	var (
+		typ attr.Type
+		els = make(map[string]attr.Value)
+	)
+	switch f.Type().Elem().Kind() {
 	case reflect.String:
 		typ = types.StringType
-		for _, k := range v.MapKeys() {
-			m[k.String()] = types.StringValue(v.MapIndex(k).String())
+		for _, k := range f.MapKeys() {
+			els[k.String()] = types.StringValue(f.MapIndex(k).String())
 		}
 	case reflect.Bool:
 		typ = types.BoolType
-		for _, k := range v.MapKeys() {
-			m[k.String()] = types.BoolValue(v.MapIndex(k).Bool())
+		for _, k := range f.MapKeys() {
+			els[f.String()] = types.BoolValue(f.MapIndex(k).Bool())
 		}
 	case reflect.Int:
 		typ = types.Int64Type
-		for _, k := range v.MapKeys() {
-			m[k.String()] = types.Int64Value(v.MapIndex(k).Int())
+		for _, k := range f.MapKeys() {
+			els[k.String()] = types.Int64Value(f.MapIndex(k).Int())
 		}
 	case reflect.Float64:
 		typ = types.Float64Type
-		for _, k := range v.MapKeys() {
-			m[k.String()] = types.Float64Value(v.MapIndex(k).Float())
+		for _, k := range f.MapKeys() {
+			els[k.String()] = types.Float64Value(f.MapIndex(k).Float())
 		}
 	default:
-		err = fmt.Errorf("unsupported map element type: %T: %s", v.Interface(), w.Path())
+		return fmt.Errorf("unsupported map element type: %T", f.Interface())
 	}
-	return typ, m, err
+	t.Set(reflect.ValueOf(types.MapValueMust(typ, els)))
+	return nil
 }
 
-func (w *copyInWalker) typeMapHeaders(v *reflect.Value) (attr.Type, map[string]attr.Value, error) {
-	header, err := textproto.NewReader(bufio.NewReader(strings.NewReader(v.String()))).ReadMIMEHeader()
+func (w *copyInWalker) copyInHeadersMap(f, t reflect.Value) error {
+	if f.Kind() != reflect.String {
+		return fmt.Errorf("string expected, got %T", f.Interface())
+	}
+	h, err := textproto.NewReader(bufio.NewReader(strings.NewReader(f.String()))).ReadMIMEHeader()
 	if err != nil && !errors.Is(err, io.EOF) {
-		return nil, nil, err
+		return err
 	}
-	m := make(map[string]attr.Value)
-	t := types.ListType{ElemType: types.StringType}
-	for key := range header {
-		values := header.Values(key)
-		elems := make([]attr.Value, 0, len(values))
-		for _, s := range values {
-			elems = append(elems, types.StringValue(s))
+	res := make(map[string]attr.Value, len(h))
+	for key := range h {
+		values := h.Values(key)
+		elems := make([]attr.Value, len(values))
+		for i, s := range values {
+			elems[i] = types.StringValue(s)
 		}
-		m[key] = types.ListValueMust(types.StringType, elems)
+		res[key] = types.ListValueMust(types.StringType, elems)
 	}
-	return t, m, nil
+	m := types.MapValueMust(types.ListType{ElemType: types.StringType}, res)
+	t.Set(reflect.ValueOf(m))
+	return nil
+}
+
+func (w *copyInWalker) copyInObject(f, t reflect.Value) error {
+	for f.Kind() == reflect.Ptr {
+		f = f.Elem()
+	}
+	if f.Kind() != reflect.Struct {
+		return fmt.Errorf("struct expected, got %T", f.Interface())
+	}
+	attrTypes := make(map[string]attr.Type)
+	attrValues := make(map[string]attr.Value)
+	for i := 0; i < f.NumField(); i++ {
+		key := stringy.New(f.Type().Field(i).Name).SnakeCase().ToLower()
+		ff := f.Field(i)
+		switch ff.Kind() {
+		case reflect.String:
+			attrTypes[key] = types.StringType
+			attrValues[key] = types.StringValue(ff.String())
+		case reflect.Bool:
+			attrTypes[key] = types.BoolType
+			attrValues[key] = types.BoolValue(ff.Bool())
+		case reflect.Int:
+			attrTypes[key] = types.Int64Type
+			attrValues[key] = types.Int64Value(ff.Int())
+		case reflect.Float64:
+			attrTypes[key] = types.Float64Type
+			attrValues[key] = types.Float64Value(ff.Float())
+		default:
+			return fmt.Errorf("%s: unsupported object attribute type: %T", key, ff.Interface())
+		}
+	}
+	t.Set(reflect.ValueOf(types.ObjectValueMust(attrTypes, attrValues)))
+	return nil
 }

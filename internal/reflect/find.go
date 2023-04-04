@@ -10,39 +10,35 @@ import (
 
 // FindByPath returns the value of the field at the given dot-delimited path.
 func FindByPath(obj any, path string) (*reflect.Value, error) {
-	w := findWalker{
+	f := pathWalkerFind{
 		target: path,
 	}
+	w := pathWalker{
+		PathWalker: &f,
+	}
 	err := reflectwalk.Walk(obj, &w)
-	return w.res, err
+	if err != nil {
+		return nil, err
+	}
+	if f.res == nil {
+		return nil, fmt.Errorf("%w: %s", ErrNotFound, path)
+	}
+	return f.res, err
 }
 
 var ErrNotFound = errors.New("not found")
 
-type findWalker struct {
-	pathWalker
+type pathWalkerFind struct {
 	target string
-	cur    *reflect.Value
 	res    *reflect.Value
 }
 
-func (w *findWalker) Enter(loc reflectwalk.Location) (err error) {
-	return w.pathWalker.Enter(loc)
-}
-
-func (w *findWalker) Exit(loc reflectwalk.Location) (err error) {
-	if w.Path() == w.target {
-		w.res = w.cur
+func (p *pathWalkerFind) Walk(path string, _ Tag, v reflect.Value) error {
+	if path == p.target {
+		p.res = &v
 	}
-	if loc == reflectwalk.WalkLoc {
-		if w.res == nil {
-			return fmt.Errorf("%w: %s", ErrNotFound, w.target)
-		}
+	if p.res != nil {
+		return reflectwalk.SkipEntry
 	}
-	return w.pathWalker.Exit(loc)
-}
-
-func (w *findWalker) StructField(f reflect.StructField, v reflect.Value) error {
-	w.cur = &v
-	return w.pathWalker.StructField(f, v)
+	return nil
 }
