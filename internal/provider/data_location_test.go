@@ -1,8 +1,9 @@
 package provider
 
 import (
+	"errors"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/pkg/errors"
 	"strconv"
 	"testing"
 )
@@ -19,7 +20,7 @@ func TestAccLocationsDataSource(t *testing.T) {
 						func(value string) error {
 							n, err := strconv.Atoi(value)
 							if err != nil {
-								return errors.Wrap(err, "failed to parse locations count")
+								return fmt.Errorf("failed to parse locations count: %w", err)
 							}
 							if n < 3 {
 								return errors.New("expected at least 3 locations")
