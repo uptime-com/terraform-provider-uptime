@@ -22,7 +22,7 @@ description: |-
 
 ### Optional
 
-- `config` (Block, Optional) (see [below for nested schema](#nestedblock--config))
+- `config` (Attributes) (see [below for nested schema](#nestedatt--config))
 - `is_paused` (Boolean)
 - `name` (String)
 - `notes` (String)
@@ -38,7 +38,7 @@ description: |-
 - `locations` (Set of String)
 - `url` (String)
 
-<a id="nestedblock--config"></a>
+<a id="nestedatt--config"></a>
 ### Nested Schema for `config`
 
 Optional:
