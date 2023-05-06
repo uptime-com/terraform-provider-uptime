@@ -3,7 +3,7 @@
 == Requirements
 
 * Terraform v0.12.0 or higher
-* Go v1.12 or higher (https://go.dev/doc/install[installation instructions])
+* Go v1.20 or higher (https://go.dev/doc/install[installation instructions])
 
 == Installation
 
