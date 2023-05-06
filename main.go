@@ -22,7 +22,7 @@ func main() {
 	opts := providerserver.ServeOpts{
 		Address:         "registry.terraform.io/uptime-com/uptime",
 		Debug:           false,
-		ProtocolVersion: 5,
+		ProtocolVersion: 6,
 	}
 
 	flag.BoolVar(&opts.Debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
