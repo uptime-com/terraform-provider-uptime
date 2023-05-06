@@ -10,7 +10,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/uptime-com/terraform-provider-uptime/internal/reflect"
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
 
@@ -52,7 +51,7 @@ func (r *genericResource[Model, Arg, Res]) Create(ctx context.Context, rq resour
 		rs.Diagnostics.Append(diags...)
 		return
 	}
-	diags = modelToAPI(&apiarg, obj)
+	diags = valueToAPI(&apiarg, obj)
 	if diags.HasError() {
 		rs.Diagnostics.Append(diags...)
 		return
@@ -62,7 +61,7 @@ func (r *genericResource[Model, Arg, Res]) Create(ctx context.Context, rq resour
 		rs.Diagnostics.AddError("Create failed", err.Error())
 		return
 	}
-	diags = modelFromAPI(&obj, *apires)
+	diags = valueFromAPI(&obj, *apires)
 	if diags.HasError() {
 		rs.Diagnostics.Append(diags...)
 		return
@@ -93,7 +92,7 @@ func (r *genericResource[Model, Arg, Res]) Read(ctx context.Context, rq resource
 		rs.Diagnostics.AddError("Read failed", err.Error())
 		return
 	}
-	diags = modelFromAPI(&obj, *apires)
+	diags = valueFromAPI(&obj, *apires)
 	if diags.HasError() {
 		rs.Diagnostics.Append(diags...)
 		return
@@ -123,7 +122,7 @@ func (r *genericResource[Model, Arg, Res]) Update(ctx context.Context, rq resour
 		rs.Diagnostics.Append(diags...)
 		return
 	}
-	diags = modelToAPI(&apiarg, obj)
+	diags = valueToAPI(&apiarg, obj)
 	if diags.HasError() {
 		rs.Diagnostics.Append(diags...)
 		return
@@ -133,7 +132,7 @@ func (r *genericResource[Model, Arg, Res]) Update(ctx context.Context, rq resour
 		rs.Diagnostics.AddError("Update failed", err.Error())
 		return
 	}
-	diags = modelFromAPI(&obj, *apires)
+	diags = valueFromAPI(&obj, *apires)
 	if diags.HasError() {
 		rs.Diagnostics.Append(diags...)
 		return
@@ -176,24 +175,4 @@ func primaryKeyFromState(ctx context.Context, state tfsdk.State) (upapi.PrimaryK
 		return nil, diags
 	}
 	return upapi.PrimaryKey(pk.ValueInt64()), nil
-}
-
-func modelFromAPI(dst, src any) diag.Diagnostics {
-	err := reflect.CopyIn(dst, src)
-	if err != nil {
-		return diag.Diagnostics{
-			diag.NewErrorDiagnostic("reflect.CopyIn", err.Error()),
-		}
-	}
-	return nil
-}
-
-func modelToAPI(dst, src any) diag.Diagnostics {
-	err := reflect.CopyOut(dst, src)
-	if err != nil {
-		return diag.Diagnostics{
-			diag.NewErrorDiagnostic("reflect.CopyOut", err.Error()),
-		}
-	}
-	return nil
 }
