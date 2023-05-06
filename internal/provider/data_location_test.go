@@ -1,0 +1,34 @@
+package provider
+
+import (
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/pkg/errors"
+	"strconv"
+	"testing"
+)
+
+func TestAccLocationsDataSource(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { _ = testAccAPIClient(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: testRenderSnippet(t, "data_locations.tf", 0, nil),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("data.uptime_locations.test", "locations.#",
+						func(value string) error {
+							n, err := strconv.Atoi(value)
+							if err != nil {
+								return errors.Wrap(err, "failed to parse locations count")
+							}
+							if n < 3 {
+								return errors.New("expected at least 3 locations")
+							}
+							return nil
+						},
+					),
+				),
+			},
+		},
+	})
+}

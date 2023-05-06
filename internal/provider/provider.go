@@ -95,7 +95,9 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 }
 
 func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return nil
+	return []func() datasource.DataSource{
+		func() datasource.DataSource { return NewLocationsDataSource(ctx, p) },
+	}
 }
 
 func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource {
