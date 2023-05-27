@@ -29,6 +29,7 @@ func Provider() *schema.Provider {
 			"uptime_check_dns":              resourceUptimeCheckDNS(),
 			"uptime_check_domain_blacklist": resourceUptimeCheckDomainBlacklist(),
 			"uptime_check_http":             resourceUptimeCheckHTTP(),
+			"uptime_check_icmp":             resourceUptimeCheckICMP(),
 			"uptime_check_malware":          resourceUptimeCheckMalware(),
 			"uptime_check_ntp":              resourceUptimeCheckNTP(),
 			"uptime_check_ssl_cert":         resourceUptimeCheckSSLCert(),
