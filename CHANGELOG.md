@@ -10,7 +10,7 @@ Changes since v1.3.4:
   * **BREAKING**: Renamed `rate_limit_ms` to `rate_limit` and changed the unit to requests per second
   * Added `endpoint` argument
   * Added `trace` argument
-  * Made `token` is now optional and configurable from environment variable
+  * Made `token` optional and configurable from environment variable
 * Added `uptime_location` data source
 * All resources:
   * `interval` is now optional and determined server-side when omitted
