@@ -51,6 +51,9 @@ You can run those in Docker as well.
     EOF
     docker compose up testacc
 
+* `TF_ACC=1` - enables acceptance tests, the exact value is not important
+* `UPTIME_TOKEN` - Uptime.com API token
+
 ## Licensing
 
 See the [LICENSE file](/LICENSE) for our project's licensing.
