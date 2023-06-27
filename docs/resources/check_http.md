@@ -19,29 +19,34 @@ description: |-
 
 - `address` (String)
 - `contact_groups` (Set of String)
-- `interval` (Number)
 - `locations` (Set of String)
 
 ### Optional
 
+- `encryption` (String)
 - `expect_string` (String)
-- `headers` (Map of String)
+- `expect_string_type` (String)
+- `headers` (Map of List of String)
 - `include_in_global_metrics` (Boolean)
-- `ip_version` (String)
+- `interval` (Number)
+- `is_paused` (Boolean)
 - `name` (String)
 - `notes` (String)
 - `num_retries` (Number)
 - `password` (String, Sensitive)
 - `port` (Number)
+- `proxy` (String)
 - `send_string` (String)
 - `sensitivity` (Number)
+- `status_code` (String)
 - `tags` (Set of String)
 - `threshold` (Number)
 - `username` (String)
+- `version` (Number)
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (Number) The ID of this resource.
 - `url` (String)
 
 

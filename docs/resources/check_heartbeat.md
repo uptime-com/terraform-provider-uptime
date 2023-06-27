@@ -18,21 +18,20 @@ description: |-
 ### Required
 
 - `contact_groups` (Set of String)
-- `interval` (Number)
 
 ### Optional
 
 - `include_in_global_metrics` (Boolean)
+- `interval` (Number)
 - `is_paused` (Boolean)
 - `name` (String)
 - `notes` (String)
-- `response_time_sla` (Number)
 - `tags` (Set of String)
-- `uptime_sla` (Number)
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `heartbeat_url` (String)
+- `id` (Number) The ID of this resource.
 - `url` (String)
 
 

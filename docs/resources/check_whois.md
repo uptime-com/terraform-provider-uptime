@@ -19,18 +19,21 @@ description: |-
 
 - `address` (String)
 - `contact_groups` (Set of String)
-- `days_before_expiry` (Number)
+- `expect_string` (String)
+- `threshold` (Number)
 
 ### Optional
 
-- `expect_string` (String)
+- `is_paused` (Boolean)
 - `name` (String)
 - `notes` (String)
+- `num_retries` (Number)
 - `tags` (Set of String)
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (Number) The ID of this resource.
+- `locations` (Set of String)
 - `url` (String)
 
 
