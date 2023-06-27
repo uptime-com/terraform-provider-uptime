@@ -1,6 +1,9 @@
 # Executable
 terraform-provider-uptime
 
+# Dotenv files
+.env
+
 # Binaries for programs and plugins
 *.exe
 *.exe~

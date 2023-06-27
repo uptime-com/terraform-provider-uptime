@@ -2,17 +2,15 @@ version: 3
 
 method:  timestamp
 
+
 tasks:
-  docs:
-    desc: Update generated documentation
+
+  generate:
+    desc: Generate whatever configured by Go generate feature
     cmds:
-      - go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.13
-    generates:
-      - docs/index.md
-    sources:
-      - ./**/*.go
+      - go generate ./...
 
   snapshot:
     desc: Build a local single-target snapshot
     cmds:
-      - go run github.com/goreleaser/goreleaser@v1 build --snapshot --single-target --rm-dist
+      - go run github.com/goreleaser/goreleaser@v1 build --snapshot --single-target --clean
