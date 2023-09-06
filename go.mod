@@ -13,7 +13,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2
 	github.com/muir/reflectutils v0.7.0
 	github.com/stretchr/testify v1.8.2
-	github.com/uptime-com/uptime-client-go/v2 v2.0.0-20230404095730-56f57032586c
+	github.com/uptime-com/uptime-client-go/v2 v2.0.0-20230906105005-8d2f10a922f1
 )
 
 require (
