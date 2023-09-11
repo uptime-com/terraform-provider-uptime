@@ -27,6 +27,7 @@ var checkBlacklistResourceSchema = schema.Schema{
 		"url":            URLAttribute(),
 		"name":           NameAttribute(),
 		"contact_groups": ContactGroupsAttribute(),
+		"locations":      LocationsReadOnlyAttribute(),
 		"tags":           TagsAttribute(),
 		"is_paused":      IsPausedAttribute(),
 		"num_retries":    NumRetriesAttribute(2),
@@ -44,6 +45,7 @@ type checkBlacklistResourceModel struct {
 	URL           types.String `tfsdk:"url" ref:"URL,opt"`
 	Name          types.String `tfsdk:"name"`
 	ContactGroups types.Set    `tfsdk:"contact_groups"`
+	Locations     types.Set    `tfsdk:"locations"`
 	Tags          types.Set    `tfsdk:"tags"`
 	IsPaused      types.Bool   `tfsdk:"is_paused"`
 	Address       types.String `tfsdk:"address"`

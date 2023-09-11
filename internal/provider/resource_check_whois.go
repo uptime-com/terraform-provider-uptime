@@ -22,48 +22,23 @@ func NewCheckWHOISResource(_ context.Context, p *providerImpl) resource.Resource
 
 var checkWHOISResourceSchema = schema.Schema{
 	Attributes: map[string]schema.Attribute{
-		"id": schema.Int64Attribute{
-			Computed: true,
-		},
-		"url": schema.StringAttribute{
-			Computed: true,
-		},
-		"name": schema.StringAttribute{
-			Optional: true,
-		},
-		"contact_groups": schema.SetAttribute{
-			ElementType: types.StringType,
-			Required:    true,
-		},
-		"locations": schema.SetAttribute{
-			ElementType: types.StringType,
-			Computed:    true,
-		},
-		"tags": schema.SetAttribute{
-			ElementType: types.StringType,
-			Optional:    true,
-			Computed:    true,
-		},
-		"is_paused": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-		},
+		"id":             IDAttribute(),
+		"url":            URLAttribute(),
+		"name":           NameAttribute(),
+		"contact_groups": ContactGroupsAttribute(),
+		"locations":      LocationsReadOnlyAttribute(),
+		"tags":           TagsAttribute(),
+		"is_paused":      IsPausedAttribute(),
+		"threshold":      ThresholdDescriptionAttribute(20, "Raise an alert if there are less than this many days before the domain needs to be renewed."),
+		"num_retries":    NumRetriesAttribute(2),
+		"notes":          NotesAttribute(),
+
 		"address": schema.StringAttribute{
 			Required: true,
 		},
 		"expect_string": schema.StringAttribute{
-			Required: true,
-		},
-		"threshold": schema.Int64Attribute{
-			Required: true,
-		},
-		"num_retries": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
-		"notes": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
+			Required:    true,
+			Description: "The current domain registration info that should always match.",
 		},
 	},
 }

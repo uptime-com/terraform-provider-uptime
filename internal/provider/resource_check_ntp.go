@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
@@ -22,66 +23,28 @@ func NewCheckNTPResource(_ context.Context, p *providerImpl) resource.Resource {
 
 var checkNTPResourceSchema = schema.Schema{
 	Attributes: map[string]schema.Attribute{
-		"id": schema.Int64Attribute{
-			Computed: true,
-		},
-		"url": schema.StringAttribute{
-			Computed: true,
-		},
-		"name": schema.StringAttribute{
-			Optional: true,
-		},
-		"contact_groups": schema.SetAttribute{
-			ElementType: types.StringType,
-			Required:    true,
-		},
-		"locations": schema.SetAttribute{
-			ElementType: types.StringType,
-			Required:    true,
-		},
-		"tags": schema.SetAttribute{
-			ElementType: types.StringType,
-			Optional:    true,
-			Computed:    true,
-		},
-		"is_paused": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"interval": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
+		"id":                        IDAttribute(),
+		"url":                       URLAttribute(),
+		"name":                      NameAttribute(),
+		"contact_groups":            ContactGroupsAttribute(),
+		"locations":                 LocationsAttribute(),
+		"tags":                      TagsAttribute(),
+		"is_paused":                 IsPausedAttribute(),
+		"interval":                  IntervalAttribute(5),
+		"threshold":                 ThresholdAttribute(20),
+		"sensitivity":               SensitivityAttribute(2),
+		"num_retries":               NumRetriesAttribute(2),
+		"notes":                     NotesAttribute(),
+		"include_in_global_metrics": IncludeInGlobalMetricsAttribute(),
+		"use_ip_version":            UseIPVersionAttribute(),
+
 		"address": schema.StringAttribute{
 			Required: true,
 		},
 		"port": schema.Int64Attribute{
 			Optional: true,
 			Computed: true,
-		},
-		"threshold": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
-		"sensitivity": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
-		"num_retries": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
-		"use_ip_version": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"notes": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"include_in_global_metrics": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
+			Default:  int64default.StaticInt64(123),
 		},
 	},
 }
