@@ -47,7 +47,7 @@ var checkDNSResourceSchema = schema.Schema{
 			Computed: true,
 			Default:  stringdefault.StaticString("ANY"),
 			Validators: []validator.String{
-				&checkDNSRecordTypeValidator{},
+				OneOfStringValidator([]string{"ANY", "A", "AAAA", "CNAME", "MX", "NS", "SOA", "SRV", "TXT"}),
 			},
 		},
 		"expect_string": schema.StringAttribute{
@@ -61,40 +61,6 @@ var checkDNSResourceSchema = schema.Schema{
 		"notes":                     NotesAttribute(),
 		"include_in_global_metrics": IncludeInGlobalMetricsAttribute(),
 	},
-}
-
-type checkDNSRecordTypeValidator struct{}
-
-func (c *checkDNSRecordTypeValidator) Description(_ context.Context) string {
-	return ""
-}
-
-func (c *checkDNSRecordTypeValidator) MarkdownDescription(_ context.Context) string {
-	return ""
-}
-
-func (c *checkDNSRecordTypeValidator) ValidateString(_ context.Context, rq validator.StringRequest, rs *validator.StringResponse) {
-	if rq.ConfigValue.IsNull() {
-		return
-	}
-	var valid = map[string]bool{
-		"ANY":   true,
-		"A":     true,
-		"AAAA":  true,
-		"CNAME": true,
-		"MX":    true,
-		"NS":    true,
-		"SOA":   true,
-		"SRV":   true,
-		"TXT":   true,
-	}
-	if !valid[rq.ConfigValue.ValueString()] {
-		rs.Diagnostics.AddAttributeError(
-			rq.Path,
-			"Invalid DNS record type",
-			"DNS record type must be one of: ANY, A, AAAA, CNAME, MX, NS, SOA, SRV, TXT",
-		)
-	}
 }
 
 type checkDNSResourceModel struct {
