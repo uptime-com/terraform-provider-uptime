@@ -48,7 +48,11 @@ func (w *copyOutWalker) Walk(path string, tag Tag, f reflect.Value) error {
 	if !t.CanSet() {
 		return fmt.Errorf("value is not settable: %s", path)
 	}
-	return w.copyOut(f, *t, tag)
+	err = w.copyOut(f, *t, tag)
+	if err != nil {
+		return fmt.Errorf("%s: %w", path, err)
+	}
+	return nil
 }
 
 func (w *copyOutWalker) copyOut(f reflect.Value, t reflect.Value, tag Tag) (err error) {
