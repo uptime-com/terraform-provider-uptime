@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
@@ -60,19 +61,16 @@ type statusPageResourceModel struct {
 
 var statusPageResourceSchema = schema.Schema{
 	Attributes: map[string]schema.Attribute{
-		"id": schema.Int64Attribute{
-			Computed: true,
-		},
-		"url": schema.StringAttribute{
-			Computed: true,
-		},
-		"name": schema.StringAttribute{
-			Required: true,
-		},
+		"id":   IDAttribute(),
+		"url":  URLAttribute(),
+		"name": NameAttribute(),
 		"visibility_level": schema.StringAttribute{
 			Optional: true,
 			Computed: true,
 			Default:  stringdefault.StaticString("UPTIME_USERS"),
+			Validators: []validator.String{
+				OneOfStringValidator([]string{"PUBLIC", "UPTIME_USERS", "EXTERNAL_USERS"}),
+			},
 		},
 		"description": schema.StringAttribute{
 			Optional: true,
@@ -82,7 +80,10 @@ var statusPageResourceSchema = schema.Schema{
 		"page_type": schema.StringAttribute{
 			Optional: true,
 			Computed: true,
-			Default:  stringdefault.StaticString("PUBLIC"),
+			Default:  stringdefault.StaticString("INTERNAL"),
+			Validators: []validator.String{
+				OneOfStringValidator([]string{"INTERNAL", "PUBLIC", "PUBLIC_SLA"}),
+			},
 		},
 		"slug": schema.StringAttribute{
 			Optional: true,
@@ -218,7 +219,7 @@ var statusPageResourceSchema = schema.Schema{
 		"timezone": schema.StringAttribute{
 			Optional: true,
 			Computed: true,
-			Default:  stringdefault.StaticString("UTC"),
+			Default:  stringdefault.StaticString("GMT"),
 		},
 	},
 }

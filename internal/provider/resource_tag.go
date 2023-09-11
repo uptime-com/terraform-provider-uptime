@@ -22,12 +22,8 @@ func NewTagResource(_ context.Context, p *providerImpl) resource.Resource {
 
 var tagResourceSchema = schema.Schema{
 	Attributes: map[string]schema.Attribute{
-		"id": schema.Int64Attribute{
-			Computed: true,
-		},
-		"url": schema.StringAttribute{
-			Computed: true,
-		},
+		"id":  IDAttribute(),
+		"url": URLAttribute(),
 		"tag": schema.StringAttribute{
 			Required: true,
 		},
