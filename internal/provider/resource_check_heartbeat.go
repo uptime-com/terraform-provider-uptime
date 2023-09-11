@@ -22,43 +22,18 @@ func NewCheckHeartbeatResource(_ context.Context, p *providerImpl) resource.Reso
 
 var checkHeartbeatResourceSchema = schema.Schema{
 	Attributes: map[string]schema.Attribute{
-		"id": schema.Int64Attribute{
-			Computed: true,
-		},
-		"url": schema.StringAttribute{
-			Computed: true,
-		},
-		"name": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"contact_groups": schema.SetAttribute{
-			Required:    true,
-			ElementType: types.StringType,
-		},
-		"tags": schema.SetAttribute{
-			Optional:    true,
-			Computed:    true,
-			ElementType: types.StringType,
-		},
-		"is_paused": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"interval": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
-		"notes": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"include_in_global_metrics": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-		},
+		"id":                        IDAttribute(),
+		"url":                       URLAttribute(),
+		"name":                      NameAttribute(),
+		"contact_groups":            ContactGroupsAttribute(),
+		"tags":                      TagsAttribute(),
+		"is_paused":                 IsPausedAttribute(),
+		"interval":                  IntervalAttribute(5),
+		"notes":                     NotesAttribute(),
+		"include_in_global_metrics": IncludeInGlobalMetricsAttribute(),
 		"heartbeat_url": schema.StringAttribute{
-			Computed: true,
+			Computed:    true,
+			Description: "URL to send data to the check",
 		},
 	},
 }
