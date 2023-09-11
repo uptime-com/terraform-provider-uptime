@@ -21,45 +21,20 @@ func NewCheckBlacklistResource(_ context.Context, p *providerImpl) resource.Reso
 }
 
 var checkBlacklistResourceSchema = schema.Schema{
+	Description: "Checks your domain against approximately 100 of the most well-known spam blacklists once per day to see if it’s included on those lists",
 	Attributes: map[string]schema.Attribute{
-		"id": schema.Int64Attribute{
-			Computed: true,
-		},
-		"url": schema.StringAttribute{
-			Computed: true,
-		},
-		"name": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"contact_groups": schema.SetAttribute{
-			Required:    true,
-			ElementType: types.StringType,
-		},
-		"locations": schema.SetAttribute{
-			Required:    false,
-			Computed:    true,
-			ElementType: types.StringType,
-		},
-		"tags": schema.SetAttribute{
-			Optional:    true,
-			Computed:    true,
-			ElementType: types.StringType,
-		},
-		"is_paused": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-		},
+		"id":             IDAttribute(),
+		"url":            URLAttribute(),
+		"name":           NameAttribute(),
+		"contact_groups": ContactGroupsAttribute(),
+		"tags":           TagsAttribute(),
+		"is_paused":      IsPausedAttribute(),
+		"num_retries":    NumRetriesAttribute(2),
+		"notes":          NotesAttribute(),
+
 		"address": schema.StringAttribute{
-			Required: true,
-		},
-		"num_retries": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
-		"notes": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
+			Required:    true,
+			Description: "Domain name to check",
 		},
 	},
 }
@@ -69,7 +44,6 @@ type checkBlacklistResourceModel struct {
 	URL           types.String `tfsdk:"url" ref:"URL,opt"`
 	Name          types.String `tfsdk:"name"`
 	ContactGroups types.Set    `tfsdk:"contact_groups"`
-	Locations     types.Set    `tfsdk:"locations"`
 	Tags          types.Set    `tfsdk:"tags"`
 	IsPaused      types.Bool   `tfsdk:"is_paused"`
 	Address       types.String `tfsdk:"address"`
