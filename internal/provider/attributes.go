@@ -84,6 +84,13 @@ func LocationsAttribute() schema.SetAttribute {
 	}
 }
 
+func LocationsReadOnlyAttribute() schema.SetAttribute {
+	return schema.SetAttribute{
+		ElementType: types.StringType,
+		Computed:    true,
+	}
+}
+
 func NotesAttribute() schema.StringAttribute {
 	return schema.StringAttribute{
 		Optional: true,
@@ -120,10 +127,25 @@ func TagsAttribute() schema.SetAttribute {
 }
 
 func ThresholdAttribute(defaultVal int64) schema.Int64Attribute {
+	return ThresholdDescriptionAttribute(defaultVal, "A timeout alert will be issued if the check takes longer than this many seconds to complete")
+}
+
+func ThresholdDescriptionAttribute(defaultVal int64, desc string) schema.Int64Attribute {
 	return schema.Int64Attribute{
 		Optional:    true,
 		Computed:    true,
-		Description: "A timeout alert will be issued if the check takes longer than this many seconds to complete",
+		Description: desc,
 		Default:     int64default.StaticInt64(defaultVal),
+	}
+}
+
+func UseIPVersionAttribute() schema.StringAttribute {
+	return schema.StringAttribute{
+		Optional: true,
+		Computed: true,
+		Default:  stringdefault.StaticString(""),
+		Validators: []validator.String{
+			OneOfStringValidator([]string{"", "IPV4", "IPV6"}),
+		},
 	}
 }
