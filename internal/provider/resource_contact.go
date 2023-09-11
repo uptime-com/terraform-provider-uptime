@@ -22,39 +22,38 @@ func NewContactResource(_ context.Context, p *providerImpl) resource.Resource {
 
 var contactResourceSchema = schema.Schema{
 	Attributes: map[string]schema.Attribute{
-		"id": schema.Int64Attribute{
-			Computed: true,
-		},
-		"url": schema.StringAttribute{
-			Computed: true,
-		},
-		"name": schema.StringAttribute{
-			Required: true,
-		},
+		"id":   IDAttribute(),
+		"url":  URLAttribute(),
+		"name": NameAttribute(),
 		"sms_list": schema.SetAttribute{
 			ElementType: types.StringType,
 			Computed:    true,
 			Optional:    true,
+			Default:     StringSetEmptyDefault(),
 		},
 		"email_list": schema.SetAttribute{
 			ElementType: types.StringType,
 			Computed:    true,
 			Optional:    true,
+			Default:     StringSetEmptyDefault(),
 		},
 		"phonecall_list": schema.SetAttribute{
 			ElementType: types.StringType,
 			Computed:    true,
 			Optional:    true,
+			Default:     StringSetEmptyDefault(),
 		},
 		"integrations": schema.SetAttribute{
 			ElementType: types.StringType,
 			Computed:    true,
 			Optional:    true,
+			Default:     StringSetEmptyDefault(),
 		},
 		"push_notification_profiles": schema.SetAttribute{
 			ElementType: types.StringType,
 			Computed:    true,
 			Optional:    true,
+			Default:     StringSetEmptyDefault(),
 		},
 	},
 }
