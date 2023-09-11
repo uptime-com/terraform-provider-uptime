@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
@@ -23,74 +24,42 @@ func NewCheckDNSResource(_ context.Context, p *providerImpl) resource.Resource {
 
 var checkDNSResourceSchema = schema.Schema{
 	Attributes: map[string]schema.Attribute{
-		"id": schema.Int64Attribute{
-			Computed: true,
-		},
-		"url": schema.StringAttribute{
-			Computed: true,
-		},
-		"name": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"contact_groups": schema.SetAttribute{
-			Required:    true,
-			ElementType: types.StringType,
-		},
-		"locations": schema.SetAttribute{
-			Required:    true,
-			ElementType: types.StringType,
-		},
-		"tags": schema.SetAttribute{
-			Optional:    true,
-			Computed:    true,
-			ElementType: types.StringType,
-		},
-		"is_paused": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"interval": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
-		"threshold": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
+		"id":             IDAttribute(),
+		"url":            URLAttribute(),
+		"name":           NameAttribute(),
+		"contact_groups": ContactGroupsAttribute(),
+		"locations":      LocationsAttribute(),
+		"tags":           TagsAttribute(),
+		"is_paused":      IsPausedAttribute(),
+		"interval":       IntervalAttribute(5),
+		"threshold":      ThresholdAttribute(20),
 		"address": schema.StringAttribute{
 			Required: true,
 		},
 		"dns_server": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString(""),
+			Description: "DNS server to query",
 		},
 		"dns_record_type": schema.StringAttribute{
 			Optional: true,
+			Computed: true,
+			Default:  stringdefault.StaticString("ANY"),
 			Validators: []validator.String{
 				&checkDNSRecordTypeValidator{},
 			},
 		},
 		"expect_string": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString(""),
+			Description: "IP Address, Domain Name or String to expect in response",
 		},
-		"sensitivity": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
-		"num_retries": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
-		"notes": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"include_in_global_metrics": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-		},
+		"sensitivity":               SensitivityAttribute(2),
+		"num_retries":               NumRetriesAttribute(2),
+		"notes":                     NotesAttribute(),
+		"include_in_global_metrics": IncludeInGlobalMetricsAttribute(),
 	},
 }
 
@@ -105,6 +74,9 @@ func (c *checkDNSRecordTypeValidator) MarkdownDescription(_ context.Context) str
 }
 
 func (c *checkDNSRecordTypeValidator) ValidateString(_ context.Context, rq validator.StringRequest, rs *validator.StringResponse) {
+	if rq.ConfigValue.IsNull() {
+		return
+	}
 	var valid = map[string]bool{
 		"ANY":   true,
 		"A":     true,
