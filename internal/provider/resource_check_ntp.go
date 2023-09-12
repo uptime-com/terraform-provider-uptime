@@ -22,6 +22,7 @@ func NewCheckNTPResource(_ context.Context, p *providerImpl) resource.Resource {
 }
 
 var checkNTPResourceSchema = schema.Schema{
+	Description: "Monitor a Network Time Protocol server",
 	Attributes: map[string]schema.Attribute{
 		"id":                        IDAttribute(),
 		"url":                       URLAttribute(),

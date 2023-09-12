@@ -25,6 +25,7 @@ func NewCheckSSLCertResource(_ context.Context, p *providerImpl) resource.Resour
 }
 
 var checkSSLCertResourceSchema = schema.Schema{
+	Description: "Verify SSL certificate validity",
 	Attributes: map[string]schema.Attribute{
 		"id":             IDAttribute(),
 		"url":            URLAttribute(),
