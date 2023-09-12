@@ -3,12 +3,12 @@
 page_title: "uptime_check_blacklist Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  
+  Checks your domain against approximately 100 of the most well-known spam blacklists once per day to see if it’s included on those lists
 ---
 
 # uptime_check_blacklist (Resource)
 
-
+Checks your domain against approximately 100 of the most well-known spam blacklists once per day to see if it’s included on those lists
 
 
 
@@ -17,15 +17,15 @@ description: |-
 
 ### Required
 
-- `address` (String)
-- `contact_groups` (Set of String)
+- `address` (String) Domain name to check
+- `name` (String)
 
 ### Optional
 
+- `contact_groups` (Set of String)
 - `is_paused` (Boolean)
-- `name` (String)
 - `notes` (String)
-- `num_retries` (Number)
+- `num_retries` (Number) How many times the check should be retried before a location is considered down
 - `tags` (Set of String)
 
 ### Read-Only

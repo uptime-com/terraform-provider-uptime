@@ -3,12 +3,12 @@
 page_title: "uptime_check_dns Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  
+  Monitor for DNS failures or changes
 ---
 
 # uptime_check_dns (Resource)
 
-
+Monitor for DNS failures or changes
 
 
 
@@ -18,23 +18,23 @@ description: |-
 ### Required
 
 - `address` (String)
-- `contact_groups` (Set of String)
-- `locations` (Set of String)
+- `name` (String)
 
 ### Optional
 
+- `contact_groups` (Set of String)
 - `dns_record_type` (String)
-- `dns_server` (String)
-- `expect_string` (String)
-- `include_in_global_metrics` (Boolean)
-- `interval` (Number)
+- `dns_server` (String) DNS server to query
+- `expect_string` (String) IP Address, Domain Name or String to expect in response
+- `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
+- `interval` (Number) The interval between checks in minutes
 - `is_paused` (Boolean)
-- `name` (String)
+- `locations` (Set of String)
 - `notes` (String)
-- `num_retries` (Number)
-- `sensitivity` (Number)
+- `num_retries` (Number) How many times the check should be retried before a location is considered down
+- `sensitivity` (Number) How many locations should be down before an alert is sent
 - `tags` (Set of String)
-- `threshold` (Number)
+- `threshold` (Number) A timeout alert will be issued if the check takes longer than this many seconds to complete
 
 ### Read-Only
 

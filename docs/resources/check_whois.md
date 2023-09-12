@@ -3,12 +3,12 @@
 page_title: "uptime_check_whois Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  
+  Monitor domain's expiry date and registration details
 ---
 
 # uptime_check_whois (Resource)
 
-
+Monitor domain's expiry date and registration details
 
 
 
@@ -18,17 +18,17 @@ description: |-
 ### Required
 
 - `address` (String)
-- `contact_groups` (Set of String)
-- `expect_string` (String)
-- `threshold` (Number)
+- `expect_string` (String) The current domain registration info that should always match.
+- `name` (String)
 
 ### Optional
 
+- `contact_groups` (Set of String)
 - `is_paused` (Boolean)
-- `name` (String)
 - `notes` (String)
-- `num_retries` (Number)
+- `num_retries` (Number) How many times the check should be retried before a location is considered down
 - `tags` (Set of String)
+- `threshold` (Number) Raise an alert if there are less than this many days before the domain needs to be renewed.
 
 ### Read-Only
 
