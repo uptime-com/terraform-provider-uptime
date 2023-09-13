@@ -97,7 +97,7 @@ var checkHTTPResourceSchema = schema.Schema{
 			},
 			Optional: true,
 			Computed: true,
-			Default:  mapdefault.StaticValue(types.MapValueMust(types.StringType, map[string]attr.Value{})),
+			Default:  mapdefault.StaticValue(types.MapValueMust(types.ListType{ElemType: types.StringType}, map[string]attr.Value{})),
 		},
 		"version": schema.Int64Attribute{
 			Optional:    true,
