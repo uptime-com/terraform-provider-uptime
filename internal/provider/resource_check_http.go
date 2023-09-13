@@ -26,6 +26,7 @@ func NewCheckHTTPResource(_ context.Context, p *providerImpl) resource.Resource 
 }
 
 var checkHTTPResourceSchema = schema.Schema{
+	Description: "Monitor a URL for specific status code(s)",
 	Attributes: map[string]schema.Attribute{
 		"id":                        IDAttribute(),
 		"url":                       URLAttribute(),
@@ -96,7 +97,7 @@ var checkHTTPResourceSchema = schema.Schema{
 			},
 			Optional: true,
 			Computed: true,
-			Default:  mapdefault.StaticValue(types.MapValueMust(types.StringType, map[string]attr.Value{})),
+			Default:  mapdefault.StaticValue(types.MapValueMust(types.ListType{ElemType: types.StringType}, map[string]attr.Value{})),
 		},
 		"version": schema.Int64Attribute{
 			Optional:    true,

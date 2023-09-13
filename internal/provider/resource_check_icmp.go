@@ -21,6 +21,7 @@ func NewCheckICMPResource(_ context.Context, p *providerImpl) resource.Resource 
 }
 
 var checkICMPResourceSchema = schema.Schema{
+	Description: "Monitor network activity for a specific domain or IP address",
 	Attributes: map[string]schema.Attribute{
 		"id":                        IDAttribute(),
 		"url":                       URLAttribute(),

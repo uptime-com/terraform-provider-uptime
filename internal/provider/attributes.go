@@ -40,7 +40,7 @@ func ContactGroupsAttribute() schema.SetAttribute {
 		ElementType: types.StringType,
 		Optional:    true,
 		Computed:    true,
-		Default:     setdefault.StaticValue(mustDiag(types.SetValue(types.StringType, []attr.Value{types.StringValue("Default")}))),
+		Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{types.StringValue("Default")})),
 	}
 }
 
@@ -75,12 +75,12 @@ func LocationsAttribute() schema.SetAttribute {
 		ElementType: types.StringType,
 		Optional:    true,
 		Computed:    true,
-		Default: setdefault.StaticValue(mustDiag(types.SetValue(types.StringType,
+		Default: setdefault.StaticValue(types.SetValueMust(types.StringType,
 			[]attr.Value{
 				types.StringValue("US East"),
 				types.StringValue("US West"),
 			},
-		))),
+		)),
 	}
 }
 
@@ -122,7 +122,7 @@ func TagsAttribute() schema.SetAttribute {
 		Optional:    true,
 		Computed:    true,
 		ElementType: types.StringType,
-		Default:     setdefault.StaticValue(mustDiag(types.SetValue(types.StringType, []attr.Value{}))),
+		Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 	}
 }
 

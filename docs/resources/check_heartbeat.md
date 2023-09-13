@@ -3,12 +3,12 @@
 page_title: "uptime_check_heartbeat Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  
+  Monitor a periodic process, such as Cron, and issue alerts if the expected interval is exceeded
 ---
 
 # uptime_check_heartbeat (Resource)
 
-
+Monitor a periodic process, such as Cron, and issue alerts if the expected interval is exceeded
 
 
 
@@ -17,20 +17,20 @@ description: |-
 
 ### Required
 
-- `contact_groups` (Set of String)
+- `name` (String)
 
 ### Optional
 
-- `include_in_global_metrics` (Boolean)
-- `interval` (Number)
+- `contact_groups` (Set of String)
+- `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
+- `interval` (Number) The interval between checks in minutes
 - `is_paused` (Boolean)
-- `name` (String)
 - `notes` (String)
 - `tags` (Set of String)
 
 ### Read-Only
 
-- `heartbeat_url` (String)
+- `heartbeat_url` (String) URL to send data to the check
 - `id` (Number) The ID of this resource.
 - `url` (String)
 

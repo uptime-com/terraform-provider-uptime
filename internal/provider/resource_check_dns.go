@@ -23,6 +23,7 @@ func NewCheckDNSResource(_ context.Context, p *providerImpl) resource.Resource {
 }
 
 var checkDNSResourceSchema = schema.Schema{
+	Description: "Monitor for DNS failures or changes",
 	Attributes: map[string]schema.Attribute{
 		"id":             IDAttribute(),
 		"url":            URLAttribute(),

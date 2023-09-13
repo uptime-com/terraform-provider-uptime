@@ -3,12 +3,12 @@
 page_title: "uptime_check_http Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  
+  Monitor a URL for specific status code(s)
 ---
 
 # uptime_check_http (Resource)
 
-
+Monitor a URL for specific status code(s)
 
 
 
@@ -17,32 +17,32 @@ description: |-
 
 ### Required
 
-- `address` (String)
-- `contact_groups` (Set of String)
-- `locations` (Set of String)
+- `address` (String) URL to check
+- `name` (String)
 
 ### Optional
 
-- `encryption` (String)
+- `contact_groups` (Set of String)
+- `encryption` (String) Whether to verify SSL/TLS certificates
 - `expect_string` (String)
 - `expect_string_type` (String)
 - `headers` (Map of List of String)
-- `include_in_global_metrics` (Boolean)
-- `interval` (Number)
+- `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
+- `interval` (Number) The interval between checks in minutes
 - `is_paused` (Boolean)
-- `name` (String)
+- `locations` (Set of String)
 - `notes` (String)
-- `num_retries` (Number)
+- `num_retries` (Number) How many times the check should be retried before a location is considered down
 - `password` (String, Sensitive)
 - `port` (Number)
 - `proxy` (String)
-- `send_string` (String)
-- `sensitivity` (Number)
+- `send_string` (String) String to post
+- `sensitivity` (Number) How many locations should be down before an alert is sent
 - `status_code` (String)
 - `tags` (Set of String)
-- `threshold` (Number)
+- `threshold` (Number) A timeout alert will be issued if the check takes longer than this many seconds to complete
 - `username` (String)
-- `version` (Number)
+- `version` (Number) Check version to use. Keep default value unless you are absolutely sure you need to change it
 
 ### Read-Only
 

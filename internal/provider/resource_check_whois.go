@@ -21,6 +21,7 @@ func NewCheckWHOISResource(_ context.Context, p *providerImpl) resource.Resource
 }
 
 var checkWHOISResourceSchema = schema.Schema{
+	Description: "Monitor domain's expiry date and registration details",
 	Attributes: map[string]schema.Attribute{
 		"id":             IDAttribute(),
 		"url":            URLAttribute(),

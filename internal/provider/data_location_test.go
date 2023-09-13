@@ -3,9 +3,10 @@ package provider
 import (
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"strconv"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestAccLocationsDataSource(t *testing.T) {

@@ -3,12 +3,12 @@
 page_title: "uptime_check_sslcert Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  
+  Verify SSL certificate validity
 ---
 
 # uptime_check_sslcert (Resource)
 
-
+Verify SSL certificate validity
 
 
 
@@ -18,19 +18,18 @@ description: |-
 ### Required
 
 - `address` (String)
-- `contact_groups` (Set of String)
+- `name` (String)
 
 ### Optional
 
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
+- `contact_groups` (Set of String)
 - `is_paused` (Boolean)
-- `name` (String)
 - `notes` (String)
-- `num_retries` (Number)
+- `num_retries` (Number) How many times the check should be retried before a location is considered down
 - `port` (Number)
-- `protocol` (String)
 - `tags` (Set of String)
-- `threshold` (Number)
+- `threshold` (Number) Raise an alert if there are less than this many days before the SSL certificate needs to be renewed
 
 ### Read-Only
 
@@ -49,8 +48,8 @@ Optional:
 - `issuer` (String)
 - `match` (String)
 - `min_version` (String)
-- `protocol` (String)
+- `protocol` (String) Application level protocol
 - `self_signed` (Boolean)
-- `url` (String)
+- `url` (String) Specify location of certificate or CRL file by URL, instead of retrieving from main domain address.
 
 

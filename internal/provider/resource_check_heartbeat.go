@@ -21,6 +21,7 @@ func NewCheckHeartbeatResource(_ context.Context, p *providerImpl) resource.Reso
 }
 
 var checkHeartbeatResourceSchema = schema.Schema{
+	Description: "Monitor a periodic process, such as Cron, and issue alerts if the expected interval is exceeded",
 	Attributes: map[string]schema.Attribute{
 		"id":                        IDAttribute(),
 		"url":                       URLAttribute(),
