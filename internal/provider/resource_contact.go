@@ -3,8 +3,10 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
@@ -29,31 +31,31 @@ var contactResourceSchema = schema.Schema{
 			ElementType: types.StringType,
 			Computed:    true,
 			Optional:    true,
-			Default:     StringSetEmptyDefault(),
+			Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 		},
 		"email_list": schema.SetAttribute{
 			ElementType: types.StringType,
 			Computed:    true,
 			Optional:    true,
-			Default:     StringSetEmptyDefault(),
+			Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 		},
 		"phonecall_list": schema.SetAttribute{
 			ElementType: types.StringType,
 			Computed:    true,
 			Optional:    true,
-			Default:     StringSetEmptyDefault(),
+			Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 		},
 		"integrations": schema.SetAttribute{
 			ElementType: types.StringType,
 			Computed:    true,
 			Optional:    true,
-			Default:     StringSetEmptyDefault(),
+			Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 		},
 		"push_notification_profiles": schema.SetAttribute{
 			ElementType: types.StringType,
 			Computed:    true,
 			Optional:    true,
-			Default:     StringSetEmptyDefault(),
+			Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 		},
 	},
 }
