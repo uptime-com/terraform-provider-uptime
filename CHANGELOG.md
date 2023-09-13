@@ -1,5 +1,15 @@
 # Uptime.com Terraform provider changelog
 
+## v2.1.0
+
+Changes since v2.0.0:
+
+* Added sensible default values to many previously required arguments thus making them optional. Backwards-compatible with v2.0.0.
+* Added `uptime_contact` resource
+* Added `uptime_statuspage` resource
+* Added `uptime_check_dns` resource
+* Added `uptime_check_icmp` resource
+
 ## v2.0.0
 
 Initial v2 release. Ported to Terraform Plugin Framework. 

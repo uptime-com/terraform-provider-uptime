@@ -46,7 +46,7 @@ func (r *genericResource[Model, Arg, Res]) Create(ctx context.Context, rq resour
 		diags  diag.Diagnostics
 		err    error
 	)
-	diags = rq.Config.Get(ctx, &obj)
+	diags = rq.Plan.Get(ctx, &obj)
 	if diags.HasError() {
 		rs.Diagnostics.Append(diags...)
 		return
@@ -117,7 +117,7 @@ func (r *genericResource[Model, Arg, Res]) Update(ctx context.Context, rq resour
 		rs.Diagnostics.Append(diags...)
 		return
 	}
-	diags = rq.Config.Get(ctx, &obj)
+	diags = rq.Plan.Get(ctx, &obj)
 	if diags.HasError() {
 		rs.Diagnostics.Append(diags...)
 		return

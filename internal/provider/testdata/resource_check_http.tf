@@ -1,8 +1,5 @@
 resource uptime_check_http test {
   name           = "{{ petname 3 "-" }}"
-  contact_groups = ["nobody"]
-  locations      = ["US East", "US West"]
-  interval       = 5
   address        = "https://example.com"
 }
 // ---

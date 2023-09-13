@@ -3,12 +3,12 @@
 page_title: "uptime_check_api Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  
+  Multi-step advanced check type that is intended to monitor API such as REST or SOAP
 ---
 
 # uptime_check_api (Resource)
 
-
+Multi-step advanced check type that is intended to monitor API such as REST or SOAP
 
 
 
@@ -17,21 +17,21 @@ description: |-
 
 ### Required
 
-- `contact_groups` (Set of String)
-- `locations` (Set of String)
+- `name` (String)
 - `script` (String)
 
 ### Optional
 
-- `include_in_global_metrics` (Boolean)
-- `interval` (Number)
+- `contact_groups` (Set of String)
+- `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
+- `interval` (Number) The interval between checks in minutes
 - `is_paused` (Boolean)
-- `name` (String)
+- `locations` (Set of String)
 - `notes` (String)
-- `num_retries` (Number)
-- `sensitivity` (Number)
+- `num_retries` (Number) How many times the check should be retried before a location is considered down
+- `sensitivity` (Number) How many locations should be down before an alert is sent
 - `tags` (Set of String)
-- `threshold` (Number)
+- `threshold` (Number) A timeout alert will be issued if the check takes longer than this many seconds to complete
 
 ### Read-Only
 

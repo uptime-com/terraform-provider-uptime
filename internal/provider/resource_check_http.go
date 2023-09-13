@@ -3,8 +3,13 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
@@ -21,81 +26,70 @@ func NewCheckHTTPResource(_ context.Context, p *providerImpl) resource.Resource 
 }
 
 var checkHTTPResourceSchema = schema.Schema{
+	Description: "Monitor a URL for specific status code(s)",
 	Attributes: map[string]schema.Attribute{
-		"id": schema.Int64Attribute{
-			Computed: true,
-		},
-		"url": schema.StringAttribute{
-			Computed: true,
-		},
-		"name": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"contact_groups": schema.SetAttribute{
-			ElementType: types.StringType,
-			Required:    true,
-		},
-		"locations": schema.SetAttribute{
-			ElementType: types.StringType,
-			Required:    true,
-		},
-		"tags": schema.SetAttribute{
-			ElementType: types.StringType,
-			Optional:    true,
-			Computed:    true,
-		},
-		"is_paused": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"interval": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
+		"id":                        IDAttribute(),
+		"url":                       URLAttribute(),
+		"name":                      NameAttribute(),
+		"contact_groups":            ContactGroupsAttribute(),
+		"locations":                 LocationsAttribute(),
+		"tags":                      TagsAttribute(),
+		"is_paused":                 IsPausedAttribute(),
+		"interval":                  IntervalAttribute(5),
+		"threshold":                 ThresholdAttribute(40),
+		"sensitivity":               SensitivityAttribute(2),
+		"num_retries":               NumRetriesAttribute(2),
+		"notes":                     NotesAttribute(),
+		"include_in_global_metrics": IncludeInGlobalMetricsAttribute(),
+
 		"address": schema.StringAttribute{
-			Required: true,
+			Required:    true,
+			Description: "URL to check",
 		},
 		"port": schema.Int64Attribute{
-			Optional: true,
 			Computed: true,
+			Optional: true,
+			Default:  int64default.StaticInt64(0),
 		},
 		"username": schema.StringAttribute{
 			Optional: true,
 			Computed: true,
+			Default:  stringdefault.StaticString(""),
 		},
 		"password": schema.StringAttribute{
 			Optional:  true,
 			Computed:  true,
 			Sensitive: true,
+			Default:   stringdefault.StaticString(""),
 		},
 		"proxy": schema.StringAttribute{
 			Optional: true,
 			Computed: true,
+			Default:  stringdefault.StaticString(""),
 		},
 		"status_code": schema.StringAttribute{
 			Optional: true,
 			Computed: true,
+			Default:  stringdefault.StaticString("200"),
 		},
 		"send_string": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString(""),
+			Description: "String to post",
 		},
 		"expect_string": schema.StringAttribute{
 			Optional: true,
 			Computed: true,
+			Default:  stringdefault.StaticString(""),
 		},
 		"expect_string_type": schema.StringAttribute{
 			Optional: true,
 			Computed: true,
-		},
-		"encryption": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"threshold": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
+			Default:  stringdefault.StaticString("STRING"),
+			Validators: []validator.String{
+				OneOfStringValidator([]string{"STRING", "REGEX", "INVERSE_REGEX"}),
+			},
 		},
 		"headers": schema.MapAttribute{
 			ElementType: types.ListType{
@@ -103,26 +97,20 @@ var checkHTTPResourceSchema = schema.Schema{
 			},
 			Optional: true,
 			Computed: true,
+			Default:  mapdefault.StaticValue(types.MapValueMust(types.ListType{ElemType: types.StringType}, map[string]attr.Value{})),
 		},
 		"version": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
+			Optional:    true,
+			Computed:    true,
+			Default:     int64default.StaticInt64(2),
+			Description: "Check version to use. Keep default value unless you are absolutely sure you need to change it",
 		},
-		"sensitivity": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
-		"num_retries": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-		},
-		"notes": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-		},
-		"include_in_global_metrics": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
+
+		"encryption": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString("SSL_TLS"),
+			Description: "Whether to verify SSL/TLS certificates",
 		},
 	},
 }

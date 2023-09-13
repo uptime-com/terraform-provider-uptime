@@ -107,11 +107,14 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewCheckDNSResource(ctx, p) },
 		func() resource.Resource { return NewCheckHeartbeatResource(ctx, p) },
 		func() resource.Resource { return NewCheckHTTPResource(ctx, p) },
+		func() resource.Resource { return NewCheckICMPResource(ctx, p) },
 		func() resource.Resource { return NewCheckMalwareResource(ctx, p) },
 		func() resource.Resource { return NewCheckNTPResource(ctx, p) },
 		func() resource.Resource { return NewCheckSSLCertResource(ctx, p) },
 		func() resource.Resource { return NewCheckWHOISResource(ctx, p) },
 
+		func() resource.Resource { return NewContactResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageResource(ctx, p) },
 		func() resource.Resource { return NewTagResource(ctx, p) },
 	}
 }

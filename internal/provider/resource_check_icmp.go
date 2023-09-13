@@ -5,24 +5,23 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
 
-func NewCheckNTPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return &genericResource[checkNTPResourceModel, upapi.CheckNTP, upapi.Check]{
-		api: &checkNTPResourceAPI{provider: p},
+func NewCheckICMPResource(_ context.Context, p *providerImpl) resource.Resource {
+	return &genericResource[checkICMPResourceModel, upapi.CheckICMP, upapi.Check]{
+		api: &checkICMPResourceAPI{provider: p},
 		metadata: genericResourceMetadata{
-			TypeNameSuffix: "check_ntp",
-			Schema:         checkNTPResourceSchema,
+			TypeNameSuffix: "check_icmp",
+			Schema:         checkICMPResourceSchema,
 		},
 	}
 }
 
-var checkNTPResourceSchema = schema.Schema{
-	Description: "Monitor a Network Time Protocol server",
+var checkICMPResourceSchema = schema.Schema{
+	Description: "Monitor network activity for a specific domain or IP address",
 	Attributes: map[string]schema.Attribute{
 		"id":                        IDAttribute(),
 		"url":                       URLAttribute(),
@@ -32,25 +31,18 @@ var checkNTPResourceSchema = schema.Schema{
 		"tags":                      TagsAttribute(),
 		"is_paused":                 IsPausedAttribute(),
 		"interval":                  IntervalAttribute(5),
-		"threshold":                 ThresholdAttribute(20),
-		"sensitivity":               SensitivityAttribute(2),
 		"num_retries":               NumRetriesAttribute(2),
+		"use_ip_version":            UseIPVersionAttribute(),
 		"notes":                     NotesAttribute(),
 		"include_in_global_metrics": IncludeInGlobalMetricsAttribute(),
-		"use_ip_version":            UseIPVersionAttribute(),
 
 		"address": schema.StringAttribute{
 			Required: true,
 		},
-		"port": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-			Default:  int64default.StaticInt64(123),
-		},
 	},
 }
 
-type checkNTPResourceModel struct {
+type checkICMPResourceModel struct {
 	ID                     types.Int64  `tfsdk:"id"  ref:"PK,opt"`
 	URL                    types.String `tfsdk:"url" ref:"URL,opt"`
 	Name                   types.String `tfsdk:"name"`
@@ -59,34 +51,32 @@ type checkNTPResourceModel struct {
 	Tags                   types.Set    `tfsdk:"tags"`
 	IsPaused               types.Bool   `tfsdk:"is_paused"`
 	Interval               types.Int64  `tfsdk:"interval"`
-	Address                types.String `tfsdk:"address"`
-	Port                   types.Int64  `tfsdk:"port"`
-	Threshold              types.Int64  `tfsdk:"threshold"`
-	Sensitivity            types.Int64  `tfsdk:"sensitivity"`
 	NumRetries             types.Int64  `tfsdk:"num_retries"`
 	UseIPVersion           types.String `tfsdk:"use_ip_version"`
 	Notes                  types.String `tfsdk:"notes"`
 	IncludeInGlobalMetrics types.Bool   `tfsdk:"include_in_global_metrics"`
+
+	Address types.String `tfsdk:"address"`
 }
 
-var _ genericResourceAPI[upapi.CheckNTP, upapi.Check] = (*checkNTPResourceAPI)(nil)
+var _ genericResourceAPI[upapi.CheckICMP, upapi.Check] = (*checkICMPResourceAPI)(nil)
 
-type checkNTPResourceAPI struct {
+type checkICMPResourceAPI struct {
 	provider *providerImpl
 }
 
-func (c *checkNTPResourceAPI) Create(ctx context.Context, arg upapi.CheckNTP) (*upapi.Check, error) {
-	return c.provider.api.Checks().CreateNTP(ctx, arg)
+func (c *checkICMPResourceAPI) Create(ctx context.Context, arg upapi.CheckICMP) (*upapi.Check, error) {
+	return c.provider.api.Checks().CreateICMP(ctx, arg)
 }
 
-func (c *checkNTPResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
+func (c *checkICMPResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
 	return c.provider.api.Checks().Get(ctx, pk)
 }
 
-func (c *checkNTPResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckNTP) (*upapi.Check, error) {
-	return c.provider.api.Checks().UpdateNTP(ctx, pk, arg)
+func (c *checkICMPResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckICMP) (*upapi.Check, error) {
+	return c.provider.api.Checks().UpdateICMP(ctx, pk, arg)
 }
 
-func (c *checkNTPResourceAPI) Delete(ctx context.Context, pk upapi.PrimaryKeyable) error {
+func (c *checkICMPResourceAPI) Delete(ctx context.Context, pk upapi.PrimaryKeyable) error {
 	return c.provider.api.Checks().Delete(ctx, pk)
 }

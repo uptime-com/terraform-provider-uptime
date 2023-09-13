@@ -1,6 +1,5 @@
 resource uptime_check_blacklist test {
   name           = "{{ petname 3 "-" }}"
-  contact_groups = ["nobody"]
   address        = "example.com"
 }
 
