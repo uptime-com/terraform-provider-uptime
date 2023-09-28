@@ -8,11 +8,14 @@ import (
 	"net/textproto"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/gobeam/stringy"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	extratypes "github.com/mikluko/terraform-plugin-framework-extratypes"
 	"github.com/mitchellh/reflectwalk"
+	"github.com/shopspring/decimal"
 )
 
 func CopyIn(dst any, src any) error {
@@ -92,6 +95,11 @@ func (w *copyInWalker) copyIn(f reflect.Value, t reflect.Value, tag Tag) error {
 		return errors.New("not implemented")
 	case types.Object:
 		err := w.copyInObject(f, t)
+		if err != nil {
+			return err
+		}
+	case extratypes.Duration:
+		err := w.copyInDuration(f, t)
 		if err != nil {
 			return err
 		}
@@ -230,5 +238,29 @@ func (w *copyInWalker) copyInObject(f, t reflect.Value) error {
 		}
 	}
 	t.Set(reflect.ValueOf(types.ObjectValueMust(attrTypes, attrValues)))
+	return nil
+}
+
+func (w *copyInWalker) copyInDuration(f, t reflect.Value) error {
+	for f.Kind() == reflect.Ptr {
+		if f.IsNil() {
+			return nil
+		}
+		f = f.Elem()
+	}
+	dec, ok := f.Interface().(decimal.Decimal)
+	if !ok {
+		return fmt.Errorf("decimal.Decimal expected, got %T", f.Interface())
+	}
+	dec = dec.Mul(decimal.NewFromInt(int64(time.Second)))
+	if !dec.IsInteger() {
+		return errors.New("resulting duration is not an integer")
+	}
+	if dec.IsNegative() {
+		return errors.New("resulting duration is negative")
+	}
+	dur := time.Duration(dec.IntPart())
+	v := extratypes.NewDurationValue(dur.String())
+	t.Set(reflect.ValueOf(v))
 	return nil
 }

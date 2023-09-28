@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	extratypes "github.com/mikluko/terraform-plugin-framework-extratypes"
 )
 
 //
@@ -29,6 +30,18 @@ func URLAttribute() schema.StringAttribute {
 func NameAttribute() schema.StringAttribute {
 	return schema.StringAttribute{
 		Required: true,
+	}
+}
+
+// SLA Attributes
+
+func ResponseTimeSLAAttribute(defaultVal string) schema.StringAttribute {
+	return schema.StringAttribute{
+		CustomType:  extratypes.DurationType{},
+		Optional:    true,
+		Computed:    true,
+		Default:     stringdefault.StaticString(defaultVal),
+		Description: "The maximum average response time. Unit is mandatory (e.g. 1500ms or 1.5s or 1s500ms).",
 	}
 }
 

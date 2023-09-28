@@ -1,6 +1,6 @@
 resource uptime_check_api test {
-  name           = "{{ petname 3 "-" }}"
-  script         = jsonencode([
+  name   = "{{ petname 3 "-" }}"
+  script = jsonencode([
     {
       step_def = "C_GET"
       values   = {
@@ -23,4 +23,5 @@ resource uptime_check_api test {
       }
     },
   ])
+  response_time_sla = "500ms"
 }

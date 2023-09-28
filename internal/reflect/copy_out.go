@@ -11,7 +11,9 @@ import (
 	"github.com/gobeam/stringy"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	extratypes "github.com/mikluko/terraform-plugin-framework-extratypes"
 	"github.com/mitchellh/reflectwalk"
+	"github.com/shopspring/decimal"
 )
 
 func CopyOut(dst any, src any) error {
@@ -122,6 +124,8 @@ func (w *copyOutWalker) copyOut(f reflect.Value, t reflect.Value, tag Tag) (err 
 		if err != nil {
 			return fmt.Errorf("%w", err)
 		}
+	case extratypes.Duration:
+		return w.copyOutDuration(x, t)
 	default:
 		return fmt.Errorf("unsupported type: %T", x)
 	}
@@ -210,13 +214,13 @@ func (w *copyOutWalker) copyOutMap(x mapElementable, v reflect.Value) error {
 
 func (w *copyOutWalker) copyOutHeadersMap(x mapElementable, v reflect.Value) error {
 	header := make(http.Header)
-	for key, attr := range x.Elements() {
-		values, ok := attr.(types.List)
+	for key, val := range x.Elements() {
+		values, ok := val.(types.List)
 		if !ok {
-			return fmt.Errorf("types.ListType{types.StringType} element expected, got %T", attr)
+			return fmt.Errorf("types.ListType{types.StringType} element expected, got %T", val)
 		}
 		if values.ElementType(nil) != types.StringType {
-			return fmt.Errorf("types.ListType{types.StringType} element expected, got %T", attr)
+			return fmt.Errorf("types.ListType{types.StringType} element expected, got %T", val)
 		}
 		for _, e := range values.Elements() {
 			header.Add(key, e.(types.String).ValueString())
@@ -294,5 +298,25 @@ func (w *copyOutWalker) objectTo(f objectAttributable, t reflect.Value) error {
 			return fmt.Errorf("unsupported type: %T", x)
 		}
 	}
+	return nil
+}
+
+func (w *copyOutWalker) derefInit(v reflect.Value) reflect.Value {
+	if v.Kind() == reflect.Ptr {
+		if v.IsNil() {
+			v.Set(reflect.New(v.Type().Elem()))
+		}
+		return w.derefInit(v.Elem())
+	}
+	return v
+}
+
+func (w *copyOutWalker) copyOutDuration(x extratypes.Duration, val reflect.Value) error {
+	val = w.derefInit(val)
+	dur, diags := x.ValueDuration()
+	if diags.HasError() {
+		return fmt.Errorf("%ss: %s", diags.Errors()[0].Summary(), diags.Errors()[0].Detail())
+	}
+	val.Set(reflect.ValueOf(decimal.NewFromFloat(dur.Seconds())))
 	return nil
 }

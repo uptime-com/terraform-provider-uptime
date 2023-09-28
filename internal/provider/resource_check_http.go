@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	extratypes "github.com/mikluko/terraform-plugin-framework-extratypes"
 
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
@@ -41,6 +42,7 @@ var checkHTTPResourceSchema = schema.Schema{
 		"num_retries":               NumRetriesAttribute(2),
 		"notes":                     NotesAttribute(),
 		"include_in_global_metrics": IncludeInGlobalMetricsAttribute(),
+		"response_time_sla":         ResponseTimeSLAAttribute("1s"),
 
 		"address": schema.StringAttribute{
 			Required:    true,
@@ -116,31 +118,32 @@ var checkHTTPResourceSchema = schema.Schema{
 }
 
 type checkHTTPResourceModel struct {
-	ID                     types.Int64  `tfsdk:"id"  ref:"PK,opt"`
-	URL                    types.String `tfsdk:"url" ref:"URL,opt"`
-	Name                   types.String `tfsdk:"name"`
-	ContactGroups          types.Set    `tfsdk:"contact_groups"`
-	Locations              types.Set    `tfsdk:"locations"`
-	Tags                   types.Set    `tfsdk:"tags"`
-	IsPaused               types.Bool   `tfsdk:"is_paused"`
-	Interval               types.Int64  `tfsdk:"interval"`
-	Address                types.String `tfsdk:"address"`
-	Port                   types.Int64  `tfsdk:"port"`
-	Username               types.String `tfsdk:"username"`
-	Password               types.String `tfsdk:"password"`
-	Proxy                  types.String `tfsdk:"proxy"`
-	StatusCode             types.String `tfsdk:"status_code"`
-	SendString             types.String `tfsdk:"send_string"`
-	ExpectString           types.String `tfsdk:"expect_string"`
-	ExpectStringType       types.String `tfsdk:"expect_string_type"`
-	Encryption             types.String `tfsdk:"encryption"`
-	Threshold              types.Int64  `tfsdk:"threshold"`
-	Headers                types.Map    `tfsdk:"headers" ref:",extra=headers"`
-	Version                types.Int64  `tfsdk:"version"`
-	Sensitivity            types.Int64  `tfsdk:"sensitivity"`
-	NumRetries             types.Int64  `tfsdk:"num_retries"`
-	Notes                  types.String `tfsdk:"notes"`
-	IncludeInGlobalMetrics types.Bool   `tfsdk:"include_in_global_metrics"`
+	ID                     types.Int64         `tfsdk:"id"  ref:"PK,opt"`
+	URL                    types.String        `tfsdk:"url" ref:"URL,opt"`
+	Name                   types.String        `tfsdk:"name"`
+	ContactGroups          types.Set           `tfsdk:"contact_groups"`
+	Locations              types.Set           `tfsdk:"locations"`
+	Tags                   types.Set           `tfsdk:"tags"`
+	IsPaused               types.Bool          `tfsdk:"is_paused"`
+	Interval               types.Int64         `tfsdk:"interval"`
+	Address                types.String        `tfsdk:"address"`
+	Port                   types.Int64         `tfsdk:"port"`
+	Username               types.String        `tfsdk:"username"`
+	Password               types.String        `tfsdk:"password"`
+	Proxy                  types.String        `tfsdk:"proxy"`
+	StatusCode             types.String        `tfsdk:"status_code"`
+	SendString             types.String        `tfsdk:"send_string"`
+	ExpectString           types.String        `tfsdk:"expect_string"`
+	ExpectStringType       types.String        `tfsdk:"expect_string_type"`
+	Encryption             types.String        `tfsdk:"encryption"`
+	Threshold              types.Int64         `tfsdk:"threshold"`
+	Headers                types.Map           `tfsdk:"headers" ref:",extra=headers"`
+	Version                types.Int64         `tfsdk:"version"`
+	Sensitivity            types.Int64         `tfsdk:"sensitivity"`
+	NumRetries             types.Int64         `tfsdk:"num_retries"`
+	Notes                  types.String        `tfsdk:"notes"`
+	IncludeInGlobalMetrics types.Bool          `tfsdk:"include_in_global_metrics"`
+	ResponseTimeSLA        extratypes.Duration `tfsdk:"response_time_sla"`
 }
 
 var _ genericResourceAPI[upapi.CheckHTTP, upapi.Check] = (*checkHTTPResourceAPI)(nil)

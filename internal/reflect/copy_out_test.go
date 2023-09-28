@@ -5,6 +5,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	extratypes "github.com/mikluko/terraform-plugin-framework-extratypes"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -146,6 +148,21 @@ func TestCopyOut(t *testing.T) {
 		err := CopyOut(&dst, src)
 		require.NoError(t, err)
 		require.Equal(t, "Baz", dst.Foo.Bar)
+	})
+	t.Run("extratypes.Duration", func(t *testing.T) {
+		type SrcType struct {
+			Foo extratypes.Duration
+		}
+		type DstType struct {
+			Foo *decimal.Decimal
+		}
+		src := SrcType{
+			Foo: extratypes.NewDurationValue((time.Second*100 + time.Millisecond*500).String()),
+		}
+		dst := DstType{}
+		err := CopyOut(&dst, src)
+		require.NoError(t, err)
+		require.True(t, dst.Foo.Equal(decimal.RequireFromString("100.500")))
 	})
 	t.Run("options", func(t *testing.T) {
 		t.Run("path", func(t *testing.T) {

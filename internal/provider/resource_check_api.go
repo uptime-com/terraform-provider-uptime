@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	extratypes "github.com/mikluko/terraform-plugin-framework-extratypes"
 
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
@@ -36,6 +37,7 @@ var checkAPIResourceSchema = schema.Schema{
 		"num_retries":               NumRetriesAttribute(2),
 		"notes":                     NotesAttribute(),
 		"include_in_global_metrics": IncludeInGlobalMetricsAttribute(),
+		"response_time_sla":         ResponseTimeSLAAttribute("30s"),
 
 		"script": schema.StringAttribute{
 			Required: true,
@@ -58,6 +60,8 @@ type checkAPIResourceModel struct {
 	NumRetries             types.Int64  `tfsdk:"num_retries"`
 	Notes                  types.String `tfsdk:"notes"`
 	IncludeInGlobalMetrics types.Bool   `tfsdk:"include_in_global_metrics"`
+	//UptimeSLA              types.Number        `tfsdk:"uptime_sla"`
+	ResponseTimeSLA extratypes.Duration `tfsdk:"response_time_sla"`
 }
 
 var _ genericResourceAPI[upapi.CheckAPI, upapi.Check] = (*checkAPIResourceAPI)(nil)

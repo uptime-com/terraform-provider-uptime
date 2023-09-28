@@ -1,6 +1,6 @@
 module github.com/uptime-com/terraform-provider-uptime
 
-go 1.21
+go 1.21.1
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
@@ -52,6 +52,7 @@ require (
 	github.com/imdario/mergo v0.3.15 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/mikluko/terraform-plugin-framework-extratypes v0.0.0-20230928104135-b0637ae90572 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect

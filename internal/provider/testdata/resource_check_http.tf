@@ -1,14 +1,15 @@
 resource uptime_check_http test {
-  name           = "{{ petname 3 "-" }}"
-  address        = "https://example.com"
+  name    = "{{ petname 3 "-" }}"
+  address = "https://example.com"
 }
 // ---
 resource uptime_check_http test {
-  name           = "{{ petname 3 "-" }}"
-  contact_groups = ["nobody", "noone"]
-  locations      = ["Serbia", "Austria"]
-  interval       = 10
-  address        = "https://example.net"
+  name              = "{{ petname 3 "-" }}"
+  contact_groups    = ["nobody", "noone"]
+  locations         = ["Serbia", "Austria"]
+  interval          = 10
+  address           = "https://example.net"
+  response_time_sla = "500ms"
 }
 // ---
 resource uptime_check_http test {
@@ -20,4 +21,5 @@ resource uptime_check_http test {
   headers        = {
     "X-My-Header" = ["my-value", "my-other-value"]
   }
+  response_time_sla = "100ms"
 }

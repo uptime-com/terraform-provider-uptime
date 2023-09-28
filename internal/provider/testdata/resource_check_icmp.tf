@@ -4,10 +4,11 @@ resource uptime_check_icmp test {
 }
 // ---
 resource uptime_check_icmp test {
-  name           = "{{ petname 3 "-" }}"
-  locations      = ["Serbia", "Austria"]
-  contact_groups = ["nobody", "noone"]
-  address        = "example.net"
-  num_retries    = 3
-  interval       = 10
+  name              = "{{ petname 3 "-" }}"
+  locations         = ["Serbia", "Austria"]
+  contact_groups    = ["nobody", "noone"]
+  address           = "example.net"
+  num_retries       = 3
+  interval          = 10
+  response_time_sla = "50ms"
 }
