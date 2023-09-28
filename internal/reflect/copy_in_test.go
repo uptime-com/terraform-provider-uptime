@@ -2,6 +2,7 @@ package reflect
 
 import (
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -176,6 +177,21 @@ func TestCopyIn(t *testing.T) {
 		dst := DstType{}
 		err := CopyIn(&dst, src)
 		require.NoError(t, err)
+	})
+	t.Run("types.Number", func(t *testing.T) {
+		dec := decimal.NewFromFloat(100.500)
+		type SrcType struct {
+			Foo decimal.Decimal
+		}
+		type DstType struct {
+			Foo types.Number
+		}
+		obj := DstType{}
+		err := CopyIn(&obj, SrcType{
+			Foo: dec,
+		})
+		require.NoError(t, err)
+		require.True(t, obj.Foo.Equal(types.NumberValue(dec.BigFloat())))
 	})
 	t.Run("extratypes.Duration", func(t *testing.T) {
 		dec := decimal.NewFromFloat(100.500)

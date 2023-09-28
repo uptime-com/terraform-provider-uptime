@@ -1,7 +1,9 @@
 package reflect
 
 import (
+	"math/big"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -148,6 +150,21 @@ func TestCopyOut(t *testing.T) {
 		err := CopyOut(&dst, src)
 		require.NoError(t, err)
 		require.Equal(t, "Baz", dst.Foo.Bar)
+	})
+	t.Run("types.Number", func(t *testing.T) {
+		type SrcType struct {
+			Foo types.Number
+		}
+		type DstType struct {
+			Foo *decimal.Decimal
+		}
+		src := SrcType{
+			Foo: types.NumberValue(big.NewFloat(100.500)),
+		}
+		dst := DstType{}
+		err := CopyOut(&dst, src)
+		require.NoError(t, err)
+		require.True(t, dst.Foo.Equal(decimal.RequireFromString(src.Foo.String())))
 	})
 	t.Run("extratypes.Duration", func(t *testing.T) {
 		type SrcType struct {

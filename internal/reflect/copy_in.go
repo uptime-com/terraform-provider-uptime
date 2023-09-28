@@ -92,7 +92,10 @@ func (w *copyInWalker) copyIn(f reflect.Value, t reflect.Value, tag Tag) error {
 			return w.copyInMap(f, t)
 		}
 	case types.Number:
-		return errors.New("not implemented")
+		err := w.copyInNumber(f, t)
+		if err != nil {
+			return err
+		}
 	case types.Object:
 		err := w.copyInObject(f, t)
 		if err != nil {
@@ -238,6 +241,22 @@ func (w *copyInWalker) copyInObject(f, t reflect.Value) error {
 		}
 	}
 	t.Set(reflect.ValueOf(types.ObjectValueMust(attrTypes, attrValues)))
+	return nil
+}
+
+func (w *copyInWalker) copyInNumber(f, t reflect.Value) error {
+	for f.Kind() == reflect.Ptr {
+		if f.IsNil() {
+			return nil
+		}
+		f = f.Elem()
+	}
+	dec, ok := f.Interface().(decimal.Decimal)
+	if !ok {
+		return fmt.Errorf("decimal.Decimal expected, got %T", f.Interface())
+	}
+	v := types.NumberValue(dec.BigFloat())
+	t.Set(reflect.ValueOf(v))
 	return nil
 }
 

@@ -114,8 +114,6 @@ func (w *copyOutWalker) copyOut(f reflect.Value, t reflect.Value, tag Tag) (err 
 				return fmt.Errorf("%w", err)
 			}
 		}
-	case types.Number:
-		return errors.New("not implemented")
 	case types.Object:
 		if t.Kind() != reflect.Struct {
 			return fmt.Errorf("struct expected, got %T", t.Interface())
@@ -124,6 +122,8 @@ func (w *copyOutWalker) copyOut(f reflect.Value, t reflect.Value, tag Tag) (err 
 		if err != nil {
 			return fmt.Errorf("%w", err)
 		}
+	case types.Number:
+		return w.copyOutNumber(x, t)
 	case extratypes.Duration:
 		return w.copyOutDuration(x, t)
 	default:
@@ -309,6 +309,12 @@ func (w *copyOutWalker) derefInit(v reflect.Value) reflect.Value {
 		return w.derefInit(v.Elem())
 	}
 	return v
+}
+
+func (w *copyOutWalker) copyOutNumber(x types.Number, val reflect.Value) error {
+	val = w.derefInit(val)
+	val.Set(reflect.ValueOf(decimal.RequireFromString(x.ValueBigFloat().String())))
+	return nil
 }
 
 func (w *copyOutWalker) copyOutDuration(x extratypes.Duration, val reflect.Value) error {
