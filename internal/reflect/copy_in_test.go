@@ -6,9 +6,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	extratypes "github.com/mikluko/terraform-plugin-framework-extratypes"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
+
+	"github.com/uptime-com/terraform-provider-uptime/internal/customtypes"
 )
 
 func TestCopyIn(t *testing.T) {
@@ -193,21 +194,36 @@ func TestCopyIn(t *testing.T) {
 		require.NoError(t, err)
 		require.True(t, obj.Foo.Equal(types.NumberValue(dec.BigFloat())))
 	})
-	t.Run("extratypes.Duration", func(t *testing.T) {
+	t.Run("customtypes.Duration", func(t *testing.T) {
 		dec := decimal.NewFromFloat(100.500)
 		dur := time.Duration(100)*time.Second + time.Duration(500)*time.Millisecond
 		type SrcType struct {
 			Foo decimal.Decimal
 		}
 		type DstType struct {
-			Foo extratypes.Duration
+			Foo customtypes.Duration
 		}
 		obj := DstType{}
 		err := CopyIn(&obj, SrcType{
 			Foo: dec,
 		})
 		require.NoError(t, err)
-		require.True(t, obj.Foo.Equal(extratypes.NewDurationValue(dur.String())))
+		require.True(t, obj.Foo.Equal(customtypes.NewDurationValue(dur.String())))
+	})
+	t.Run("customtypes.SmartPercentage", func(t *testing.T) {
+		dec := decimal.NewFromFloat(0.1234)
+		type SrcType struct {
+			Foo decimal.Decimal
+		}
+		type DstType struct {
+			Foo customtypes.SmartPercentage
+		}
+		obj := DstType{}
+		err := CopyIn(&obj, SrcType{
+			Foo: dec,
+		})
+		require.NoError(t, err)
+		require.True(t, obj.Foo.Equal(customtypes.NewSmartPercentageValue(dec.BigFloat())), "expected 0.1234, got %s", obj.Foo.String())
 	})
 	t.Run("options", func(t *testing.T) {
 		t.Run("path", func(t *testing.T) {

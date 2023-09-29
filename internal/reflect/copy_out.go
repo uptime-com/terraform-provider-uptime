@@ -5,15 +5,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/big"
 	"net/http"
 	"reflect"
 
 	"github.com/gobeam/stringy"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	extratypes "github.com/mikluko/terraform-plugin-framework-extratypes"
 	"github.com/mitchellh/reflectwalk"
 	"github.com/shopspring/decimal"
+
+	"github.com/uptime-com/terraform-provider-uptime/internal/customtypes"
 )
 
 func CopyOut(dst any, src any) error {
@@ -29,16 +31,22 @@ type copyOutWalker struct {
 }
 
 func (w *copyOutWalker) Walk(path string, tag Tag, f reflect.Value) error {
-	if a, ok := f.Interface().(attr.Value); !ok {
-		return nil // skip value which isn't an attribute
-	} else if a.IsUnknown() {
-		return nil // skip value without value set
-	}
+	// FIXME: this should more rely on TF typing system and less on native reflection
 	if tag.Skip {
 		return nil
 	}
 	if tag.Path != "" {
 		path = tag.Path
+	}
+	a, ok := f.Interface().(attr.Value)
+	if !ok {
+		return nil // skip value which isn't an attribute
+	}
+	if a.IsUnknown() {
+		return nil // skip value without value set
+	}
+	if a.IsNull() {
+		return nil // skip null value
 	}
 	t, err := FindByPath(w.dst, path)
 	if err != nil {
@@ -124,8 +132,10 @@ func (w *copyOutWalker) copyOut(f reflect.Value, t reflect.Value, tag Tag) (err 
 		}
 	case types.Number:
 		return w.copyOutNumber(x, t)
-	case extratypes.Duration:
+	case customtypes.Duration:
 		return w.copyOutDuration(x, t)
+	case customtypes.SmartPercentage:
+		return w.copyOutSmartPercentage(x, t)
 	default:
 		return fmt.Errorf("unsupported type: %T", x)
 	}
@@ -317,12 +327,19 @@ func (w *copyOutWalker) copyOutNumber(x types.Number, val reflect.Value) error {
 	return nil
 }
 
-func (w *copyOutWalker) copyOutDuration(x extratypes.Duration, val reflect.Value) error {
+func (w *copyOutWalker) copyOutDuration(x customtypes.Duration, val reflect.Value) error {
 	val = w.derefInit(val)
 	dur, diags := x.ValueDuration()
 	if diags.HasError() {
 		return fmt.Errorf("%ss: %s", diags.Errors()[0].Summary(), diags.Errors()[0].Detail())
 	}
 	val.Set(reflect.ValueOf(decimal.NewFromFloat(dur.Seconds())))
+	return nil
+}
+
+func (w *copyOutWalker) copyOutSmartPercentage(x customtypes.SmartPercentage, val reflect.Value) error {
+	i, _ := new(big.Float).Mul(x.ValueBigFloat(), big.NewFloat(10000)).Int(nil)
+	d := decimal.NewFromBigInt(i, -4)
+	w.derefInit(val).Set(reflect.ValueOf(d))
 	return nil
 }

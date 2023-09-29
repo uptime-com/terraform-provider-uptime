@@ -6,7 +6,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	extratypes "github.com/mikluko/terraform-plugin-framework-extratypes"
+
+	"github.com/uptime-com/terraform-provider-uptime/internal/customtypes"
 
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
@@ -42,17 +43,17 @@ var checkHeartbeatResourceSchema = schema.Schema{
 }
 
 type checkHeartbeatResourceModel struct {
-	ID                     types.Int64         `tfsdk:"id"   ref:"PK,opt"`
-	URL                    types.String        `tfsdk:"url"  ref:"URL,opt"`
-	Name                   types.String        `tfsdk:"name"`
-	ContactGroups          types.Set           `tfsdk:"contact_groups"`
-	Tags                   types.Set           `tfsdk:"tags"`
-	IsPaused               types.Bool          `tfsdk:"is_paused"`
-	Interval               types.Int64         `tfsdk:"interval"`
-	Notes                  types.String        `tfsdk:"notes"`
-	IncludeInGlobalMetrics types.Bool          `tfsdk:"include_in_global_metrics"`
-	HeartbeatURL           types.String        `tfsdk:"heartbeat_url"`
-	ResponseTimeSLA        extratypes.Duration `tfsdk:"response_time_sla"`
+	ID                     types.Int64          `tfsdk:"id"   ref:"PK,opt"`
+	URL                    types.String         `tfsdk:"url"  ref:"URL,opt"`
+	Name                   types.String         `tfsdk:"name"`
+	ContactGroups          types.Set            `tfsdk:"contact_groups"`
+	Tags                   types.Set            `tfsdk:"tags"`
+	IsPaused               types.Bool           `tfsdk:"is_paused"`
+	Interval               types.Int64          `tfsdk:"interval"`
+	Notes                  types.String         `tfsdk:"notes"`
+	IncludeInGlobalMetrics types.Bool           `tfsdk:"include_in_global_metrics"`
+	HeartbeatURL           types.String         `tfsdk:"heartbeat_url"`
+	ResponseTimeSLA        customtypes.Duration `tfsdk:"response_time_sla"`
 }
 
 var _ genericResourceAPI[upapi.CheckHeartbeat, upapi.Check] = (*checkHeartbeatResourceAPI)(nil)

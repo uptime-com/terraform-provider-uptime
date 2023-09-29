@@ -8,7 +8,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	extratypes "github.com/mikluko/terraform-plugin-framework-extratypes"
+
+	"github.com/uptime-com/terraform-provider-uptime/internal/customtypes"
 
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
@@ -67,24 +68,24 @@ var checkDNSResourceSchema = schema.Schema{
 }
 
 type checkDNSResourceModel struct {
-	ID                     types.Int64         `tfsdk:"id"  ref:"PK,opt"`
-	URL                    types.String        `tfsdk:"url" ref:"URL,opt"`
-	Name                   types.String        `tfsdk:"name"`
-	ContactGroups          types.Set           `tfsdk:"contact_groups"`
-	Locations              types.Set           `tfsdk:"locations"`
-	Tags                   types.Set           `tfsdk:"tags"`
-	IsPaused               types.Bool          `tfsdk:"is_paused"`
-	Interval               types.Int64         `tfsdk:"interval"`
-	Threshold              types.Int64         `tfsdk:"threshold"`
-	Address                types.String        `tfsdk:"address"`
-	DNSServer              types.String        `tfsdk:"dns_server"`
-	DNSRecordType          types.String        `tfsdk:"dns_record_type"`
-	ExpectString           types.String        `tfsdk:"expect_string"`
-	Sensitivity            types.Int64         `tfsdk:"sensitivity"`
-	NumRetries             types.Int64         `tfsdk:"num_retries"`
-	Notes                  types.String        `tfsdk:"notes"`
-	IncludeInGlobalMetrics types.Bool          `tfsdk:"include_in_global_metrics"`
-	ResponseTimeSLA        extratypes.Duration `tfsdk:"response_time_sla"`
+	ID                     types.Int64          `tfsdk:"id"  ref:"PK,opt"`
+	URL                    types.String         `tfsdk:"url" ref:"URL,opt"`
+	Name                   types.String         `tfsdk:"name"`
+	ContactGroups          types.Set            `tfsdk:"contact_groups"`
+	Locations              types.Set            `tfsdk:"locations"`
+	Tags                   types.Set            `tfsdk:"tags"`
+	IsPaused               types.Bool           `tfsdk:"is_paused"`
+	Interval               types.Int64          `tfsdk:"interval"`
+	Threshold              types.Int64          `tfsdk:"threshold"`
+	Address                types.String         `tfsdk:"address"`
+	DNSServer              types.String         `tfsdk:"dns_server"`
+	DNSRecordType          types.String         `tfsdk:"dns_record_type"`
+	ExpectString           types.String         `tfsdk:"expect_string"`
+	Sensitivity            types.Int64          `tfsdk:"sensitivity"`
+	NumRetries             types.Int64          `tfsdk:"num_retries"`
+	Notes                  types.String         `tfsdk:"notes"`
+	IncludeInGlobalMetrics types.Bool           `tfsdk:"include_in_global_metrics"`
+	ResponseTimeSLA        customtypes.Duration `tfsdk:"response_time_sla"`
 }
 
 var _ genericResourceAPI[upapi.CheckDNS, upapi.Check] = (*checkDNSResourceAPI)(nil)

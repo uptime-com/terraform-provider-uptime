@@ -13,9 +13,10 @@ import (
 	"github.com/gobeam/stringy"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	extratypes "github.com/mikluko/terraform-plugin-framework-extratypes"
 	"github.com/mitchellh/reflectwalk"
 	"github.com/shopspring/decimal"
+
+	"github.com/uptime-com/terraform-provider-uptime/internal/customtypes"
 )
 
 func CopyIn(dst any, src any) error {
@@ -31,6 +32,7 @@ type copyInWalker struct {
 }
 
 func (w *copyInWalker) Walk(path string, tag Tag, t reflect.Value) error {
+	// FIXME: this should more rely on TF typing system and less on native reflection
 	if _, ok := t.Interface().(attr.Value); !ok {
 		return nil // skip value which isn't an attribute
 	}
@@ -101,8 +103,13 @@ func (w *copyInWalker) copyIn(f reflect.Value, t reflect.Value, tag Tag) error {
 		if err != nil {
 			return err
 		}
-	case extratypes.Duration:
+	case customtypes.Duration:
 		err := w.copyInDuration(f, t)
+		if err != nil {
+			return err
+		}
+	case customtypes.SmartPercentage:
+		err := w.copyInSmartPercentage(f, t)
 		if err != nil {
 			return err
 		}
@@ -279,7 +286,23 @@ func (w *copyInWalker) copyInDuration(f, t reflect.Value) error {
 		return errors.New("resulting duration is negative")
 	}
 	dur := time.Duration(dec.IntPart())
-	v := extratypes.NewDurationValue(dur.String())
+	v := customtypes.NewDurationValue(dur.String())
+	t.Set(reflect.ValueOf(v))
+	return nil
+}
+
+func (w *copyInWalker) copyInSmartPercentage(f, t reflect.Value) error {
+	for f.Kind() == reflect.Ptr {
+		if f.IsNil() {
+			return nil
+		}
+		f = f.Elem()
+	}
+	d, ok := f.Interface().(decimal.Decimal)
+	if !ok {
+		return fmt.Errorf("decimal.Decimal expected, got %T", f.Interface())
+	}
+	v := customtypes.NewSmartPercentageValue(d.BigFloat())
 	t.Set(reflect.ValueOf(v))
 	return nil
 }
