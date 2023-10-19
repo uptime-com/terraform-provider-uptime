@@ -9,7 +9,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	extratypes "github.com/mikluko/terraform-plugin-framework-extratypes"
+
+	"github.com/uptime-com/terraform-provider-uptime/internal/customtypes"
 )
 
 //
@@ -37,7 +38,7 @@ func NameAttribute() schema.StringAttribute {
 
 func ResponseTimeSLAAttribute(defaultVal string) schema.StringAttribute {
 	return schema.StringAttribute{
-		CustomType:  extratypes.DurationType{},
+		CustomType:  customtypes.DurationType{},
 		Optional:    true,
 		Computed:    true,
 		Default:     stringdefault.StaticString(defaultVal),

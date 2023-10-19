@@ -41,7 +41,8 @@ var checkAPIResourceSchema = schema.Schema{
 		"response_time_sla":         ResponseTimeSLAAttribute("30s"),
 
 		"script": schema.StringAttribute{
-			Required: true,
+			CustomType: customtypes.JsonType{},
+			Required:   true,
 		},
 	},
 }
@@ -56,7 +57,7 @@ type checkAPIResourceModel struct {
 	IsPaused               types.Bool           `tfsdk:"is_paused"`
 	Interval               types.Int64          `tfsdk:"interval"`
 	Threshold              types.Int64          `tfsdk:"threshold"`
-	Script                 types.String         `tfsdk:"script"`
+	Script                 customtypes.Json     `tfsdk:"script"`
 	Sensitivity            types.Int64          `tfsdk:"sensitivity"`
 	NumRetries             types.Int64          `tfsdk:"num_retries"`
 	Notes                  types.String         `tfsdk:"notes"`
