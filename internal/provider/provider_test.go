@@ -15,24 +15,11 @@ import (
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
-
-func TestMain(m *testing.M) {
-	var err error
-	err = godotenv.Load(".env")
-	if err != nil {
-		err = godotenv.Load("../.env")
-	}
-	if err != nil {
-		err = godotenv.Load("../../.env")
-	}
-	os.Exit(m.Run())
-}
 
 func testAccProtoV6ProviderFactories() map[string]func() (tfprotov6.ProviderServer, error) {
 	return map[string]func() (tfprotov6.ProviderServer, error){
