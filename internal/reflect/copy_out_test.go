@@ -195,7 +195,23 @@ func TestCopyOut(t *testing.T) {
 		dst := DstType{}
 		err := CopyOut(&dst, src)
 		require.NoError(t, err)
-		require.True(t, dst.Foo.Equal(decimal.RequireFromString("0.1234")), "expected 0.1234, got %s", dst.Foo.String())
+		require.Truef(t, dst.Foo.Equal(decimal.RequireFromString("0.1234")), "expected 0.1234, got %s", dst.Foo.String())
+	})
+	t.Run("customtypes.Json", func(t *testing.T) {
+		foo := `{"foo":"bar"}`
+		type SrcType struct {
+			Foo customtypes.Json
+		}
+		type DstType struct {
+			Foo string
+		}
+		src := SrcType{
+			Foo: customtypes.NewJsonValue(foo),
+		}
+		dst := DstType{}
+		err := CopyOut(&dst, src)
+		require.NoError(t, err)
+		require.Equal(t, foo, dst.Foo)
 	})
 	t.Run("options", func(t *testing.T) {
 		t.Run("path", func(t *testing.T) {

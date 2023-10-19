@@ -225,6 +225,21 @@ func TestCopyIn(t *testing.T) {
 		require.NoError(t, err)
 		require.True(t, obj.Foo.Equal(customtypes.NewSmartPercentageValue(dec.BigFloat())), "expected 0.1234, got %s", obj.Foo.String())
 	})
+	t.Run("customtypes.Json", func(t *testing.T) {
+		foo := `{"foo":"bar"}`
+		type SrcType struct {
+			Foo string
+		}
+		type DstType struct {
+			Foo customtypes.Json
+		}
+		obj := DstType{}
+		err := CopyIn(&obj, SrcType{
+			Foo: foo,
+		})
+		require.NoError(t, err)
+		require.True(t, obj.Foo.Equal(customtypes.NewJsonValue(foo)), "expected %q, got %q", foo, obj.Foo.ValueString())
+	})
 	t.Run("options", func(t *testing.T) {
 		t.Run("path", func(t *testing.T) {
 			type SrcType struct {

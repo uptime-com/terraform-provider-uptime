@@ -113,6 +113,11 @@ func (w *copyInWalker) copyIn(f reflect.Value, t reflect.Value, tag Tag) error {
 		if err != nil {
 			return err
 		}
+	case customtypes.Json:
+		err := w.copyInJson(f, t)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -303,6 +308,22 @@ func (w *copyInWalker) copyInSmartPercentage(f, t reflect.Value) error {
 		return fmt.Errorf("decimal.Decimal expected, got %T", f.Interface())
 	}
 	v := customtypes.NewSmartPercentageValue(d.BigFloat())
+	t.Set(reflect.ValueOf(v))
+	return nil
+}
+
+func (w *copyInWalker) copyInJson(f, t reflect.Value) error {
+	for f.Kind() == reflect.Ptr {
+		if f.IsNil() {
+			return nil
+		}
+		f = f.Elem()
+	}
+	s, ok := f.Interface().(string)
+	if !ok {
+		return fmt.Errorf("string expected, got %T", f.Interface())
+	}
+	v := customtypes.NewJsonValue(s)
 	t.Set(reflect.ValueOf(v))
 	return nil
 }

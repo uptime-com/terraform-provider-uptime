@@ -136,6 +136,11 @@ func (w *copyOutWalker) copyOut(f reflect.Value, t reflect.Value, tag Tag) (err 
 		return w.copyOutDuration(x, t)
 	case customtypes.SmartPercentage:
 		return w.copyOutSmartPercentage(x, t)
+	case customtypes.Json:
+		if t.Kind() != reflect.String {
+			return fmt.Errorf("string expected, got %T", t.Interface())
+		}
+		t.SetString(x.ValueString())
 	default:
 		return fmt.Errorf("unsupported type: %T", x)
 	}
