@@ -184,8 +184,12 @@ github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.7.2/go.mod h1:R6va5+xMeoiuVRoj+gSkQ7d3FALtqAAGI1FQKckRals=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
+github.com/uptime-com/uptime-client-go v1.3.0 h1:wiDqrhfXgrLD0/S9Wk7xbZrp0CrTimXQPfA4e+ZYGyk=
+github.com/uptime-com/uptime-client-go v1.3.0/go.mod h1:utJEXdG5CFgMfcR5rM40l6k2SSeNEi9fhRyrDO1axgI=
 github.com/uptime-com/uptime-client-go/v2 v2.0.0-20230907093351-30fc904d0abb h1:N9SYOujsa6WGBGglC5mqXAZpWgU2hhwUtwDAUCpz2fk=
 github.com/uptime-com/uptime-client-go/v2 v2.0.0-20230907093351-30fc904d0abb/go.mod h1:jtWeB/tQ00fLX2r9OwKfTnxQ/PMR0YjmhTuc9RZH2h0=
+github.com/uptime-com/uptime-client-go/v2 v2.0.0-20231020133742-33a21b4cf313 h1:IPjMiJYIHq1pwKp+999Fgw49wWFB4vyJRQrpXDy0R0I=
+github.com/uptime-com/uptime-client-go/v2 v2.0.0-20231020133742-33a21b4cf313/go.mod h1:jtWeB/tQ00fLX2r9OwKfTnxQ/PMR0YjmhTuc9RZH2h0=
 github.com/vmihailenco/msgpack v3.3.3+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=
 github.com/vmihailenco/msgpack v4.0.4+incompatible h1:dSLoQfGFAo3F6OoNhwUmLwVgaUXK79GlxNBwueZn0xI=
 github.com/vmihailenco/msgpack v4.0.4+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=

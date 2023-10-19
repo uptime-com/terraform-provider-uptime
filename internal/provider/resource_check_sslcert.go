@@ -6,7 +6,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -68,6 +70,10 @@ var checkSSLCertResourceSchema = schema.Schema{
 					Optional: true,
 					Computed: true,
 					Default:  booldefault.StaticBool(false),
+					// This is workaround for API bug where it fails to update the value of this attribute once it has been set to true
+					PlanModifiers: []planmodifier.Bool{
+						boolplanmodifier.RequiresReplace(),
+					},
 				},
 				"first_element_only": schema.BoolAttribute{
 					Optional: true,
