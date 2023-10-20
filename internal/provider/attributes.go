@@ -49,6 +49,34 @@ func ResponseTimeSLAAttribute(defaultVal string) schema.StringAttribute {
 //
 // Less common attributes alphabetically
 
+func AddressHostnameAttribute() schema.StringAttribute {
+	return AddressHostnameAttributeDesc("The hostname to check")
+}
+
+func AddressHostnameAttributeDesc(desc string) schema.StringAttribute {
+	return schema.StringAttribute{
+		Required:    true,
+		Description: desc,
+		Validators: []validator.String{
+			HostnameValidator(),
+		},
+	}
+}
+
+func AddressURLAttribute() schema.StringAttribute {
+	return AddressURLAttributeDesc("The URL to check")
+}
+
+func AddressURLAttributeDesc(desc string) schema.StringAttribute {
+	return schema.StringAttribute{
+		Required:    true,
+		Description: desc,
+		Validators: []validator.String{
+			URLValidator(),
+		},
+	}
+}
+
 func ContactGroupsAttribute() schema.SetAttribute {
 	return schema.SetAttribute{
 		ElementType: types.StringType,

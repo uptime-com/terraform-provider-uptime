@@ -34,9 +34,7 @@ var checkWHOISResourceSchema = schema.Schema{
 		"num_retries":    NumRetriesAttribute(2),
 		"notes":          NotesAttribute(),
 
-		"address": schema.StringAttribute{
-			Required: true,
-		},
+		"address": AddressHostnameAttribute(),
 		"expect_string": schema.StringAttribute{
 			Required:    true,
 			Description: "The current domain registration info that should always match.",

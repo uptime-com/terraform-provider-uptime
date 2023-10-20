@@ -39,9 +39,7 @@ var checkICMPResourceSchema = schema.Schema{
 		"include_in_global_metrics": IncludeInGlobalMetricsAttribute(),
 		"response_time_sla":         ResponseTimeSLAAttribute("1s"),
 
-		"address": schema.StringAttribute{
-			Required: true,
-		},
+		"address": AddressHostnameAttribute(),
 	},
 }
 

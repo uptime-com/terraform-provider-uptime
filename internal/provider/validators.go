@@ -3,6 +3,8 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/url"
+	"regexp"
 	"sync"
 
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -40,11 +42,83 @@ func (v *oneOfStringValidator) ValidateString(_ context.Context, rq validator.St
 	if rq.ConfigValue.IsNull() {
 		return
 	}
+	if rq.ConfigValue.IsUnknown() {
+		return
+	}
 	if _, ok := v.m[rq.ConfigValue.ValueString()]; !ok {
 		rs.Diagnostics.AddAttributeError(
 			rq.Path,
 			"Invalid value",
 			fmt.Sprintf("value must be one of: %v", v.v),
+		)
+	}
+}
+
+func HostnameValidator() validator.String {
+	return &hostnameValidator{}
+}
+
+type hostnameValidator struct{}
+
+func (d *hostnameValidator) Description(_ context.Context) string {
+	return "is a valid DNS hostname"
+}
+
+func (d *hostnameValidator) MarkdownDescription(_ context.Context) string {
+	return "is a valid DNS hostname"
+}
+
+var hostnameRE = regexp.MustCompile(`^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])`)
+
+func (d *hostnameValidator) ValidateString(_ context.Context, rq validator.StringRequest, rs *validator.StringResponse) {
+	if rq.ConfigValue.IsNull() {
+		return
+	}
+	if rq.ConfigValue.IsUnknown() {
+		return
+	}
+	s := rq.ConfigValue.ValueString()
+	if !hostnameRE.MatchString(s) {
+		rs.Diagnostics.AddAttributeError(
+			rq.Path,
+			"Invalid value",
+			"value must be a valid DNS hostname",
+		)
+	}
+}
+
+func URLValidator() validator.String {
+	return &urlAddressValidator{}
+}
+
+type urlAddressValidator struct{}
+
+func (u *urlAddressValidator) Description(_ context.Context) string {
+	return "is a valid URL"
+}
+
+func (u *urlAddressValidator) MarkdownDescription(_ context.Context) string {
+	return "is a valid URL"
+}
+
+func (u *urlAddressValidator) ValidateString(_ context.Context, rq validator.StringRequest, rs *validator.StringResponse) {
+	if rq.ConfigValue.IsNull() {
+		return
+	}
+	if rq.ConfigValue.IsUnknown() {
+		return
+	}
+	if u, err := url.Parse(rq.ConfigValue.ValueString()); err != nil {
+		rs.Diagnostics.AddAttributeError(
+			rq.Path,
+			"Invalid value",
+			"value must be a valid URL",
+		)
+	} else if u.Scheme == "" {
+		rs.Diagnostics.AddAttributeError(
+			rq.Path,
+			"Invalid value",
+			"value must be a valid URL with a scheme",
 		)
 	}
 }

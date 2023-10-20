@@ -41,9 +41,7 @@ var checkSSLCertResourceSchema = schema.Schema{
 		"num_retries": NumRetriesAttribute(2),
 		"notes":       NotesAttribute(),
 
-		"address": schema.StringAttribute{
-			Required: true,
-		},
+		"address": AddressHostnameAttribute(),
 		"port": schema.Int64Attribute{
 			Optional: true,
 			Computed: true,

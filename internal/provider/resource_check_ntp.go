@@ -42,9 +42,7 @@ var checkNTPResourceSchema = schema.Schema{
 		"response_time_sla":         ResponseTimeSLAAttribute("1s"),
 		"use_ip_version":            UseIPVersionAttribute(),
 
-		"address": schema.StringAttribute{
-			Required: true,
-		},
+		"address": AddressHostnameAttribute(),
 		"port": schema.Int64Attribute{
 			Optional: true,
 			Computed: true,

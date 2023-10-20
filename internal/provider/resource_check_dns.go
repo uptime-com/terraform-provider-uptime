@@ -36,9 +36,7 @@ var checkDNSResourceSchema = schema.Schema{
 		"is_paused":      IsPausedAttribute(),
 		"interval":       IntervalAttribute(5),
 		"threshold":      ThresholdAttribute(20),
-		"address": schema.StringAttribute{
-			Required: true,
-		},
+		"address":        AddressHostnameAttribute(),
 		"dns_server": schema.StringAttribute{
 			Optional:    true,
 			Computed:    true,

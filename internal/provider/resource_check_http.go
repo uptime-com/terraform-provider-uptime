@@ -45,10 +45,7 @@ var checkHTTPResourceSchema = schema.Schema{
 		"include_in_global_metrics": IncludeInGlobalMetricsAttribute(),
 		"response_time_sla":         ResponseTimeSLAAttribute("1s"),
 
-		"address": schema.StringAttribute{
-			Required:    true,
-			Description: "URL to check",
-		},
+		"address": AddressURLAttribute(),
 		"port": schema.Int64Attribute{
 			Computed: true,
 			Optional: true,

@@ -26,17 +26,13 @@ var checkBlacklistResourceSchema = schema.Schema{
 		"id":             IDAttribute(),
 		"url":            URLAttribute(),
 		"name":           NameAttribute(),
+		"address":        AddressHostnameAttributeDesc("Domain name to check"),
 		"contact_groups": ContactGroupsAttribute(),
 		"locations":      LocationsReadOnlyAttribute(),
 		"tags":           TagsAttribute(),
 		"is_paused":      IsPausedAttribute(),
 		"num_retries":    NumRetriesAttribute(2),
 		"notes":          NotesAttribute(),
-
-		"address": schema.StringAttribute{
-			Required:    true,
-			Description: "Domain name to check",
-		},
 	},
 }
 
