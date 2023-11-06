@@ -55,22 +55,16 @@ func (v *oneOfStringValidator) ValidateString(_ context.Context, rq validator.St
 }
 
 func HostnameValidator() validator.String {
-	return &hostnameValidator{}
+	return hostnameValidator{}
 }
 
-type hostnameValidator struct{}
-
-func (d *hostnameValidator) Description(_ context.Context) string {
-	return "is a valid DNS hostname"
-}
-
-func (d *hostnameValidator) MarkdownDescription(_ context.Context) string {
-	return "is a valid DNS hostname"
+type hostnameValidator struct {
+	zoyaDescriber
 }
 
 var hostnameRE = regexp.MustCompile(`^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])`)
 
-func (d *hostnameValidator) ValidateString(_ context.Context, rq validator.StringRequest, rs *validator.StringResponse) {
+func (hostnameValidator) ValidateString(_ context.Context, rq validator.StringRequest, rs *validator.StringResponse) {
 	if rq.ConfigValue.IsNull() {
 		return
 	}
@@ -88,20 +82,14 @@ func (d *hostnameValidator) ValidateString(_ context.Context, rq validator.Strin
 }
 
 func URLValidator() validator.String {
-	return &urlAddressValidator{}
+	return urlValidator{}
 }
 
-type urlAddressValidator struct{}
-
-func (u *urlAddressValidator) Description(_ context.Context) string {
-	return "is a valid URL"
+type urlValidator struct {
+	zoyaDescriber
 }
 
-func (u *urlAddressValidator) MarkdownDescription(_ context.Context) string {
-	return "is a valid URL"
-}
-
-func (u *urlAddressValidator) ValidateString(_ context.Context, rq validator.StringRequest, rs *validator.StringResponse) {
+func (urlValidator) ValidateString(_ context.Context, rq validator.StringRequest, rs *validator.StringResponse) {
 	if rq.ConfigValue.IsNull() {
 		return
 	}

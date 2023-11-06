@@ -9,10 +9,10 @@ import (
 )
 
 func NewLocationsDataSource(_ context.Context, p *providerImpl) datasource.DataSource {
-	return &locationsDataSource{p: p}
+	return LocationsDataSource{p: p}
 }
 
-var locationsDataSchema = schema.Schema{
+var LocationsDataSchema = schema.Schema{
 	Attributes: map[string]schema.Attribute{
 		"id": schema.StringAttribute{
 			Computed: true,
@@ -39,53 +39,49 @@ var locationsDataSchema = schema.Schema{
 	},
 }
 
-type locationsDataSourceLocationModel struct {
-	ID       types.String `tfsdk:"id"       ref:",skip"`
-	Name     types.String `tfsdk:"name"     ref:"ProbeName"`
-	Location types.String `tfsdk:"location"`
-	IP       types.String `tfsdk:"ip"       ref:"IPAddress"`
-}
-
-type locationsDataSourceModel struct {
+type LocationsDataSourceModel struct {
 	ID        types.String                       `tfsdk:"id"`
-	Locations []locationsDataSourceLocationModel `tfsdk:"locations"`
+	Locations []LocationsDataSourceLocationModel `tfsdk:"locations"`
 }
 
-var _ datasource.DataSource = &locationsDataSource{}
+type LocationsDataSourceLocationModel struct {
+	ID       types.String `tfsdk:"id"`
+	Name     types.String `tfsdk:"name"`
+	Location types.String `tfsdk:"location"`
+	IP       types.String `tfsdk:"ip"`
+}
 
-type locationsDataSource struct {
+var _ datasource.DataSource = &LocationsDataSource{}
+
+type LocationsDataSource struct {
 	p *providerImpl
 }
 
-func (d *locationsDataSource) Metadata(_ context.Context, rq datasource.MetadataRequest, rs *datasource.MetadataResponse) {
+func (d LocationsDataSource) Metadata(_ context.Context, rq datasource.MetadataRequest, rs *datasource.MetadataResponse) {
 	rs.TypeName = rq.ProviderTypeName + "_locations"
 }
 
-func (d *locationsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, rs *datasource.SchemaResponse) {
-	rs.Schema = locationsDataSchema
+func (d LocationsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, rs *datasource.SchemaResponse) {
+	rs.Schema = LocationsDataSchema
 }
 
-func (d *locationsDataSource) Read(ctx context.Context, rq datasource.ReadRequest, rs *datasource.ReadResponse) {
-	apires, err := d.p.api.ProbeServers().List(ctx)
+func (d LocationsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, rs *datasource.ReadResponse) {
+	api, err := d.p.api.ProbeServers().List(ctx)
 	if err != nil {
 		rs.Diagnostics.AddError("API call failed", err.Error())
 		return
 	}
-	state := locationsDataSourceModel{
+	model := LocationsDataSourceModel{
 		ID:        types.StringValue(""),
-		Locations: make([]locationsDataSourceLocationModel, len(apires)),
+		Locations: make([]LocationsDataSourceLocationModel, len(api)),
 	}
-	for i := range apires {
-		diags := valueFromAPI(&state.Locations[i], apires[i])
-		if diags.HasError() {
-			rs.Diagnostics = diags
-			return
+	for i := range api {
+		model.Locations[i] = LocationsDataSourceLocationModel{
+			Name:     types.StringValue(api[i].ProbeName),
+			Location: types.StringValue(api[i].Location),
+			IP:       types.StringValue(api[i].IPAddress),
 		}
 	}
-	diags := rs.State.Set(ctx, &state)
-	if diags.HasError() {
-		rs.Diagnostics = diags
-		return
-	}
+	rs.Diagnostics = rs.State.Set(ctx, model)
 	return
 }

@@ -17,6 +17,6 @@ SCRIPT
 }
 
 resource uptime_check_api test {
-  name       = var.name
-  script     = var.script
+  name   = var.name
+  script = var.script
 }

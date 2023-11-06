@@ -111,14 +111,14 @@ func TestAccCheckNTPResource_Locations(t *testing.T) {
 			ConfigVariables: config.Variables{
 				"name": config.StringVariable(name),
 				"locations": config.ListVariable(
-					config.StringVariable("US East"),
-					config.StringVariable("US West"),
+					config.StringVariable("US-CA-Los Angeles"),
+					config.StringVariable("US-NY-New York"),
 				),
 			},
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_ntp.test", "locations.#", "2"),
-				resource.TestCheckResourceAttr("uptime_check_ntp.test", "locations.0", "US East"),
-				resource.TestCheckResourceAttr("uptime_check_ntp.test", "locations.1", "US West"),
+				resource.TestCheckResourceAttr("uptime_check_ntp.test", "locations.0", "US-CA-Los Angeles"),
+				resource.TestCheckResourceAttr("uptime_check_ntp.test", "locations.1", "US-NY-New York"),
 			),
 		},
 		{
@@ -126,14 +126,14 @@ func TestAccCheckNTPResource_Locations(t *testing.T) {
 			ConfigVariables: config.Variables{
 				"name": config.StringVariable(name),
 				"locations": config.ListVariable(
-					config.StringVariable("Austria"),
-					config.StringVariable("Serbia"),
+					config.StringVariable("Israel-Tel Aviv"),
+					config.StringVariable("Serbia-Belgrade"),
 				),
 			},
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_ntp.test", "locations.#", "2"),
-				resource.TestCheckResourceAttr("uptime_check_ntp.test", "locations.0", "Austria"),
-				resource.TestCheckResourceAttr("uptime_check_ntp.test", "locations.1", "Serbia"),
+				resource.TestCheckResourceAttr("uptime_check_ntp.test", "locations.0", "Israel-Tel Aviv"),
+				resource.TestCheckResourceAttr("uptime_check_ntp.test", "locations.1", "Serbia-Belgrade"),
 			),
 		},
 	}))
@@ -161,33 +161,6 @@ func TestAccCheckNTPResource_NumRetries(t *testing.T) {
 			},
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_ntp.test", "num_retries", "2"),
-			),
-		},
-	}))
-}
-
-func TestAccCheckNTPResource_ResponseTimeSLA(t *testing.T) {
-	t.Parallel()
-	name := petname.Generate(3, "-")
-	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
-		{
-			ConfigDirectory: config.StaticDirectory("testdata/resource_check_ntp/response_time_sla"),
-			ConfigVariables: config.Variables{
-				"name":              config.StringVariable(name),
-				"response_time_sla": config.StringVariable("100ms"),
-			},
-			Check: resource.ComposeAggregateTestCheckFunc(
-				resource.TestCheckResourceAttr("uptime_check_ntp.test", "response_time_sla", "100ms"),
-			),
-		},
-		{
-			ConfigDirectory: config.StaticDirectory("testdata/resource_check_ntp/response_time_sla"),
-			ConfigVariables: config.Variables{
-				"name":              config.StringVariable(name),
-				"response_time_sla": config.StringVariable("200ms"),
-			},
-			Check: resource.ComposeAggregateTestCheckFunc(
-				resource.TestCheckResourceAttr("uptime_check_ntp.test", "response_time_sla", "200ms"),
 			),
 		},
 	}))

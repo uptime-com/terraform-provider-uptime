@@ -6,7 +6,7 @@ variable color_hex {
   type = string
 }
 
-resource uptime_tag color_hex {
+resource uptime_tag test {
   tag       = var.tag
   color_hex = var.color_hex
 }

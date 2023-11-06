@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -14,56 +15,21 @@ import (
 )
 
 func NewStatusPageResource(_ context.Context, p *providerImpl) resource.Resource {
-	return &genericResource[statusPageResourceModel, upapi.StatusPage, upapi.StatusPage]{
-		api: &statusPageResourceAPI{provider: p},
-		metadata: genericResourceMetadata{
+	return APIResource[StatusPageResourceModel, upapi.StatusPage, upapi.StatusPage]{
+		api: &StatusPageResourceAPI{provider: p},
+		mod: StatusPageResourceModelAdapter{},
+		meta: APIResourceMetadata{
 			TypeNameSuffix: "statuspage",
 			Schema:         statusPageResourceSchema,
 		},
 	}
 }
 
-type statusPageResourceModel struct {
-	ID                        types.Int64  `tfsdk:"id"  ref:"PK,opt"`
-	URL                       types.String `tfsdk:"url"  ref:"URL,opt"`
-	Name                      types.String `tfsdk:"name"`
-	VisibilityLevel           types.String `tfsdk:"visibility_level"`
-	Description               types.String `tfsdk:"description"`
-	PageType                  types.String `tfsdk:"page_type"`
-	Slug                      types.String `tfsdk:"slug"`
-	CNAME                     types.String `tfsdk:"cname"`
-	AllowSubscriptions        types.Bool   `tfsdk:"allow_subscriptions"`
-	AllowSearchIndexing       types.Bool   `tfsdk:"allow_search_indexing"`
-	AllowDrillDown            types.Bool   `tfsdk:"allow_drill_down"`
-	AuthUsername              types.String `tfsdk:"auth_username"`
-	AuthPassword              types.String `tfsdk:"auth_password"`
-	ShowStatusTab             types.Bool   `tfsdk:"show_status_tab"`
-	ShowActiveIncidents       types.Bool   `tfsdk:"show_active_incidents"`
-	ShowComponentResponseTime types.Bool   `tfsdk:"show_component_response_time"`
-	ShowHistoryTab            types.Bool   `tfsdk:"show_history_tab"`
-	DefaultHistoryDateRange   types.Int64  `tfsdk:"default_history_date_range"`
-	UptimeCalculationType     types.String `tfsdk:"uptime_calculation_type"`
-	ShowHistorySnake          types.Bool   `tfsdk:"show_history_snake"`
-	ShowComponentHistory      types.Bool   `tfsdk:"show_component_history"`
-	ShowSummaryMetrics        types.Bool   `tfsdk:"show_summary_metrics"`
-	ShowPastIncidents         types.Bool   `tfsdk:"show_past_incidents"`
-	AllowPdfReport            types.Bool   `tfsdk:"allow_pdf_report"`
-	GoogleAnalyticsCode       types.String `tfsdk:"google_analytics_code"`
-	ContactEmail              types.String `tfsdk:"contact_email"`
-	EmailFrom                 types.String `tfsdk:"email_from"`
-	EmailReplyTo              types.String `tfsdk:"email_reply_to"`
-	CustomHeaderHtml          types.String `tfsdk:"custom_header_html"`
-	CustomFooterHtml          types.String `tfsdk:"custom_footer_html"`
-	CustomCss                 types.String `tfsdk:"custom_css"`
-	CompanyWebsiteUrl         types.String `tfsdk:"company_website_url"`
-	Timezone                  types.String `tfsdk:"timezone"`
-}
-
 var statusPageResourceSchema = schema.Schema{
 	Attributes: map[string]schema.Attribute{
-		"id":   IDAttribute(),
-		"url":  URLAttribute(),
-		"name": NameAttribute(),
+		"id":   IDSchemaAttribute(),
+		"url":  URLSchemaAttribute(),
+		"name": NameSchemaAttribute(),
 		"visibility_level": schema.StringAttribute{
 			Optional: true,
 			Computed: true,
@@ -94,6 +60,9 @@ var statusPageResourceSchema = schema.Schema{
 			Optional: true,
 			Computed: true,
 			Default:  stringdefault.StaticString(""),
+			Validators: []validator.String{
+				HostnameValidator(),
+			},
 		},
 		"allow_subscriptions": schema.BoolAttribute{
 			Optional: true,
@@ -224,27 +193,152 @@ var statusPageResourceSchema = schema.Schema{
 	},
 }
 
-var _ genericResourceAPI[upapi.StatusPage, upapi.StatusPage] = (*statusPageResourceAPI)(nil)
+type StatusPageResourceModel struct {
+	ID                        types.Int64  `tfsdk:"id"`
+	URL                       types.String `tfsdk:"url"`
+	Name                      types.String `tfsdk:"name"`
+	VisibilityLevel           types.String `tfsdk:"visibility_level"`
+	Description               types.String `tfsdk:"description"`
+	PageType                  types.String `tfsdk:"page_type"`
+	Slug                      types.String `tfsdk:"slug"`
+	CNAME                     types.String `tfsdk:"cname"`
+	AllowSubscriptions        types.Bool   `tfsdk:"allow_subscriptions"`
+	AllowSearchIndexing       types.Bool   `tfsdk:"allow_search_indexing"`
+	AllowDrillDown            types.Bool   `tfsdk:"allow_drill_down"`
+	AuthUsername              types.String `tfsdk:"auth_username"`
+	AuthPassword              types.String `tfsdk:"auth_password"`
+	ShowStatusTab             types.Bool   `tfsdk:"show_status_tab"`
+	ShowActiveIncidents       types.Bool   `tfsdk:"show_active_incidents"`
+	ShowComponentResponseTime types.Bool   `tfsdk:"show_component_response_time"`
+	ShowHistoryTab            types.Bool   `tfsdk:"show_history_tab"`
+	DefaultHistoryDateRange   types.Int64  `tfsdk:"default_history_date_range"`
+	UptimeCalculationType     types.String `tfsdk:"uptime_calculation_type"`
+	ShowHistorySnake          types.Bool   `tfsdk:"show_history_snake"`
+	ShowComponentHistory      types.Bool   `tfsdk:"show_component_history"`
+	ShowSummaryMetrics        types.Bool   `tfsdk:"show_summary_metrics"`
+	ShowPastIncidents         types.Bool   `tfsdk:"show_past_incidents"`
+	AllowPdfReport            types.Bool   `tfsdk:"allow_pdf_report"`
+	GoogleAnalyticsCode       types.String `tfsdk:"google_analytics_code"`
+	ContactEmail              types.String `tfsdk:"contact_email"`
+	EmailFrom                 types.String `tfsdk:"email_from"`
+	EmailReplyTo              types.String `tfsdk:"email_reply_to"`
+	CustomHeaderHtml          types.String `tfsdk:"custom_header_html"`
+	CustomFooterHtml          types.String `tfsdk:"custom_footer_html"`
+	CustomCss                 types.String `tfsdk:"custom_css"`
+	CompanyWebsiteUrl         types.String `tfsdk:"company_website_url"`
+	Timezone                  types.String `tfsdk:"timezone"`
+}
 
-type statusPageResourceAPI struct {
+func (m StatusPageResourceModel) PrimaryKey() upapi.PrimaryKey {
+	return upapi.PrimaryKey(m.ID.ValueInt64())
+}
+
+type StatusPageResourceModelAdapter struct{}
+
+func (c StatusPageResourceModelAdapter) Get(ctx context.Context, sg StateGetter) (*StatusPageResourceModel, diag.Diagnostics) {
+	model := *new(StatusPageResourceModel)
+	diags := sg.Get(ctx, &model)
+	if diags.HasError() {
+		return nil, diags
+	}
+	return &model, nil
+}
+
+func (c StatusPageResourceModelAdapter) ToAPIArgument(model StatusPageResourceModel) (*upapi.StatusPage, error) {
+	api := upapi.StatusPage{
+		Name:                      model.Name.ValueString(),
+		VisibilityLevel:           model.VisibilityLevel.ValueString(),
+		Description:               model.Description.ValueString(),
+		PageType:                  model.PageType.ValueString(),
+		Slug:                      model.Slug.ValueString(),
+		CNAME:                     model.CNAME.ValueString(),
+		AllowSubscriptions:        model.AllowSubscriptions.ValueBool(),
+		AllowSearchIndexing:       model.AllowSearchIndexing.ValueBool(),
+		AllowDrillDown:            model.AllowDrillDown.ValueBool(),
+		AuthUsername:              model.AuthUsername.ValueString(),
+		AuthPassword:              model.AuthPassword.ValueString(),
+		ShowStatusTab:             model.ShowStatusTab.ValueBool(),
+		ShowActiveIncidents:       model.ShowActiveIncidents.ValueBool(),
+		ShowComponentResponseTime: model.ShowComponentResponseTime.ValueBool(),
+		ShowHistoryTab:            model.ShowHistoryTab.ValueBool(),
+		DefaultHistoryDateRange:   model.DefaultHistoryDateRange.ValueInt64(),
+		UptimeCalculationType:     model.UptimeCalculationType.ValueString(),
+		ShowHistorySnake:          model.ShowHistorySnake.ValueBool(),
+		ShowComponentHistory:      model.ShowComponentHistory.ValueBool(),
+		ShowSummaryMetrics:        model.ShowSummaryMetrics.ValueBool(),
+		ShowPastIncidents:         model.ShowPastIncidents.ValueBool(),
+		AllowPdfReport:            model.AllowPdfReport.ValueBool(),
+		GoogleAnalyticsCode:       model.GoogleAnalyticsCode.ValueString(),
+		ContactEmail:              model.ContactEmail.ValueString(),
+		EmailFrom:                 model.EmailFrom.ValueString(),
+		EmailReplyTo:              model.EmailReplyTo.ValueString(),
+		CustomHeaderHtml:          model.CustomHeaderHtml.ValueString(),
+		CustomFooterHtml:          model.CustomFooterHtml.ValueString(),
+		CustomCss:                 model.CustomCss.ValueString(),
+		CompanyWebsiteUrl:         model.CompanyWebsiteUrl.ValueString(),
+		Timezone:                  model.Timezone.ValueString(),
+	}
+	return &api, nil
+}
+
+func (c StatusPageResourceModelAdapter) FromAPIResult(api upapi.StatusPage) (*StatusPageResourceModel, error) {
+	model := StatusPageResourceModel{
+		ID:                        types.Int64Value(api.PK),
+		URL:                       types.StringValue(api.URL),
+		Name:                      types.StringValue(api.Name),
+		VisibilityLevel:           types.StringValue(api.VisibilityLevel),
+		Description:               types.StringValue(api.Description),
+		PageType:                  types.StringValue(api.PageType),
+		Slug:                      types.StringValue(api.Slug),
+		CNAME:                     types.StringValue(api.CNAME),
+		AllowSubscriptions:        types.BoolValue(api.AllowSubscriptions),
+		AllowSearchIndexing:       types.BoolValue(api.AllowSearchIndexing),
+		AllowDrillDown:            types.BoolValue(api.AllowDrillDown),
+		AuthUsername:              types.StringValue(api.AuthUsername),
+		AuthPassword:              types.StringValue(api.AuthPassword),
+		ShowStatusTab:             types.BoolValue(api.ShowStatusTab),
+		ShowActiveIncidents:       types.BoolValue(api.ShowActiveIncidents),
+		ShowComponentResponseTime: types.BoolValue(api.ShowComponentResponseTime),
+		ShowHistoryTab:            types.BoolValue(api.ShowHistoryTab),
+		DefaultHistoryDateRange:   types.Int64Value(api.DefaultHistoryDateRange),
+		UptimeCalculationType:     types.StringValue(api.UptimeCalculationType),
+		ShowHistorySnake:          types.BoolValue(api.ShowHistorySnake),
+		ShowComponentHistory:      types.BoolValue(api.ShowComponentHistory),
+		ShowSummaryMetrics:        types.BoolValue(api.ShowSummaryMetrics),
+		ShowPastIncidents:         types.BoolValue(api.ShowPastIncidents),
+		AllowPdfReport:            types.BoolValue(api.AllowPdfReport),
+		GoogleAnalyticsCode:       types.StringValue(api.GoogleAnalyticsCode),
+		ContactEmail:              types.StringValue(api.ContactEmail),
+		EmailFrom:                 types.StringValue(api.EmailFrom),
+		EmailReplyTo:              types.StringValue(api.EmailReplyTo),
+		CustomHeaderHtml:          types.StringValue(api.CustomHeaderHtml),
+		CustomFooterHtml:          types.StringValue(api.CustomFooterHtml),
+		CustomCss:                 types.StringValue(api.CustomCss),
+		CompanyWebsiteUrl:         types.StringValue(api.CompanyWebsiteUrl),
+		Timezone:                  types.StringValue(api.Timezone),
+	}
+	return &model, nil
+}
+
+type StatusPageResourceAPI struct {
 	provider *providerImpl
 }
 
-func (s *statusPageResourceAPI) Create(ctx context.Context, arg upapi.StatusPage) (*upapi.StatusPage, error) {
+func (s StatusPageResourceAPI) Create(ctx context.Context, arg upapi.StatusPage) (*upapi.StatusPage, error) {
 	obj, err := s.provider.api.StatusPages().Create(ctx, arg)
 	return obj, err
 }
 
-func (s *statusPageResourceAPI) Read(ctx context.Context, arg upapi.PrimaryKeyable) (*upapi.StatusPage, error) {
+func (s StatusPageResourceAPI) Read(ctx context.Context, arg upapi.PrimaryKeyable) (*upapi.StatusPage, error) {
 	obj, err := s.provider.api.StatusPages().Get(ctx, arg)
 	return obj, err
 }
 
-func (s *statusPageResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.StatusPage) (*upapi.StatusPage, error) {
+func (s StatusPageResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.StatusPage) (*upapi.StatusPage, error) {
 	obj, err := s.provider.api.StatusPages().Update(ctx, pk, arg)
 	return obj, err
 }
 
-func (s *statusPageResourceAPI) Delete(ctx context.Context, keyable upapi.PrimaryKeyable) error {
+func (s StatusPageResourceAPI) Delete(ctx context.Context, keyable upapi.PrimaryKeyable) error {
 	return s.provider.api.StatusPages().Delete(ctx, keyable)
 }

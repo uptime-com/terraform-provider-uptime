@@ -6,7 +6,16 @@ import (
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
+
+func TestAccCheckBlacklistResource_impl(t *testing.T) {
+	var (
+		_ APIModel                                                                   = (*CheckBlacklistResourceModel)(nil)
+		_ APIModeler[CheckBlacklistResourceModel, upapi.CheckBlacklist, upapi.Check] = (*CheckBlacklistResourceModelAdapter)(nil)
+		_ API[upapi.CheckBlacklist, upapi.Check]                                     = (*CheckBlacklistResourceAPI)(nil)
+	)
+}
 
 func TestAccCheckBlacklistResource(t *testing.T) {
 	t.Parallel()

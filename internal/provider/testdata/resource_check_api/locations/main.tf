@@ -5,14 +5,14 @@ variable name {
 variable script {
   type    = string
   default = <<SCRIPT
-[
-  {
-    "step_def": "C_GET",
-    "values": {
-      "url": "https://example.com/"
-    }
-  }
-]
+    [
+      {
+        "step_def": "C_GET",
+        "values": {
+          "url": "https://example.com/"
+        }
+      }
+    ]
 SCRIPT
 }
 

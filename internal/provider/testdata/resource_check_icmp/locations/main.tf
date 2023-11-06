@@ -9,7 +9,6 @@ variable address {
 
 variable locations {
   type    = list(string)
-  default = ["US East", "US West"]
 }
 resource uptime_check_icmp test {
   name      = var.name

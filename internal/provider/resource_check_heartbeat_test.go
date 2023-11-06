@@ -98,28 +98,65 @@ func TestAccCheckHeartbeatResource_Interval(t *testing.T) {
 	}))
 }
 
-func TestAccCheckHeartbeatResource_ResponseTimeSLA(t *testing.T) {
+func TestAccCheckHeartbeatResource_SLA_Uptime(t *testing.T) {
 	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
-			ConfigDirectory: config.StaticDirectory("testdata/resource_check_heartbeat/response_time_sla"),
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_heartbeat/sla/uptime"),
 			ConfigVariables: config.Variables{
-				"name":              config.StringVariable(name),
-				"response_time_sla": config.StringVariable("100ms"),
+				"name":       config.StringVariable(name),
+				"sla_uptime": config.StringVariable("0.8"),
 			},
 			Check: resource.ComposeAggregateTestCheckFunc(
-				resource.TestCheckResourceAttr("uptime_check_heartbeat.test", "response_time_sla", "100ms"),
+				resource.TestCheckResourceAttr("uptime_check_heartbeat.test", "sla.uptime", "0.8"),
 			),
 		},
 		{
-			ConfigDirectory: config.StaticDirectory("testdata/resource_check_heartbeat/response_time_sla"),
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_heartbeat/sla/uptime"),
 			ConfigVariables: config.Variables{
-				"name":              config.StringVariable(name),
-				"response_time_sla": config.StringVariable("200ms"),
+				"name":       config.StringVariable(name),
+				"sla_uptime": config.StringVariable("0.9999"),
 			},
 			Check: resource.ComposeAggregateTestCheckFunc(
-				resource.TestCheckResourceAttr("uptime_check_heartbeat.test", "response_time_sla", "200ms"),
+				resource.TestCheckResourceAttr("uptime_check_heartbeat.test", "sla.uptime", "0.9999"),
+			),
+		},
+	}))
+}
+
+func TestAccCheckHeartbeatResource_SLA_Latency(t *testing.T) {
+	t.Parallel()
+	name := petname.Generate(3, "-")
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_heartbeat/sla/latency"),
+			ConfigVariables: config.Variables{
+				"name":        config.StringVariable(name),
+				"sla_latency": config.StringVariable("1s"),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_heartbeat.test", "sla.latency", "1s"),
+			),
+		},
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_heartbeat/sla/latency"),
+			ConfigVariables: config.Variables{
+				"name":        config.StringVariable(name),
+				"sla_latency": config.StringVariable("60s"),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_heartbeat.test", "sla.latency", "60s"),
+			),
+		},
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_heartbeat/sla/latency"),
+			ConfigVariables: config.Variables{
+				"name":        config.StringVariable(name),
+				"sla_latency": config.StringVariable("1000ms"),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_heartbeat.test", "sla.latency", "1000ms"),
 			),
 		},
 	}))

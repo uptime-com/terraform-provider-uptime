@@ -3,82 +3,155 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-
-	"github.com/uptime-com/terraform-provider-uptime/internal/customtypes"
+	"github.com/shopspring/decimal"
 
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
 
 func NewCheckICMPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return &genericResource[checkICMPResourceModel, upapi.CheckICMP, upapi.Check]{
-		api: &checkICMPResourceAPI{provider: p},
-		metadata: genericResourceMetadata{
+	return &APIResource[CheckICMPResourceModel, upapi.CheckICMP, upapi.Check]{
+		CheckICMPResourceAPI{provider: p},
+		CheckICMPResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "check_icmp",
-			Schema:         checkICMPResourceSchema,
+			Schema:         CheckICMPResourceSchema,
 		},
 	}
 }
 
-var checkICMPResourceSchema = schema.Schema{
+var CheckICMPResourceSchema = schema.Schema{
 	Description: "Monitor network activity for a specific domain or IP address",
 	Attributes: map[string]schema.Attribute{
-		"id":                        IDAttribute(),
-		"url":                       URLAttribute(),
-		"name":                      NameAttribute(),
-		"contact_groups":            ContactGroupsAttribute(),
-		"locations":                 LocationsAttribute(),
-		"tags":                      TagsAttribute(),
-		"is_paused":                 IsPausedAttribute(),
-		"interval":                  IntervalAttribute(5),
+		"id":                        IDSchemaAttribute(),
+		"url":                       URLSchemaAttribute(),
+		"name":                      NameSchemaAttribute(),
+		"address":                   AddressHostnameSchemaAttribute(),
+		"contact_groups":            ContactGroupsSchemaAttribute(),
+		"locations":                 LocationsSchemaAttribute(),
+		"tags":                      TagsSchemaAttribute(),
+		"is_paused":                 IsPausedSchemaAttribute(),
+		"interval":                  IntervalSchemaAttribute(5),
 		"num_retries":               NumRetriesAttribute(2),
-		"use_ip_version":            UseIPVersionAttribute(),
-		"notes":                     NotesAttribute(),
-		"include_in_global_metrics": IncludeInGlobalMetricsAttribute(),
-		"response_time_sla":         ResponseTimeSLAAttribute("1s"),
-
-		"address": AddressHostnameAttribute(),
+		"use_ip_version":            UseIPVersionSchemaAttribute(),
+		"notes":                     NotesSchemaAttribute(),
+		"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
+		"sla":                       SLASchemaAttribute(),
 	},
 }
 
-type checkICMPResourceModel struct {
-	ID                     types.Int64          `tfsdk:"id"  ref:"PK,opt"`
-	URL                    types.String         `tfsdk:"url" ref:"URL,opt"`
-	Name                   types.String         `tfsdk:"name"`
-	ContactGroups          types.Set            `tfsdk:"contact_groups"`
-	Locations              types.Set            `tfsdk:"locations"`
-	Tags                   types.Set            `tfsdk:"tags"`
-	IsPaused               types.Bool           `tfsdk:"is_paused"`
-	Interval               types.Int64          `tfsdk:"interval"`
-	NumRetries             types.Int64          `tfsdk:"num_retries"`
-	UseIPVersion           types.String         `tfsdk:"use_ip_version"`
-	Notes                  types.String         `tfsdk:"notes"`
-	IncludeInGlobalMetrics types.Bool           `tfsdk:"include_in_global_metrics"`
-	ResponseTimeSLA        customtypes.Duration `tfsdk:"response_time_sla"`
+type CheckICMPResourceModel struct {
+	ID                     types.Int64  `tfsdk:"id"  ref:"PK,opt"`
+	URL                    types.String `tfsdk:"url" ref:"URL,opt"`
+	Name                   types.String `tfsdk:"name"`
+	Address                types.String `tfsdk:"address"`
+	ContactGroups          types.Set    `tfsdk:"contact_groups"`
+	Locations              types.Set    `tfsdk:"locations"`
+	Tags                   types.Set    `tfsdk:"tags"`
+	IsPaused               types.Bool   `tfsdk:"is_paused"`
+	Interval               types.Int64  `tfsdk:"interval"`
+	NumRetries             types.Int64  `tfsdk:"num_retries"`
+	UseIPVersion           types.String `tfsdk:"use_ip_version"`
+	Notes                  types.String `tfsdk:"notes"`
+	IncludeInGlobalMetrics types.Bool   `tfsdk:"include_in_global_metrics"`
+	SLA                    types.Object `tfsdk:"sla"`
 
-	Address types.String `tfsdk:"address"`
+	sla *SLAAttribute `tfsdk:"-"`
 }
 
-var _ genericResourceAPI[upapi.CheckICMP, upapi.Check] = (*checkICMPResourceAPI)(nil)
+func (m CheckICMPResourceModel) PrimaryKey() upapi.PrimaryKey {
+	return upapi.PrimaryKey(m.ID.ValueInt64())
+}
 
-type checkICMPResourceAPI struct {
+type CheckICMPResourceModelAdapter struct {
+	ContactGroupsAttributeAdapter
+	LocationsAttributeAdapter
+	TagsAttributeAdapter
+	SLAAttributeContextAdapter
+}
+
+func (a CheckICMPResourceModelAdapter) Get(ctx context.Context, sg StateGetter) (*CheckICMPResourceModel, diag.Diagnostics) {
+	model := *new(CheckICMPResourceModel)
+	diags := sg.Get(ctx, &model)
+	if diags.HasError() {
+		return nil, diags
+	}
+	model.sla, diags = a.SLAAttributeContext(ctx, model.SLA)
+	if diags.HasError() {
+		return nil, diags
+	}
+	return &model, nil
+}
+
+func (a CheckICMPResourceModelAdapter) ToAPIArgument(model CheckICMPResourceModel) (*upapi.CheckICMP, error) {
+	api := upapi.CheckICMP{
+		Name:                   model.Name.ValueString(),
+		Address:                model.Address.ValueString(),
+		ContactGroups:          a.ContactGroups(model.ContactGroups),
+		Locations:              a.Locations(model.Locations),
+		Tags:                   a.Tags(model.Tags),
+		IsPaused:               model.IsPaused.ValueBool(),
+		Interval:               model.Interval.ValueInt64(),
+		NumRetries:             model.NumRetries.ValueInt64(),
+		UseIPVersion:           model.UseIPVersion.ValueString(),
+		Notes:                  model.Notes.ValueString(),
+		IncludeInGlobalMetrics: model.IncludeInGlobalMetrics.ValueBool(),
+	}
+
+	if model.sla != nil {
+		if !model.sla.Uptime.IsUnknown() {
+			api.UptimeSLA = model.sla.Uptime.ValueDecimal()
+		}
+		if !model.sla.Latency.IsUnknown() {
+			api.ResponseTimeSLA = decimal.NewFromFloat(model.sla.Latency.ValueDuration().Seconds())
+		}
+	}
+
+	return &api, nil
+}
+
+func (a CheckICMPResourceModelAdapter) FromAPIResult(api upapi.Check) (*CheckICMPResourceModel, error) {
+	model := CheckICMPResourceModel{
+		ID:                     types.Int64Value(api.PK),
+		URL:                    types.StringValue(api.URL),
+		Name:                   types.StringValue(api.Name),
+		Address:                types.StringValue(api.Address),
+		ContactGroups:          a.ContactGroupsValue(api.ContactGroups),
+		Locations:              a.LocationsValue(api.Locations),
+		Tags:                   a.TagsValue(api.Tags),
+		IsPaused:               types.BoolValue(api.IsPaused),
+		Interval:               types.Int64Value(api.Interval),
+		NumRetries:             types.Int64Value(api.NumRetries),
+		UseIPVersion:           types.StringValue(api.UseIPVersion),
+		Notes:                  types.StringValue(api.Notes),
+		IncludeInGlobalMetrics: types.BoolValue(api.IncludeInGlobalMetrics),
+		SLA: a.SLAAttributeValue(SLAAttribute{
+			Latency: DurationValueFromDecimalSeconds(api.ResponseTimeSLA),
+			Uptime:  DecimalValue(api.UptimeSLA),
+		}),
+	}
+	return &model, nil
+}
+
+type CheckICMPResourceAPI struct {
 	provider *providerImpl
 }
 
-func (c *checkICMPResourceAPI) Create(ctx context.Context, arg upapi.CheckICMP) (*upapi.Check, error) {
+func (c CheckICMPResourceAPI) Create(ctx context.Context, arg upapi.CheckICMP) (*upapi.Check, error) {
 	return c.provider.api.Checks().CreateICMP(ctx, arg)
 }
 
-func (c *checkICMPResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
+func (c CheckICMPResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
 	return c.provider.api.Checks().Get(ctx, pk)
 }
 
-func (c *checkICMPResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckICMP) (*upapi.Check, error) {
+func (c CheckICMPResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckICMP) (*upapi.Check, error) {
 	return c.provider.api.Checks().UpdateICMP(ctx, pk, arg)
 }
 
-func (c *checkICMPResourceAPI) Delete(ctx context.Context, pk upapi.PrimaryKeyable) error {
+func (c CheckICMPResourceAPI) Delete(ctx context.Context, pk upapi.PrimaryKeyable) error {
 	return c.provider.api.Checks().Delete(ctx, pk)
 }
