@@ -18,8 +18,9 @@ import (
 var _ provider.Provider = (*providerImpl)(nil)
 
 type providerImpl struct {
-	api     upapi.API
-	version string
+	api       upapi.API
+	version   string
+	locations []string
 }
 
 type providerConfig struct {
@@ -90,8 +91,20 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 		rs.Diagnostics.AddError("Failed to initialize API client", err.Error())
 		return
 	}
-
 	p.api = api
+	servers, err := p.api.ProbeServers().List(ctx)
+	if err != nil {
+		rs.Diagnostics.AddError("Failed to get list of locations", err.Error())
+		return
+
+	}
+	locationsSet := make(map[string]struct{}, len(servers))
+	for _, server := range servers {
+		if _, ok := locationsSet[server.Location]; !ok {
+			locationsSet[server.Location] = struct{}{}
+			p.locations = append(p.locations, server.Location)
+		}
+	}
 }
 
 func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.DataSource {

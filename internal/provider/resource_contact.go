@@ -18,7 +18,7 @@ func NewContactResource(_ context.Context, p *providerImpl) resource.Resource {
 		mod: ContactResourceModelAdapter{},
 		meta: APIResourceMetadata{
 			TypeNameSuffix: "contact",
-			Schema:         contactResourceSchema,
+			Schema:         EnreachResourceSchema(contactResourceSchema, p),
 		},
 	}
 }

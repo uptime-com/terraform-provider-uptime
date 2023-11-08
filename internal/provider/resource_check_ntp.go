@@ -18,7 +18,7 @@ func NewCheckNTPResource(_ context.Context, p *providerImpl) resource.Resource {
 		mod: CheckNTPResourceModelAdapter{},
 		meta: APIResourceMetadata{
 			TypeNameSuffix: "check_ntp",
-			Schema:         checkNTPResourceSchema,
+			Schema:         EnreachResourceSchema(checkNTPResourceSchema, p),
 		},
 	}
 }

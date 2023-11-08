@@ -18,7 +18,7 @@ func NewCheckHeartbeatResource(_ context.Context, p *providerImpl) resource.Reso
 		mod: CheckHeartbeatResourceModelAdapter{},
 		meta: APIResourceMetadata{
 			TypeNameSuffix: "check_heartbeat",
-			Schema:         checkHeartbeatResourceSchema,
+			Schema:         EnreachResourceSchema(checkHeartbeatResourceSchema, p),
 		},
 	}
 }

@@ -20,7 +20,7 @@ func NewStatusPageResource(_ context.Context, p *providerImpl) resource.Resource
 		mod: StatusPageResourceModelAdapter{},
 		meta: APIResourceMetadata{
 			TypeNameSuffix: "statuspage",
-			Schema:         statusPageResourceSchema,
+			Schema:         EnreachResourceSchema(statusPageResourceSchema, p),
 		},
 	}
 }
