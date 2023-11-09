@@ -27,7 +27,7 @@ func NewCheckNTPResource(_ context.Context, p *providerImpl) resource.Resource {
 					"address":                   AddressHostnameSchemaAttribute(),
 					"port":                      PortSchemaAttribute(123),
 					"contact_groups":            ContactGroupsSchemaAttribute(),
-					"locations":                 LocationsSchemaAttribute(p.locations),
+					"locations":                 LocationsSchemaAttribute(p.getLocations),
 					"tags":                      TagsSchemaAttribute(),
 					"is_paused":                 IsPausedSchemaAttribute(),
 					"interval":                  IntervalSchemaAttribute(5),
@@ -44,8 +44,7 @@ func NewCheckNTPResource(_ context.Context, p *providerImpl) resource.Resource {
 	}
 }
 
-//var checkNTPResourceSchema =
-
+// var checkNTPResourceSchema =
 type CheckNTPResourceModel struct {
 	ID                     types.Int64  `tfsdk:"id"`
 	URL                    types.String `tfsdk:"url"`

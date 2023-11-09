@@ -1,16 +1,14 @@
 package provider
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-func LocationsSchemaAttribute(validLocations []string) schema.SetAttribute {
+func LocationsSchemaAttribute(getLocations LocationsSetGetter) schema.SetAttribute {
 	return schema.SetAttribute{
 		ElementType: types.StringType,
 		Default: setdefault.StaticValue(
@@ -24,8 +22,8 @@ func LocationsSchemaAttribute(validLocations []string) schema.SetAttribute {
 		),
 		Optional: true,
 		Computed: true,
-		Validators: []validator.Set{
-			setvalidator.ValueStringsAre(stringvalidator.OneOf(validLocations...)),
+		PlanModifiers: []planmodifier.Set{
+			&locationsPlanModifier{getLocations: getLocations},
 		},
 	}
 }

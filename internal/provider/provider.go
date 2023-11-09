@@ -21,7 +21,7 @@ var _ provider.Provider = (*providerImpl)(nil)
 type providerImpl struct {
 	api       upapi.API
 	version   string
-	locations []string
+	locations map[string]struct{}
 }
 
 type providerConfig struct {
@@ -94,19 +94,6 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 		return
 	}
 	p.api = api
-	servers, err := p.api.ProbeServers().List(ctx)
-	if err != nil {
-		rs.Diagnostics.AddError("Failed to get list of locations", err.Error())
-		return
-
-	}
-	locationsSet := make(map[string]struct{}, len(servers))
-	for _, server := range servers {
-		if _, ok := locationsSet[server.Location]; !ok {
-			locationsSet[server.Location] = struct{}{}
-			p.locations = append(p.locations, server.Location)
-		}
-	}
 }
 
 func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.DataSource {
@@ -132,6 +119,21 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewStatusPageResource(ctx, p) },
 		func() resource.Resource { return NewTagResource(ctx, p) },
 	}
+}
+
+func (p *providerImpl) getLocations(ctx context.Context) (map[string]struct{}, error) {
+	if p.locations != nil {
+		return p.locations, nil
+	}
+	servers, err := p.api.ProbeServers().List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get list of locations: %v", err)
+	}
+	p.locations = make(map[string]struct{}, len(servers))
+	for _, server := range servers {
+		p.locations[server.Location] = struct{}{}
+	}
+	return p.locations, nil
 }
 
 func VersionFactory(version string) func() provider.Provider {

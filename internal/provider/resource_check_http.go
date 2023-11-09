@@ -28,7 +28,7 @@ func NewCheckHTTPResource(_ context.Context, p *providerImpl) resource.Resource 
 					"name":                      NameSchemaAttribute(),
 					"address":                   AddressURLSchemaAttribute(),
 					"contact_groups":            ContactGroupsSchemaAttribute(),
-					"locations":                 LocationsSchemaAttribute(p.locations),
+					"locations":                 LocationsSchemaAttribute(p.getLocations),
 					"tags":                      TagsSchemaAttribute(),
 					"is_paused":                 IsPausedSchemaAttribute(),
 					"interval":                  IntervalSchemaAttribute(5),
