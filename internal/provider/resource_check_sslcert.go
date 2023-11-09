@@ -19,102 +19,100 @@ import (
 )
 
 func NewCheckSSLCertResource(_ context.Context, p *providerImpl) resource.Resource {
-	return &APIResource[CheckSSLCertResourceModel, upapi.CheckSSLCert, upapi.Check]{
+	return APIResource[CheckSSLCertResourceModel, upapi.CheckSSLCert, upapi.Check]{
 		api: CheckSSLCertResourceAPI{provider: p},
 		mod: CheckSSLCertResourceModelAdapter{},
 		meta: APIResourceMetadata{
 			TypeNameSuffix: "check_sslcert",
-			Schema:         CheckSSLCertResourceSchema,
-		},
-	}
-}
+			Schema: schema.Schema{
+				Description: "Verify SSL certificate validity",
+				Attributes: map[string]schema.Attribute{
+					"id":             IDSchemaAttribute(),
+					"url":            URLSchemaAttribute(),
+					"name":           NameSchemaAttribute(),
+					"contact_groups": ContactGroupsSchemaAttribute(),
+					"locations":      LocationsReadOnlySchemaAttribute(),
+					"tags":           TagsSchemaAttribute(),
+					"is_paused":      IsPausedSchemaAttribute(),
+					"threshold": ThresholdDescriptionSchemaAttribute(
+						20,
+						"Raise an alert if there are less than this many days before the SSL certificate needs to be renewed",
+					),
+					"num_retries": NumRetriesSchemaAttribute(2),
+					"notes":       NotesSchemaAttribute(),
+					"address":     AddressHostnameSchemaAttribute(),
+					"port":        PortSchemaAttribute(443),
 
-var CheckSSLCertResourceSchema = schema.Schema{
-	Description: "Verify SSL certificate validity",
-	Attributes: map[string]schema.Attribute{
-		"id":             IDSchemaAttribute(),
-		"url":            URLSchemaAttribute(),
-		"name":           NameSchemaAttribute(),
-		"contact_groups": ContactGroupsSchemaAttribute(),
-		"locations":      LocationsReadOnlySchemaAttribute(),
-		"tags":           TagsSchemaAttribute(),
-		"is_paused":      IsPausedSchemaAttribute(),
-		"threshold": ThresholdDescriptionSchemaAttribute(
-			20,
-			"Raise an alert if there are less than this many days before the SSL certificate needs to be renewed",
-		),
-		"num_retries": NumRetriesSchemaAttribute(2),
-		"notes":       NotesSchemaAttribute(),
-		"address":     AddressHostnameSchemaAttribute(),
-		"port":        PortSchemaAttribute(443),
-
-		"config": schema.SingleNestedAttribute{
-			Optional: true,
-			Computed: true,
-			Attributes: map[string]schema.Attribute{
-				"protocol": schema.StringAttribute{
-					Optional:    true,
-					Computed:    true,
-					Default:     stringdefault.StaticString("https"),
-					Description: "Application level protocol",
-					Validators: []validator.String{
-						OneOfStringValidator([]string{
-							"https", "ftp", "ftps", "http", "h2", "imap", "imaps", "irc", "ircs", "ldap", "ldaps", "mysql",
-							"pop3", "pop3s", "postgres", "sieve", "smtp", "smtps", "xmpp", "xmpp-server",
-						}),
+					"config": schema.SingleNestedAttribute{
+						Optional: true,
+						Computed: true,
+						Attributes: map[string]schema.Attribute{
+							"protocol": schema.StringAttribute{
+								Optional:    true,
+								Computed:    true,
+								Default:     stringdefault.StaticString("https"),
+								Description: "Application level protocol",
+								Validators: []validator.String{
+									OneOfStringValidator([]string{
+										"https", "ftp", "ftps", "http", "h2", "imap", "imaps", "irc", "ircs", "ldap", "ldaps", "mysql",
+										"pop3", "pop3s", "postgres", "sieve", "smtp", "smtps", "xmpp", "xmpp-server",
+									}),
+								},
+							},
+							"crl": schema.BoolAttribute{
+								Optional: true,
+								Computed: true,
+								Default:  booldefault.StaticBool(false),
+								// This is workaround for API bug where it fails to update the value of this attribute once it has been set to true
+								PlanModifiers: []planmodifier.Bool{
+									boolplanmodifier.RequiresReplace(),
+								},
+							},
+							"first_element_only": schema.BoolAttribute{
+								Optional: true,
+								Computed: true,
+								Default:  booldefault.StaticBool(false),
+							},
+							"match": schema.StringAttribute{
+								Optional: true,
+								Computed: true,
+								Default:  stringdefault.StaticString(""),
+							},
+							"issuer": schema.StringAttribute{
+								Optional: true,
+								Computed: true,
+								Default:  stringdefault.StaticString(""),
+							},
+							"min_version": schema.StringAttribute{
+								Optional: true,
+								Computed: true,
+								Default:  stringdefault.StaticString("sslv3"),
+								Validators: []validator.String{
+									OneOfStringValidator([]string{"sslv3", "tlsv1", "tlsv11", "tlsv12", "tlsv13"}),
+								},
+							},
+							"fingerprint": schema.StringAttribute{
+								Optional: true,
+								Computed: true,
+								Default:  stringdefault.StaticString(""),
+							},
+							"self_signed": schema.BoolAttribute{
+								Optional: true,
+								Computed: true,
+								Default:  booldefault.StaticBool(false),
+							},
+							"url": schema.StringAttribute{
+								Optional:    true,
+								Computed:    true,
+								Default:     stringdefault.StaticString(""),
+								Description: "Specify location of certificate or CRL file by URL, instead of retrieving from main domain address.",
+							},
+						},
 					},
-				},
-				"crl": schema.BoolAttribute{
-					Optional: true,
-					Computed: true,
-					Default:  booldefault.StaticBool(false),
-					// This is workaround for API bug where it fails to update the value of this attribute once it has been set to true
-					PlanModifiers: []planmodifier.Bool{
-						boolplanmodifier.RequiresReplace(),
-					},
-				},
-				"first_element_only": schema.BoolAttribute{
-					Optional: true,
-					Computed: true,
-					Default:  booldefault.StaticBool(false),
-				},
-				"match": schema.StringAttribute{
-					Optional: true,
-					Computed: true,
-					Default:  stringdefault.StaticString(""),
-				},
-				"issuer": schema.StringAttribute{
-					Optional: true,
-					Computed: true,
-					Default:  stringdefault.StaticString(""),
-				},
-				"min_version": schema.StringAttribute{
-					Optional: true,
-					Computed: true,
-					Default:  stringdefault.StaticString("sslv3"),
-					Validators: []validator.String{
-						OneOfStringValidator([]string{"sslv3", "tlsv1", "tlsv11", "tlsv12", "tlsv13"}),
-					},
-				},
-				"fingerprint": schema.StringAttribute{
-					Optional: true,
-					Computed: true,
-					Default:  stringdefault.StaticString(""),
-				},
-				"self_signed": schema.BoolAttribute{
-					Optional: true,
-					Computed: true,
-					Default:  booldefault.StaticBool(false),
-				},
-				"url": schema.StringAttribute{
-					Optional:    true,
-					Computed:    true,
-					Default:     stringdefault.StaticString(""),
-					Description: "Specify location of certificate or CRL file by URL, instead of retrieving from main domain address.",
 				},
 			},
 		},
-	},
+	}
 }
 
 type CheckSSLCertResourceModel struct {

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sync"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -18,8 +20,10 @@ import (
 var _ provider.Provider = (*providerImpl)(nil)
 
 type providerImpl struct {
-	api     upapi.API
-	version string
+	api           upapi.API
+	version       string
+	locations     map[string]struct{}
+	locationsOnce sync.Once
 }
 
 type providerConfig struct {
@@ -78,6 +82,7 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 		upapi.WithToken(cfg.Token.ValueString()),
 		upapi.WithUserAgent(p.UserAgentString()),
 		upapi.WithRateLimit(cfg.RateLimit.ValueFloat64()),
+		upapi.WithRetry(10, time.Second*30, os.Stderr),
 	}
 	if ep := cfg.Endpoint.ValueString(); ep != "" {
 		opts = append(opts, upapi.WithBaseURL(ep))
@@ -90,7 +95,6 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 		rs.Diagnostics.AddError("Failed to initialize API client", err.Error())
 		return
 	}
-
 	p.api = api
 }
 
@@ -117,6 +121,28 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewStatusPageResource(ctx, p) },
 		func() resource.Resource { return NewTagResource(ctx, p) },
 	}
+}
+
+func (p *providerImpl) getLocations(ctx context.Context) error {
+	servers, err := p.api.ProbeServers().List(ctx)
+	if err != nil {
+		return err
+	}
+	p.locations = make(map[string]struct{}, len(servers))
+	for _, server := range servers {
+		p.locations[server.Location] = struct{}{}
+	}
+	return nil
+}
+
+func (p *providerImpl) GetLocations(ctx context.Context) (_ map[string]struct{}, err error) {
+	p.locationsOnce.Do(func() {
+		err = p.getLocations(ctx)
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get list of locations: %w", err)
+	}
+	return p.locations, nil
 }
 
 func VersionFactory(version string) func() provider.Provider {

@@ -13,34 +13,32 @@ import (
 )
 
 func NewCheckHeartbeatResource(_ context.Context, p *providerImpl) resource.Resource {
-	return &APIResource[CheckHeartbeatResourceModel, upapi.CheckHeartbeat, upapi.Check]{
+	return APIResource[CheckHeartbeatResourceModel, upapi.CheckHeartbeat, upapi.Check]{
 		api: CheckHeartbeatResourceAPI{provider: p},
 		mod: CheckHeartbeatResourceModelAdapter{},
 		meta: APIResourceMetadata{
 			TypeNameSuffix: "check_heartbeat",
-			Schema:         checkHeartbeatResourceSchema,
+			Schema: schema.Schema{
+				Description: "Monitor a periodic process, such as Cron, and issue alerts if the expected interval is exceeded",
+				Attributes: map[string]schema.Attribute{
+					"id":                        IDSchemaAttribute(),
+					"url":                       URLSchemaAttribute(),
+					"name":                      NameSchemaAttribute(),
+					"contact_groups":            ContactGroupsSchemaAttribute(),
+					"tags":                      TagsSchemaAttribute(),
+					"is_paused":                 IsPausedSchemaAttribute(),
+					"interval":                  IntervalSchemaAttribute(5),
+					"notes":                     NotesSchemaAttribute(),
+					"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
+					"heartbeat_url": schema.StringAttribute{
+						Computed:    true,
+						Description: "URL to send data to the check",
+					},
+					"sla": SLASchemaAttribute(),
+				},
+			},
 		},
 	}
-}
-
-var checkHeartbeatResourceSchema = schema.Schema{
-	Description: "Monitor a periodic process, such as Cron, and issue alerts if the expected interval is exceeded",
-	Attributes: map[string]schema.Attribute{
-		"id":                        IDSchemaAttribute(),
-		"url":                       URLSchemaAttribute(),
-		"name":                      NameSchemaAttribute(),
-		"contact_groups":            ContactGroupsSchemaAttribute(),
-		"tags":                      TagsSchemaAttribute(),
-		"is_paused":                 IsPausedSchemaAttribute(),
-		"interval":                  IntervalSchemaAttribute(5),
-		"notes":                     NotesSchemaAttribute(),
-		"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
-		"heartbeat_url": schema.StringAttribute{
-			Computed:    true,
-			Description: "URL to send data to the check",
-		},
-		"sla": SLASchemaAttribute(),
-	},
 }
 
 type CheckHeartbeatResourceModel struct {

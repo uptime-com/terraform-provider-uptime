@@ -13,39 +13,38 @@ import (
 )
 
 func NewCheckNTPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return &APIResource[CheckNTPResourceModel, upapi.CheckNTP, upapi.Check]{
+	return APIResource[CheckNTPResourceModel, upapi.CheckNTP, upapi.Check]{
 		api: CheckNTPResourceAPI{provider: p},
 		mod: CheckNTPResourceModelAdapter{},
 		meta: APIResourceMetadata{
 			TypeNameSuffix: "check_ntp",
-			Schema:         checkNTPResourceSchema,
+			Schema: schema.Schema{
+				Description: "Monitor a Network Time Protocol server",
+				Attributes: map[string]schema.Attribute{
+					"id":                        IDSchemaAttribute(),
+					"url":                       URLSchemaAttribute(),
+					"name":                      NameSchemaAttribute(),
+					"address":                   AddressHostnameSchemaAttribute(),
+					"port":                      PortSchemaAttribute(123),
+					"contact_groups":            ContactGroupsSchemaAttribute(),
+					"locations":                 LocationsSchemaAttribute(p),
+					"tags":                      TagsSchemaAttribute(),
+					"is_paused":                 IsPausedSchemaAttribute(),
+					"interval":                  IntervalSchemaAttribute(5),
+					"threshold":                 ThresholdSchemaAttribute(20),
+					"sensitivity":               SensitivitySchemaAttribute(2),
+					"num_retries":               NumRetriesSchemaAttribute(2),
+					"notes":                     NotesSchemaAttribute(),
+					"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
+					"use_ip_version":            UseIPVersionSchemaAttribute(),
+					"sla":                       SLASchemaAttribute(),
+				},
+			},
 		},
 	}
 }
 
-var checkNTPResourceSchema = schema.Schema{
-	Description: "Monitor a Network Time Protocol server",
-	Attributes: map[string]schema.Attribute{
-		"id":                        IDSchemaAttribute(),
-		"url":                       URLSchemaAttribute(),
-		"name":                      NameSchemaAttribute(),
-		"address":                   AddressHostnameSchemaAttribute(),
-		"port":                      PortSchemaAttribute(123),
-		"contact_groups":            ContactGroupsSchemaAttribute(),
-		"locations":                 LocationsSchemaAttribute(),
-		"tags":                      TagsSchemaAttribute(),
-		"is_paused":                 IsPausedSchemaAttribute(),
-		"interval":                  IntervalSchemaAttribute(5),
-		"threshold":                 ThresholdSchemaAttribute(20),
-		"sensitivity":               SensitivitySchemaAttribute(2),
-		"num_retries":               NumRetriesSchemaAttribute(2),
-		"notes":                     NotesSchemaAttribute(),
-		"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
-		"use_ip_version":            UseIPVersionSchemaAttribute(),
-		"sla":                       SLASchemaAttribute(),
-	},
-}
-
+// var checkNTPResourceSchema =
 type CheckNTPResourceModel struct {
 	ID                     types.Int64  `tfsdk:"id"`
 	URL                    types.String `tfsdk:"url"`

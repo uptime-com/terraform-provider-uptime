@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"regexp"
 	"sort"
 	"testing"
 
@@ -127,6 +128,16 @@ func TestAccCheckAPIResource_Locations(t *testing.T) {
 				resource.TestCheckResourceAttr("uptime_check_api.test", "locations.0", "US-CA-Los Angeles"),
 				resource.TestCheckResourceAttr("uptime_check_api.test", "locations.1", "US-NY-New York"),
 			),
+		},
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_api/locations"),
+			ConfigVariables: config.Variables{
+				"name": config.StringVariable(name),
+				"locations": config.ListVariable(
+					config.StringVariable("Disneyland"),
+				),
+			},
+			ExpectError: regexp.MustCompile(`Invalid value: "Disneyland"`),
 		},
 		{
 			ConfigDirectory: config.StaticDirectory("testdata/resource_check_api/locations"),

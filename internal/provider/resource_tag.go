@@ -16,20 +16,18 @@ func NewTagResource(_ context.Context, p *providerImpl) resource.Resource {
 		TagResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "tag",
-			Schema:         TagResourceSchema,
+			Schema: schema.Schema{
+				Attributes: map[string]schema.Attribute{
+					"id":  IDSchemaAttribute(),
+					"url": URLSchemaAttribute(),
+					"tag": schema.StringAttribute{
+						Required: true,
+					},
+					"color_hex": ColorHexSchemaAttribute(),
+				},
+			},
 		},
 	}
-}
-
-var TagResourceSchema = schema.Schema{
-	Attributes: map[string]schema.Attribute{
-		"id":  IDSchemaAttribute(),
-		"url": URLSchemaAttribute(),
-		"tag": schema.StringAttribute{
-			Required: true,
-		},
-		"color_hex": ColorHexSchemaAttribute(),
-	},
 }
 
 type TagResourceModel struct {

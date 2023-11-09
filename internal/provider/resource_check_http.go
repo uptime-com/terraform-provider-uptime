@@ -15,93 +15,91 @@ import (
 )
 
 func NewCheckHTTPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return &APIResource[CheckHTTPResourceModel, upapi.CheckHTTP, upapi.Check]{
+	return APIResource[CheckHTTPResourceModel, upapi.CheckHTTP, upapi.Check]{
 		api: CheckHTTPResourceAPI{provider: p},
 		mod: CheckHTTPResourceModelAdapter{},
 		meta: APIResourceMetadata{
 			TypeNameSuffix: "check_http",
-			Schema:         CheckHTTPResourceSchema,
-		},
-	}
-}
-
-var CheckHTTPResourceSchema = schema.Schema{
-	Description: "Monitor a URL for specific status code(s)",
-	Attributes: map[string]schema.Attribute{
-		"id":                        IDSchemaAttribute(),
-		"url":                       URLSchemaAttribute(),
-		"name":                      NameSchemaAttribute(),
-		"address":                   AddressURLSchemaAttribute(),
-		"contact_groups":            ContactGroupsSchemaAttribute(),
-		"locations":                 LocationsSchemaAttribute(),
-		"tags":                      TagsSchemaAttribute(),
-		"is_paused":                 IsPausedSchemaAttribute(),
-		"interval":                  IntervalSchemaAttribute(5),
-		"threshold":                 ThresholdSchemaAttribute(40),
-		"sensitivity":               SensitivitySchemaAttribute(2),
-		"num_retries":               NumRetriesAttribute(2),
-		"notes":                     NotesSchemaAttribute(),
-		"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
-		"sla":                       SLASchemaAttribute(),
-		"port": schema.Int64Attribute{
-			Computed: true,
-			Optional: true,
-			Default:  int64default.StaticInt64(0),
-		},
-		"username": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"password": schema.StringAttribute{
-			Optional:  true,
-			Computed:  true,
-			Sensitive: true,
-			Default:   stringdefault.StaticString(""),
-		},
-		"proxy": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"status_code": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString("200"),
-		},
-		"send_string": schema.StringAttribute{
-			Optional:    true,
-			Computed:    true,
-			Default:     stringdefault.StaticString(""),
-			Description: "String to post",
-		},
-		"expect_string": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"expect_string_type": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString("STRING"),
-			Validators: []validator.String{
-				OneOfStringValidator([]string{"STRING", "REGEX", "INVERSE_REGEX"}),
+			Schema: schema.Schema{
+				Description: "Monitor a URL for specific status code(s)",
+				Attributes: map[string]schema.Attribute{
+					"id":                        IDSchemaAttribute(),
+					"url":                       URLSchemaAttribute(),
+					"name":                      NameSchemaAttribute(),
+					"address":                   AddressURLSchemaAttribute(),
+					"contact_groups":            ContactGroupsSchemaAttribute(),
+					"locations":                 LocationsSchemaAttribute(p),
+					"tags":                      TagsSchemaAttribute(),
+					"is_paused":                 IsPausedSchemaAttribute(),
+					"interval":                  IntervalSchemaAttribute(5),
+					"threshold":                 ThresholdSchemaAttribute(40),
+					"sensitivity":               SensitivitySchemaAttribute(2),
+					"num_retries":               NumRetriesAttribute(2),
+					"notes":                     NotesSchemaAttribute(),
+					"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
+					"sla":                       SLASchemaAttribute(),
+					"port": schema.Int64Attribute{
+						Computed: true,
+						Optional: true,
+						Default:  int64default.StaticInt64(0),
+					},
+					"username": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"password": schema.StringAttribute{
+						Optional:  true,
+						Computed:  true,
+						Sensitive: true,
+						Default:   stringdefault.StaticString(""),
+					},
+					"proxy": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"status_code": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("200"),
+					},
+					"send_string": schema.StringAttribute{
+						Optional:    true,
+						Computed:    true,
+						Default:     stringdefault.StaticString(""),
+						Description: "String to post",
+					},
+					"expect_string": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"expect_string_type": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("STRING"),
+						Validators: []validator.String{
+							OneOfStringValidator([]string{"STRING", "REGEX", "INVERSE_REGEX"}),
+						},
+					},
+					"headers": HeadersSchemaAttribute(),
+					"version": schema.Int64Attribute{
+						Optional:    true,
+						Computed:    true,
+						Default:     int64default.StaticInt64(2),
+						Description: "Check version to use. Keep default value unless you are absolutely sure you need to change it",
+					},
+					"encryption": schema.StringAttribute{
+						Optional:    true,
+						Computed:    true,
+						Default:     stringdefault.StaticString("SSL_TLS"),
+						Description: "Whether to verify SSL/TLS certificates",
+					},
+				},
 			},
 		},
-		"headers": HeadersSchemaAttribute(),
-		"version": schema.Int64Attribute{
-			Optional:    true,
-			Computed:    true,
-			Default:     int64default.StaticInt64(2),
-			Description: "Check version to use. Keep default value unless you are absolutely sure you need to change it",
-		},
-		"encryption": schema.StringAttribute{
-			Optional:    true,
-			Computed:    true,
-			Default:     stringdefault.StaticString("SSL_TLS"),
-			Description: "Whether to verify SSL/TLS certificates",
-		},
-	},
+	}
 }
 
 type CheckHTTPResourceModel struct {

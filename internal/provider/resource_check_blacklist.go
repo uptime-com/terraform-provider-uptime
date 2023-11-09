@@ -12,7 +12,7 @@ import (
 )
 
 func NewCheckBlacklistResource(_ context.Context, p *providerImpl) resource.Resource {
-	return &APIResource[CheckBlacklistResourceModel, upapi.CheckBlacklist, upapi.Check]{
+	return APIResource[CheckBlacklistResourceModel, upapi.CheckBlacklist, upapi.Check]{
 		CheckBlacklistResourceAPI{provider: p},
 		CheckBlacklistResourceModelAdapter{},
 		APIResourceMetadata{

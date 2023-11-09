@@ -83,6 +83,8 @@ github.com/hashicorp/terraform-json v0.17.1 h1:eMfvh/uWggKmY7Pmb3T85u86E2EQg6EQH
 github.com/hashicorp/terraform-json v0.17.1/go.mod h1:Huy6zt6euxaY9knPAFKjUITn8QxUFIe9VuSzb4zn/0o=
 github.com/hashicorp/terraform-plugin-framework v1.4.0 h1:WKbtCRtNrjsh10eA7NZvC/Qyr7zp77j+D21aDO5th9c=
 github.com/hashicorp/terraform-plugin-framework v1.4.0/go.mod h1:XC0hPcQbBvlbxwmjxuV/8sn8SbZRg4XwGMs22f+kqV0=
+github.com/hashicorp/terraform-plugin-framework-validators v0.12.0 h1:HOjBuMbOEzl7snOdOoUfE2Jgeto6JOjLVQ39Ls2nksc=
+github.com/hashicorp/terraform-plugin-framework-validators v0.12.0/go.mod h1:jfHGE/gzjxYz6XoUwi/aYiiKrJDeutQNUtGQXkaHklg=
 github.com/hashicorp/terraform-plugin-go v0.19.0 h1:BuZx/6Cp+lkmiG0cOBk6Zps0Cb2tmqQpDM3iAtnhDQU=
 github.com/hashicorp/terraform-plugin-go v0.19.0/go.mod h1:EhRSkEPNoylLQntYsk5KrDHTZJh9HQoumZXbOGOXmec=
 github.com/hashicorp/terraform-plugin-log v0.9.0 h1:i7hOA+vdAItN1/7UrfBqBwvYPQ9TFvymaRGZED3FCV0=
@@ -166,6 +168,8 @@ github.com/uptime-com/uptime-client-go/v2 v2.0.0-20231031092623-ddbe2977f7fb h1:
 github.com/uptime-com/uptime-client-go/v2 v2.0.0-20231031092623-ddbe2977f7fb/go.mod h1:jtWeB/tQ00fLX2r9OwKfTnxQ/PMR0YjmhTuc9RZH2h0=
 github.com/uptime-com/uptime-client-go/v2 v2.0.0-20231108153244-dd63c1cf8415 h1:6XImsHFe1xLei1oWYPjfw5EQ7mzD9AhCkstlc7sWT3U=
 github.com/uptime-com/uptime-client-go/v2 v2.0.0-20231108153244-dd63c1cf8415/go.mod h1:jtWeB/tQ00fLX2r9OwKfTnxQ/PMR0YjmhTuc9RZH2h0=
+github.com/uptime-com/uptime-client-go/v2 v2.0.0-20231109080805-a5fd3377fc67 h1:tVXxfZkzLr9MKHiWXg6LFX3spbofnOHNZpVEJ2C1jqg=
+github.com/uptime-com/uptime-client-go/v2 v2.0.0-20231109080805-a5fd3377fc67/go.mod h1:jtWeB/tQ00fLX2r9OwKfTnxQ/PMR0YjmhTuc9RZH2h0=
 github.com/vmihailenco/msgpack v3.3.3+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=
 github.com/vmihailenco/msgpack v4.0.4+incompatible h1:dSLoQfGFAo3F6OoNhwUmLwVgaUXK79GlxNBwueZn0xI=
 github.com/vmihailenco/msgpack v4.0.4+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=
