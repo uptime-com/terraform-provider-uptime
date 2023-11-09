@@ -13,7 +13,7 @@ import (
 	"github.com/uptime-com/terraform-provider-uptime/internal/provider"
 )
 
-func TestJsonType_Validate(t *testing.T) {
+func TestRawJsonType_Validate(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -38,7 +38,7 @@ func TestJsonType_Validate(t *testing.T) {
 			expectedDiags: diag.Diagnostics{
 				diag.NewAttributeErrorDiagnostic(
 					path.Root("test"),
-					"Json Type Validation Error",
+					"RawJsonType Validation Error",
 					"Value is not a valid json. This is an error in the configuration.",
 				),
 			},
@@ -48,7 +48,7 @@ func TestJsonType_Validate(t *testing.T) {
 			expectedDiags: diag.Diagnostics{
 				diag.NewAttributeErrorDiagnostic(
 					path.Root("test"),
-					"Json Type Validation Error",
+					"RawJsonType Validation Error",
 					"An unexpected error was encountered trying to validate an attribute value. This is always an error in the provider. Please report the following to the provider developer:\n\n"+
 						"expected String value, received tftypes.Value with value: tftypes.Number<\"123\">",
 				),
@@ -143,15 +143,15 @@ func TestRawJson_StringSemanticEquals(t *testing.T) {
 			value2:         provider.RawJsonUnknown(),
 			expectedResult: true,
 		},
-		"unknown equals null": {
+		"unknown not equals null": {
 			value1:         provider.RawJsonUnknown(),
 			value2:         provider.RawJsonNull(),
-			expectedResult: true,
+			expectedResult: false,
 		},
-		"unknown equals value": {
+		"unknown not equals value": {
 			value1:         provider.RawJsonUnknown(),
 			value2:         provider.RawJsonValue(`{"a": "b"}`),
-			expectedResult: true,
+			expectedResult: false,
 		},
 		"null not equals value": {
 			value1:         provider.RawJsonNull(),
