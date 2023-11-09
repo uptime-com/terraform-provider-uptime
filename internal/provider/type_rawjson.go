@@ -25,7 +25,7 @@ type RawJsonType struct{}
 
 // StringValue returns a human readable string of the type name.
 func (t RawJsonType) String() string {
-	return "provider.RawJsonType"
+	return "RawJsonType"
 }
 
 // ValueType returns the Value type.

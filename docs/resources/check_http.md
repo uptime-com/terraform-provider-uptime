@@ -17,7 +17,7 @@ Monitor a URL for specific status code(s)
 
 ### Required
 
-- `address` (String) URL to check
+- `address` (String)
 - `name` (String)
 
 ### Optional
@@ -38,6 +38,7 @@ Monitor a URL for specific status code(s)
 - `proxy` (String)
 - `send_string` (String) String to post
 - `sensitivity` (Number) How many locations should be down before an alert is sent
+- `sla` (Attributes) SLA related attributes (see [below for nested schema](#nestedatt--sla))
 - `status_code` (String)
 - `tags` (Set of String)
 - `threshold` (Number) A timeout alert will be issued if the check takes longer than this many seconds to complete
@@ -48,5 +49,13 @@ Monitor a URL for specific status code(s)
 
 - `id` (Number) The ID of this resource.
 - `url` (String)
+
+<a id="nestedatt--sla"></a>
+### Nested Schema for `sla`
+
+Optional:
+
+- `latency` (String) The maximum average response time. Unit is mandatory (e.g. 1500ms or 1.5s or 1s500ms).
+- `uptime` (String) The minimum uptime percentage. \nMust be a fraction with exactly 4 decimal places (e.g. 0.9995 for 99.95% uptime)
 
 
