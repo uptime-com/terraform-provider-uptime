@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"regexp"
 	"testing"
 
 	petname "github.com/dustinkirkland/golang-petname"
@@ -135,6 +136,17 @@ func TestAccCheckNTPResource_Locations(t *testing.T) {
 				resource.TestCheckResourceAttr("uptime_check_ntp.test", "locations.0", "Israel-Tel Aviv"),
 				resource.TestCheckResourceAttr("uptime_check_ntp.test", "locations.1", "Serbia-Belgrade"),
 			),
+		},
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_ntp/locations"),
+			ConfigVariables: config.Variables{
+				"name": config.StringVariable(name),
+				"locations": config.ListVariable(
+					config.StringVariable("Israel-Tel Aviv"),
+					config.StringVariable("Non-existent"),
+				),
+			},
+			ExpectError: regexp.MustCompile(`invalid location: Non-existent`),
 		},
 	}))
 }
