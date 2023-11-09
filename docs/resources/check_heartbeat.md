@@ -26,6 +26,7 @@ Monitor a periodic process, such as Cron, and issue alerts if the expected inter
 - `interval` (Number) The interval between checks in minutes
 - `is_paused` (Boolean)
 - `notes` (String)
+- `sla` (Attributes) SLA related attributes (see [below for nested schema](#nestedatt--sla))
 - `tags` (Set of String)
 
 ### Read-Only
@@ -33,5 +34,13 @@ Monitor a periodic process, such as Cron, and issue alerts if the expected inter
 - `heartbeat_url` (String) URL to send data to the check
 - `id` (Number) The ID of this resource.
 - `url` (String)
+
+<a id="nestedatt--sla"></a>
+### Nested Schema for `sla`
+
+Optional:
+
+- `latency` (String) The maximum average response time. Unit is mandatory (e.g. 1500ms or 1.5s or 1s500ms).
+- `uptime` (String) The minimum uptime percentage. \nMust be a fraction with exactly 4 decimal places (e.g. 0.9995 for 99.95% uptime)
 
 

@@ -27,7 +27,7 @@ Verify SSL certificate validity
 - `is_paused` (Boolean)
 - `notes` (String)
 - `num_retries` (Number) How many times the check should be retried before a location is considered down
-- `port` (Number)
+- `port` (Number) The port to check
 - `tags` (Set of String)
 - `threshold` (Number) Raise an alert if there are less than this many days before the SSL certificate needs to be renewed
 
