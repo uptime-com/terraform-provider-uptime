@@ -28,7 +28,6 @@ func TestDurationImpl(t *testing.T) {
 }
 
 func TestDurationType_Validate(t *testing.T) {
-	t.Parallel()
 
 	testCases := map[string]struct {
 		in            tftypes.Value
@@ -74,7 +73,6 @@ func TestDurationType_Validate(t *testing.T) {
 	for name, testCase := range testCases {
 		name, testCase := name, testCase
 		t.Run(name, func(t *testing.T) {
-			t.Parallel()
 
 			diags := provider.DurationType.Validate(context.Background(), testCase.in, path.Root("test"))
 
@@ -86,7 +84,6 @@ func TestDurationType_Validate(t *testing.T) {
 }
 
 func TestDurationType_ValueFromTerraform(t *testing.T) {
-	t.Parallel()
 
 	testCases := map[string]struct {
 		in        tftypes.Value
@@ -95,7 +92,7 @@ func TestDurationType_ValueFromTerraform(t *testing.T) {
 	}{
 		"value": {
 			in:     tftypes.NewValue(tftypes.String, "1h"),
-			expect: provider.DurationValue(time.Hour),
+			expect: provider.DurationStringMust("1h"),
 		},
 		"unknown": {
 			in:     tftypes.NewValue(tftypes.String, tftypes.UnknownValue),
@@ -105,9 +102,9 @@ func TestDurationType_ValueFromTerraform(t *testing.T) {
 			in:     tftypes.NewValue(tftypes.String, nil),
 			expect: provider.DurationNull(),
 		},
-		"wrong type": {
+		"unexpected type": {
 			in:        tftypes.NewValue(tftypes.Number, 123),
-			expectErr: "tftypes.String required, got tftypes.Number",
+			expectErr: "expected tftypes.String, got tftypes.Number",
 		},
 	}
 
@@ -117,8 +114,6 @@ func TestDurationType_ValueFromTerraform(t *testing.T) {
 	for name, c := range testCases {
 		name, c := name, c
 		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
 			got, err := provider.DurationType.ValueFromTerraform(ctx, c.in)
 			if err != nil {
 				if c.expectErr == "" {
@@ -131,7 +126,7 @@ func TestDurationType_ValueFromTerraform(t *testing.T) {
 			}
 			assert.True(t, c.expect.Equal(got))
 			assert.True(t, c.expect.IsNull() == c.in.IsNull(), "null-ness mismatch")
-			//assert.True(t, c.expect.IsUnknown() == !c.in.IsKnown(), "unknown-ness mismatch")
+			assert.True(t, c.expect.IsUnknown() == !c.in.IsKnown(), "unknown-ness mismatch")
 			if c.expectErr != "" {
 				require.Error(t, err)
 				assert.ErrorContains(t, err, c.expectErr)
@@ -141,7 +136,6 @@ func TestDurationType_ValueFromTerraform(t *testing.T) {
 }
 
 func TestDurationValue_Equal(t *testing.T) {
-	t.Parallel()
 
 	testCases := map[string]struct {
 		value    provider.Duration
@@ -178,7 +172,6 @@ func TestDurationValue_Equal(t *testing.T) {
 	for name, testCase := range testCases {
 		name, testCase := name, testCase
 		t.Run(name, func(t *testing.T) {
-			t.Parallel()
 
 			got := testCase.value.Equal(testCase.argument)
 
@@ -190,7 +183,6 @@ func TestDurationValue_Equal(t *testing.T) {
 }
 
 func TestDurationValue_StringSemanticEquals(t *testing.T) {
-	t.Parallel()
 
 	testCases := map[string]struct {
 		value    provider.Duration
@@ -228,6 +220,11 @@ func TestDurationValue_StringSemanticEquals(t *testing.T) {
 			argument: basetypes.NewStringValue("60m"),
 			expected: true,
 		},
+		"1h equals 1h0m0s": {
+			value:    provider.DurationValue(time.Hour),
+			argument: basetypes.NewStringValue("1h0m"),
+			expected: true,
+		},
 		"1h not equals 1m": {
 			value:    provider.DurationValue(time.Hour),
 			argument: basetypes.NewStringValue("1m"),
@@ -237,12 +234,6 @@ func TestDurationValue_StringSemanticEquals(t *testing.T) {
 			value:    provider.DurationValue(time.Hour),
 			argument: basetypes.NewStringValue("hello, world"),
 			expected: false,
-			diags: diag.Diagnostics{
-				diag.NewErrorDiagnostic(
-					"duration parse error",
-					`unexpected error converting string to time.Duration: time: invalid duration "hello, world"`,
-				),
-			},
 		},
 	}
 
@@ -252,7 +243,6 @@ func TestDurationValue_StringSemanticEquals(t *testing.T) {
 	for name, c := range testCases {
 		name, c := name, c
 		t.Run(name, func(t *testing.T) {
-			t.Parallel()
 			got, diags := c.value.StringSemanticEquals(ctx, c.argument)
 			require.Equal(t, c.expected, got)
 			require.Equal(t, c.diags, diags)

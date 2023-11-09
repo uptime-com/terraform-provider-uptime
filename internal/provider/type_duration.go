@@ -41,7 +41,7 @@ func (t durationType) Equal(o attr.Type) bool {
 
 // ValueFromString returns a StringValuable type given a StringValue.
 func (t durationType) ValueFromString(_ context.Context, in basetypes.StringValue) (basetypes.StringValuable, diag.Diagnostics) {
-	_, err := time.ParseDuration(in.ValueString())
+	dur, err := time.ParseDuration(in.ValueString())
 	if err != nil {
 		return nil, diag.Diagnostics{
 			diag.NewErrorDiagnostic(
@@ -51,7 +51,7 @@ func (t durationType) ValueFromString(_ context.Context, in basetypes.StringValu
 			),
 		}
 	}
-	return durationValue{value: in.ValueString(), state: attr.ValueStateKnown}, nil
+	return durationValue{valueDuration: dur, valueString: in.ValueString(), state: attr.ValueStateKnown}, nil
 }
 
 // ValueFromTerraform returns a Value given a tftypes.Value.  This is meant to convert the tftypes.Value into a more convenient Go type
@@ -63,20 +63,22 @@ func (t durationType) ValueFromTerraform(_ context.Context, in tftypes.Value) (a
 	if in.IsNull() {
 		return DurationNull(), nil
 	}
+	if !in.Type().Equal(tftypes.String) {
+		return nil, fmt.Errorf("expected %s, got %s", tftypes.String, in.Type())
+	}
 
-	var s string
-
+	s := *new(string)
 	err := in.As(&s)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = time.ParseDuration(s)
+	d, err := time.ParseDuration(s)
 	if err != nil {
 		return nil, fmt.Errorf("unexpected error converting %s to %s: %w", in.Type(), t, err)
 	}
 
-	return durationValue{value: s, state: attr.ValueStateKnown}, nil
+	return durationValue{valueDuration: d, valueString: s, state: attr.ValueStateKnown}, nil
 }
 
 // Validate implements type validation. This type requires the value provided to be a StringValue value that is a parseable
@@ -137,10 +139,37 @@ func DurationValueFromDecimalSeconds(v decimal.Decimal) Duration {
 }
 
 func DurationValue(d time.Duration) Duration {
-	return durationValue{
-		value: d.String(),
-		state: attr.ValueStateKnown,
+	return durationValue{valueDuration: d, valueString: d.String(), state: attr.ValueStateKnown}
+}
+
+func DurationString(s string) (Duration, diag.Diagnostics) {
+	d, err := time.ParseDuration(s)
+	if err != nil {
+		return DurationUnknown(), diag.Diagnostics{
+			diag.NewErrorDiagnostic(
+				"Invalid Duration String Value",
+				"While creating a duration value from a string, an error was encountered trying to parse the string as a duration.\n\n"+
+					fmt.Sprintf("Given Value: %ss\nError: %s", s, err),
+			),
+		}
 	}
+	return durationValue{valueDuration: d, valueString: s, state: attr.ValueStateKnown}, nil
+}
+
+func DurationStringMust(s string) Duration {
+	d, diags := DurationString(s)
+	if diags.HasError() {
+		diagsStrings := make([]string, 0, len(diags))
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+		panic("ObjectValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+	return d
 }
 
 func DurationUnknown() Duration {
@@ -158,8 +187,9 @@ func DurationNull() Duration {
 type Duration = durationValue
 
 type durationValue struct {
-	value string
-	state attr.ValueState
+	valueDuration time.Duration
+	valueString   string
+	state         attr.ValueState
 }
 
 func (d durationValue) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
@@ -215,7 +245,7 @@ func (d durationValue) Equal(x attr.Value) bool {
 	if d.IsUnknown() {
 		return o.IsUnknown()
 	}
-	return d.value == o.value
+	return d.valueDuration == o.valueDuration && d.valueString == o.valueString
 }
 
 // StringSemanticEquals returns true if the given string value can be parsed into a time.Duration which is equal to the durationValue.
@@ -234,7 +264,7 @@ func (d durationValue) StringSemanticEquals(ctx context.Context, in basetypes.St
 	if err != nil {
 		return false, nil
 	}
-	return d.ValueDuration() == dur, nil
+	return d.valueDuration == dur, nil
 }
 
 func (d durationValue) ToStringValue(_ context.Context) (basetypes.StringValue, diag.Diagnostics) {
@@ -248,11 +278,9 @@ func (d durationValue) ToStringValue(_ context.Context) (basetypes.StringValue, 
 }
 
 func (d durationValue) ValueString() string {
-	return d.value
+	return d.valueString
 }
 
 func (d durationValue) ValueDuration() time.Duration {
-	// it pretty much always should be parseable since the type implements validation
-	v, _ := time.ParseDuration(d.value)
-	return v
+	return d.valueDuration
 }
