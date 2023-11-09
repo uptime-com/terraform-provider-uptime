@@ -16,34 +16,32 @@ func NewCheckWHOISResource(_ context.Context, p *providerImpl) resource.Resource
 		mod: CheckWHOISResourceModelAdapter{},
 		meta: APIResourceMetadata{
 			TypeNameSuffix: "check_whois",
-			Schema:         CheckWHOISResourceSchema,
+			Schema: schema.Schema{
+				Description: "Monitor domain's expiry date and registration details",
+				Attributes: map[string]schema.Attribute{
+					"id":             IDSchemaAttribute(),
+					"url":            URLSchemaAttribute(),
+					"name":           NameSchemaAttribute(),
+					"contact_groups": ContactGroupsSchemaAttribute(),
+					"locations":      LocationsReadOnlySchemaAttribute(),
+					"tags":           TagsSchemaAttribute(),
+					"is_paused":      IsPausedSchemaAttribute(),
+					"threshold":      ThresholdDescriptionSchemaAttribute(20, "Raise an alert if there are less than this many days before the domain needs to be renewed."),
+					"num_retries":    NumRetriesSchemaAttribute(2),
+					"notes":          NotesSchemaAttribute(),
+					"address":        AddressHostnameSchemaAttribute(),
+					"expect_string": schema.StringAttribute{
+						Required:    true,
+						Description: "The current domain registration info that should always match.",
+					},
+
+					// NOTE: for this check only uptime SLA is meaningful. Latency is ignored even if provided.
+					// TODO: implement partial SLA attribute containing only uptime.
+					"sla": SLASchemaAttribute(),
+				},
+			},
 		},
 	}
-}
-
-var CheckWHOISResourceSchema = schema.Schema{
-	Description: "Monitor domain's expiry date and registration details",
-	Attributes: map[string]schema.Attribute{
-		"id":             IDSchemaAttribute(),
-		"url":            URLSchemaAttribute(),
-		"name":           NameSchemaAttribute(),
-		"contact_groups": ContactGroupsSchemaAttribute(),
-		"locations":      LocationsReadOnlySchemaAttribute(),
-		"tags":           TagsSchemaAttribute(),
-		"is_paused":      IsPausedSchemaAttribute(),
-		"threshold":      ThresholdDescriptionSchemaAttribute(20, "Raise an alert if there are less than this many days before the domain needs to be renewed."),
-		"num_retries":    NumRetriesSchemaAttribute(2),
-		"notes":          NotesSchemaAttribute(),
-		"address":        AddressHostnameSchemaAttribute(),
-		"expect_string": schema.StringAttribute{
-			Required:    true,
-			Description: "The current domain registration info that should always match.",
-		},
-
-		// NOTE: for this check only uptime SLA is meaningful. Latency is ignored even if provided.
-		// TODO: implement partial SLA attribute containing only uptime.
-		"sla": SLASchemaAttribute(),
-	},
 }
 
 type CheckWHOISResourceModel struct {

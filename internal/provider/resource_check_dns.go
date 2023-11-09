@@ -14,55 +14,53 @@ import (
 )
 
 func NewCheckDNSResource(_ context.Context, p *providerImpl) resource.Resource {
-	return &APIResource[CheckDNSResourceModel, upapi.CheckDNS, upapi.Check]{
+	return APIResource[CheckDNSResourceModel, upapi.CheckDNS, upapi.Check]{
 		CheckDNSResourceAPI{provider: p},
 		CheckDNSResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_dns",
-			Schema:         CheckDNSResourceSchema,
-		},
-	}
-}
-
-var CheckDNSResourceSchema = schema.Schema{
-	Description: "Monitor for DNS failures or changes",
-	Attributes: map[string]schema.Attribute{
-		"id":             IDSchemaAttribute(),
-		"url":            URLSchemaAttribute(),
-		"name":           NameSchemaAttribute(),
-		"contact_groups": ContactGroupsSchemaAttribute(),
-		"locations":      LocationsSchemaAttribute(),
-		"tags":           TagsSchemaAttribute(),
-		"is_paused":      IsPausedSchemaAttribute(),
-		"interval":       IntervalSchemaAttribute(5),
-		"threshold":      ThresholdSchemaAttribute(20),
-		"address":        AddressHostnameSchemaAttribute(),
-		"dns_server": schema.StringAttribute{
-			Optional:    true,
-			Computed:    true,
-			Default:     stringdefault.StaticString(""),
-			Description: "DNS server to query",
-		},
-		"dns_record_type": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString("ANY"),
-			Validators: []validator.String{
-				OneOfStringValidator([]string{"ANY", "A", "AAAA", "CNAME", "MX", "NS", "SOA", "SRV", "TXT"}),
+			Schema: schema.Schema{
+				Description: "Monitor for DNS failures or changes",
+				Attributes: map[string]schema.Attribute{
+					"id":             IDSchemaAttribute(),
+					"url":            URLSchemaAttribute(),
+					"name":           NameSchemaAttribute(),
+					"contact_groups": ContactGroupsSchemaAttribute(),
+					"locations":      LocationsSchemaAttribute(p.locations),
+					"tags":           TagsSchemaAttribute(),
+					"is_paused":      IsPausedSchemaAttribute(),
+					"interval":       IntervalSchemaAttribute(5),
+					"threshold":      ThresholdSchemaAttribute(20),
+					"address":        AddressHostnameSchemaAttribute(),
+					"dns_server": schema.StringAttribute{
+						Optional:    true,
+						Computed:    true,
+						Default:     stringdefault.StaticString(""),
+						Description: "DNS server to query",
+					},
+					"dns_record_type": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("ANY"),
+						Validators: []validator.String{
+							OneOfStringValidator([]string{"ANY", "A", "AAAA", "CNAME", "MX", "NS", "SOA", "SRV", "TXT"}),
+						},
+					},
+					"expect_string": schema.StringAttribute{
+						Optional:    true,
+						Computed:    true,
+						Default:     stringdefault.StaticString(""),
+						Description: "IP Address, Domain Name or String to expect in response",
+					},
+					"sensitivity":               SensitivitySchemaAttribute(2),
+					"num_retries":               NumRetriesAttribute(2),
+					"notes":                     NotesSchemaAttribute(),
+					"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
+					"sla":                       SLASchemaAttribute(),
+				},
 			},
 		},
-		"expect_string": schema.StringAttribute{
-			Optional:    true,
-			Computed:    true,
-			Default:     stringdefault.StaticString(""),
-			Description: "IP Address, Domain Name or String to expect in response",
-		},
-		"sensitivity":               SensitivitySchemaAttribute(2),
-		"num_retries":               NumRetriesAttribute(2),
-		"notes":                     NotesSchemaAttribute(),
-		"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
-		"sla":                       SLASchemaAttribute(),
-	},
+	}
 }
 
 type CheckDNSResourceModel struct {

@@ -18,47 +18,45 @@ func NewContactResource(_ context.Context, p *providerImpl) resource.Resource {
 		mod: ContactResourceModelAdapter{},
 		meta: APIResourceMetadata{
 			TypeNameSuffix: "contact",
-			Schema:         EnreachResourceSchema(contactResourceSchema, p),
+			Schema: schema.Schema{
+				Attributes: map[string]schema.Attribute{
+					"id":   IDSchemaAttribute(),
+					"url":  URLSchemaAttribute(),
+					"name": NameSchemaAttribute(),
+					"sms_list": schema.SetAttribute{
+						ElementType: types.StringType,
+						Computed:    true,
+						Optional:    true,
+						Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
+					},
+					"email_list": schema.SetAttribute{
+						ElementType: types.StringType,
+						Computed:    true,
+						Optional:    true,
+						Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
+					},
+					"phonecall_list": schema.SetAttribute{
+						ElementType: types.StringType,
+						Computed:    true,
+						Optional:    true,
+						Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
+					},
+					"integrations": schema.SetAttribute{
+						ElementType: types.StringType,
+						Computed:    true,
+						Optional:    true,
+						Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
+					},
+					"push_notification_profiles": schema.SetAttribute{
+						ElementType: types.StringType,
+						Computed:    true,
+						Optional:    true,
+						Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
+					},
+				},
+			},
 		},
 	}
-}
-
-var contactResourceSchema = schema.Schema{
-	Attributes: map[string]schema.Attribute{
-		"id":   IDSchemaAttribute(),
-		"url":  URLSchemaAttribute(),
-		"name": NameSchemaAttribute(),
-		"sms_list": schema.SetAttribute{
-			ElementType: types.StringType,
-			Computed:    true,
-			Optional:    true,
-			Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
-		},
-		"email_list": schema.SetAttribute{
-			ElementType: types.StringType,
-			Computed:    true,
-			Optional:    true,
-			Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
-		},
-		"phonecall_list": schema.SetAttribute{
-			ElementType: types.StringType,
-			Computed:    true,
-			Optional:    true,
-			Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
-		},
-		"integrations": schema.SetAttribute{
-			ElementType: types.StringType,
-			Computed:    true,
-			Optional:    true,
-			Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
-		},
-		"push_notification_profiles": schema.SetAttribute{
-			ElementType: types.StringType,
-			Computed:    true,
-			Optional:    true,
-			Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
-		},
-	},
 }
 
 type ContactResourceModel struct {

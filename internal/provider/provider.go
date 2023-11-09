@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -79,6 +80,7 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 		upapi.WithToken(cfg.Token.ValueString()),
 		upapi.WithUserAgent(p.UserAgentString()),
 		upapi.WithRateLimit(cfg.RateLimit.ValueFloat64()),
+		upapi.WithRetry(10, time.Second*30, os.Stderr),
 	}
 	if ep := cfg.Endpoint.ValueString(); ep != "" {
 		opts = append(opts, upapi.WithBaseURL(ep))

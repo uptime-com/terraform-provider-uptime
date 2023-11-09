@@ -20,177 +20,175 @@ func NewStatusPageResource(_ context.Context, p *providerImpl) resource.Resource
 		mod: StatusPageResourceModelAdapter{},
 		meta: APIResourceMetadata{
 			TypeNameSuffix: "statuspage",
-			Schema:         EnreachResourceSchema(statusPageResourceSchema, p),
+			Schema: schema.Schema{
+				Attributes: map[string]schema.Attribute{
+					"id":   IDSchemaAttribute(),
+					"url":  URLSchemaAttribute(),
+					"name": NameSchemaAttribute(),
+					"visibility_level": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("UPTIME_USERS"),
+						Validators: []validator.String{
+							OneOfStringValidator([]string{"PUBLIC", "UPTIME_USERS", "EXTERNAL_USERS"}),
+						},
+					},
+					"description": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"page_type": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("INTERNAL"),
+						Validators: []validator.String{
+							OneOfStringValidator([]string{"INTERNAL", "PUBLIC", "PUBLIC_SLA"}),
+						},
+					},
+					"slug": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"cname": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+						Validators: []validator.String{
+							HostnameValidator(),
+						},
+					},
+					"allow_subscriptions": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"allow_search_indexing": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"allow_drill_down": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"auth_username": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"auth_password": schema.StringAttribute{
+						Optional:  true,
+						Sensitive: true,
+						Computed:  true,
+						Default:   stringdefault.StaticString(""),
+					},
+					"show_status_tab": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"show_active_incidents": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"show_component_response_time": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"show_history_tab": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"default_history_date_range": schema.Int64Attribute{
+						Optional: true,
+						Computed: true,
+						Default:  int64default.StaticInt64(90),
+					},
+					"uptime_calculation_type": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("BY_INCIDENTS"),
+					},
+					"show_history_snake": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"show_component_history": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"show_summary_metrics": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"show_past_incidents": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"allow_pdf_report": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"google_analytics_code": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"contact_email": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"email_from": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"email_reply_to": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"custom_header_html": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"custom_footer_html": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"custom_css": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"company_website_url": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"timezone": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("GMT"),
+					},
+				},
+			},
 		},
 	}
-}
-
-var statusPageResourceSchema = schema.Schema{
-	Attributes: map[string]schema.Attribute{
-		"id":   IDSchemaAttribute(),
-		"url":  URLSchemaAttribute(),
-		"name": NameSchemaAttribute(),
-		"visibility_level": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString("UPTIME_USERS"),
-			Validators: []validator.String{
-				OneOfStringValidator([]string{"PUBLIC", "UPTIME_USERS", "EXTERNAL_USERS"}),
-			},
-		},
-		"description": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"page_type": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString("INTERNAL"),
-			Validators: []validator.String{
-				OneOfStringValidator([]string{"INTERNAL", "PUBLIC", "PUBLIC_SLA"}),
-			},
-		},
-		"slug": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"cname": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-			Validators: []validator.String{
-				HostnameValidator(),
-			},
-		},
-		"allow_subscriptions": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"allow_search_indexing": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"allow_drill_down": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"auth_username": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"auth_password": schema.StringAttribute{
-			Optional:  true,
-			Sensitive: true,
-			Computed:  true,
-			Default:   stringdefault.StaticString(""),
-		},
-		"show_status_tab": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"show_active_incidents": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"show_component_response_time": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"show_history_tab": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"default_history_date_range": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-			Default:  int64default.StaticInt64(90),
-		},
-		"uptime_calculation_type": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString("BY_INCIDENTS"),
-		},
-		"show_history_snake": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"show_component_history": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"show_summary_metrics": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"show_past_incidents": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"allow_pdf_report": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"google_analytics_code": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"contact_email": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"email_from": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"email_reply_to": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"custom_header_html": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"custom_footer_html": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"custom_css": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"company_website_url": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"timezone": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString("GMT"),
-		},
-	},
 }
 
 type StatusPageResourceModel struct {

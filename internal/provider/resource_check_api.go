@@ -12,35 +12,33 @@ import (
 )
 
 func NewCheckAPIResource(_ context.Context, p *providerImpl) resource.Resource {
-	return &APIResource[CheckAPIResourceModel, upapi.CheckAPI, upapi.Check]{
+	return APIResource[CheckAPIResourceModel, upapi.CheckAPI, upapi.Check]{
 		CheckAPIResourceAPI{provider: p},
 		CheckAPIResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_api",
-			Schema:         CheckAPIResourceSchema,
+			Schema: schema.Schema{
+				Description: "Multi-step advanced check type that is intended to monitor API such as REST or SOAP",
+				Attributes: map[string]schema.Attribute{
+					"id":                        IDSchemaAttribute(),
+					"url":                       URLSchemaAttribute(),
+					"name":                      NameSchemaAttribute(),
+					"contact_groups":            ContactGroupsSchemaAttribute(),
+					"locations":                 LocationsSchemaAttribute(p.locations),
+					"tags":                      TagsSchemaAttribute(),
+					"is_paused":                 IsPausedSchemaAttribute(),
+					"interval":                  IntervalSchemaAttribute(5),
+					"threshold":                 ThresholdSchemaAttribute(30),
+					"sensitivity":               SensitivitySchemaAttribute(2),
+					"num_retries":               NumRetriesAttribute(2),
+					"notes":                     NotesSchemaAttribute(),
+					"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
+					"script":                    ScriptSchemaAttribute(),
+					"sla":                       SLASchemaAttribute(),
+				},
+			},
 		},
 	}
-}
-
-var CheckAPIResourceSchema = schema.Schema{
-	Description: "Multi-step advanced check type that is intended to monitor API such as REST or SOAP",
-	Attributes: map[string]schema.Attribute{
-		"id":                        IDSchemaAttribute(),
-		"url":                       URLSchemaAttribute(),
-		"name":                      NameSchemaAttribute(),
-		"contact_groups":            ContactGroupsSchemaAttribute(),
-		"locations":                 LocationsSchemaAttribute(),
-		"tags":                      TagsSchemaAttribute(),
-		"is_paused":                 IsPausedSchemaAttribute(),
-		"interval":                  IntervalSchemaAttribute(5),
-		"threshold":                 ThresholdSchemaAttribute(30),
-		"sensitivity":               SensitivitySchemaAttribute(2),
-		"num_retries":               NumRetriesAttribute(2),
-		"notes":                     NotesSchemaAttribute(),
-		"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
-		"script":                    ScriptSchemaAttribute(),
-		"sla":                       SLASchemaAttribute(),
-	},
 }
 
 type CheckAPIResource struct {

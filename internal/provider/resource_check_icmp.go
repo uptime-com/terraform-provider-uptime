@@ -13,34 +13,32 @@ import (
 )
 
 func NewCheckICMPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return &APIResource[CheckICMPResourceModel, upapi.CheckICMP, upapi.Check]{
+	return APIResource[CheckICMPResourceModel, upapi.CheckICMP, upapi.Check]{
 		CheckICMPResourceAPI{provider: p},
 		CheckICMPResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_icmp",
-			Schema:         CheckICMPResourceSchema,
+			Schema: schema.Schema{
+				Description: "Monitor network activity for a specific domain or IP address",
+				Attributes: map[string]schema.Attribute{
+					"id":                        IDSchemaAttribute(),
+					"url":                       URLSchemaAttribute(),
+					"name":                      NameSchemaAttribute(),
+					"address":                   AddressHostnameSchemaAttribute(),
+					"contact_groups":            ContactGroupsSchemaAttribute(),
+					"locations":                 LocationsSchemaAttribute(p.locations),
+					"tags":                      TagsSchemaAttribute(),
+					"is_paused":                 IsPausedSchemaAttribute(),
+					"interval":                  IntervalSchemaAttribute(5),
+					"num_retries":               NumRetriesAttribute(2),
+					"use_ip_version":            UseIPVersionSchemaAttribute(),
+					"notes":                     NotesSchemaAttribute(),
+					"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
+					"sla":                       SLASchemaAttribute(),
+				},
+			},
 		},
 	}
-}
-
-var CheckICMPResourceSchema = schema.Schema{
-	Description: "Monitor network activity for a specific domain or IP address",
-	Attributes: map[string]schema.Attribute{
-		"id":                        IDSchemaAttribute(),
-		"url":                       URLSchemaAttribute(),
-		"name":                      NameSchemaAttribute(),
-		"address":                   AddressHostnameSchemaAttribute(),
-		"contact_groups":            ContactGroupsSchemaAttribute(),
-		"locations":                 LocationsSchemaAttribute(),
-		"tags":                      TagsSchemaAttribute(),
-		"is_paused":                 IsPausedSchemaAttribute(),
-		"interval":                  IntervalSchemaAttribute(5),
-		"num_retries":               NumRetriesAttribute(2),
-		"use_ip_version":            UseIPVersionSchemaAttribute(),
-		"notes":                     NotesSchemaAttribute(),
-		"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
-		"sla":                       SLASchemaAttribute(),
-	},
 }
 
 type CheckICMPResourceModel struct {
