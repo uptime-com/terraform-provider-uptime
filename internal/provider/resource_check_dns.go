@@ -26,7 +26,7 @@ func NewCheckDNSResource(_ context.Context, p *providerImpl) resource.Resource {
 					"url":            URLSchemaAttribute(),
 					"name":           NameSchemaAttribute(),
 					"contact_groups": ContactGroupsSchemaAttribute(),
-					"locations":      LocationsSchemaAttribute(p.getLocations),
+					"locations":      LocationsSchemaAttribute(p),
 					"tags":           TagsSchemaAttribute(),
 					"is_paused":      IsPausedSchemaAttribute(),
 					"interval":       IntervalSchemaAttribute(5),

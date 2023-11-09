@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -19,9 +20,10 @@ import (
 var _ provider.Provider = (*providerImpl)(nil)
 
 type providerImpl struct {
-	api       upapi.API
-	version   string
-	locations map[string]struct{}
+	api           upapi.API
+	version       string
+	locations     map[string]struct{}
+	locationsOnce sync.Once
 }
 
 type providerConfig struct {
@@ -121,17 +123,24 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 	}
 }
 
-func (p *providerImpl) getLocations(ctx context.Context) (map[string]struct{}, error) {
-	if p.locations != nil {
-		return p.locations, nil
-	}
+func (p *providerImpl) getLocations(ctx context.Context) error {
 	servers, err := p.api.ProbeServers().List(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get list of locations: %v", err)
+		return err
 	}
 	p.locations = make(map[string]struct{}, len(servers))
 	for _, server := range servers {
 		p.locations[server.Location] = struct{}{}
+	}
+	return nil
+}
+
+func (p *providerImpl) GetLocations(ctx context.Context) (_ map[string]struct{}, err error) {
+	p.locationsOnce.Do(func() {
+		err = p.getLocations(ctx)
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get list of locations: %w", err)
 	}
 	return p.locations, nil
 }

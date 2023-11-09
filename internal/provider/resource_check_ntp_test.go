@@ -143,10 +143,10 @@ func TestAccCheckNTPResource_Locations(t *testing.T) {
 				"name": config.StringVariable(name),
 				"locations": config.ListVariable(
 					config.StringVariable("Israel-Tel Aviv"),
-					config.StringVariable("Non-existent"),
+					config.StringVariable("Disneyland"),
 				),
 			},
-			ExpectError: regexp.MustCompile(`invalid location: Non-existent`),
+			ExpectError: regexp.MustCompile(`Invalid value: "Disneyland"`),
 		},
 	}))
 }

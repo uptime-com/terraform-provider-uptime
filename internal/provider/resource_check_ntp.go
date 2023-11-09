@@ -27,7 +27,7 @@ func NewCheckNTPResource(_ context.Context, p *providerImpl) resource.Resource {
 					"address":                   AddressHostnameSchemaAttribute(),
 					"port":                      PortSchemaAttribute(123),
 					"contact_groups":            ContactGroupsSchemaAttribute(),
-					"locations":                 LocationsSchemaAttribute(p.getLocations),
+					"locations":                 LocationsSchemaAttribute(p),
 					"tags":                      TagsSchemaAttribute(),
 					"is_paused":                 IsPausedSchemaAttribute(),
 					"interval":                  IntervalSchemaAttribute(5),
