@@ -33,6 +33,7 @@ Monitor for DNS failures or changes
 - `notes` (String)
 - `num_retries` (Number) How many times the check should be retried before a location is considered down
 - `sensitivity` (Number) How many locations should be down before an alert is sent
+- `sla` (Attributes) SLA related attributes (see [below for nested schema](#nestedatt--sla))
 - `tags` (Set of String)
 - `threshold` (Number) A timeout alert will be issued if the check takes longer than this many seconds to complete
 
@@ -40,5 +41,13 @@ Monitor for DNS failures or changes
 
 - `id` (Number) The ID of this resource.
 - `url` (String)
+
+<a id="nestedatt--sla"></a>
+### Nested Schema for `sla`
+
+Optional:
+
+- `latency` (String) The maximum average response time. Unit is mandatory (e.g. 1500ms or 1.5s or 1s500ms).
+- `uptime` (String) The minimum uptime percentage. \nMust be a fraction with exactly 4 decimal places (e.g. 0.9995 for 99.95% uptime)
 
 

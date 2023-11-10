@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -14,18 +15,185 @@ import (
 )
 
 func NewStatusPageResource(_ context.Context, p *providerImpl) resource.Resource {
-	return &genericResource[statusPageResourceModel, upapi.StatusPage, upapi.StatusPage]{
-		api: &statusPageResourceAPI{provider: p},
-		metadata: genericResourceMetadata{
+	return APIResource[StatusPageResourceModel, upapi.StatusPage, upapi.StatusPage]{
+		api: &StatusPageResourceAPI{provider: p},
+		mod: StatusPageResourceModelAdapter{},
+		meta: APIResourceMetadata{
 			TypeNameSuffix: "statuspage",
-			Schema:         statusPageResourceSchema,
+			Schema: schema.Schema{
+				Attributes: map[string]schema.Attribute{
+					"id":   IDSchemaAttribute(),
+					"url":  URLSchemaAttribute(),
+					"name": NameSchemaAttribute(),
+					"visibility_level": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("UPTIME_USERS"),
+						Validators: []validator.String{
+							OneOfStringValidator([]string{"PUBLIC", "UPTIME_USERS", "EXTERNAL_USERS"}),
+						},
+					},
+					"description": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"page_type": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("INTERNAL"),
+						Validators: []validator.String{
+							OneOfStringValidator([]string{"INTERNAL", "PUBLIC", "PUBLIC_SLA"}),
+						},
+					},
+					"slug": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"cname": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+						Validators: []validator.String{
+							HostnameValidator(),
+						},
+					},
+					"allow_subscriptions": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"allow_search_indexing": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"allow_drill_down": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"auth_username": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"auth_password": schema.StringAttribute{
+						Optional:  true,
+						Sensitive: true,
+						Computed:  true,
+						Default:   stringdefault.StaticString(""),
+					},
+					"show_status_tab": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"show_active_incidents": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"show_component_response_time": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"show_history_tab": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"default_history_date_range": schema.Int64Attribute{
+						Optional: true,
+						Computed: true,
+						Default:  int64default.StaticInt64(90),
+					},
+					"uptime_calculation_type": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("BY_INCIDENTS"),
+					},
+					"show_history_snake": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"show_component_history": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"show_summary_metrics": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"show_past_incidents": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"allow_pdf_report": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"google_analytics_code": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"contact_email": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"email_from": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"email_reply_to": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"custom_header_html": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"custom_footer_html": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"custom_css": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"company_website_url": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"timezone": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("GMT"),
+					},
+				},
+			},
 		},
 	}
 }
 
-type statusPageResourceModel struct {
-	ID                        types.Int64  `tfsdk:"id"  ref:"PK,opt"`
-	URL                       types.String `tfsdk:"url"  ref:"URL,opt"`
+type StatusPageResourceModel struct {
+	ID                        types.Int64  `tfsdk:"id"`
+	URL                       types.String `tfsdk:"url"`
 	Name                      types.String `tfsdk:"name"`
 	VisibilityLevel           types.String `tfsdk:"visibility_level"`
 	Description               types.String `tfsdk:"description"`
@@ -59,192 +227,116 @@ type statusPageResourceModel struct {
 	Timezone                  types.String `tfsdk:"timezone"`
 }
 
-var statusPageResourceSchema = schema.Schema{
-	Attributes: map[string]schema.Attribute{
-		"id":   IDAttribute(),
-		"url":  URLAttribute(),
-		"name": NameAttribute(),
-		"visibility_level": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString("UPTIME_USERS"),
-			Validators: []validator.String{
-				OneOfStringValidator([]string{"PUBLIC", "UPTIME_USERS", "EXTERNAL_USERS"}),
-			},
-		},
-		"description": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"page_type": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString("INTERNAL"),
-			Validators: []validator.String{
-				OneOfStringValidator([]string{"INTERNAL", "PUBLIC", "PUBLIC_SLA"}),
-			},
-		},
-		"slug": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"cname": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"allow_subscriptions": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"allow_search_indexing": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"allow_drill_down": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"auth_username": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"auth_password": schema.StringAttribute{
-			Optional:  true,
-			Sensitive: true,
-			Computed:  true,
-			Default:   stringdefault.StaticString(""),
-		},
-		"show_status_tab": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"show_active_incidents": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"show_component_response_time": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"show_history_tab": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"default_history_date_range": schema.Int64Attribute{
-			Optional: true,
-			Computed: true,
-			Default:  int64default.StaticInt64(90),
-		},
-		"uptime_calculation_type": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString("BY_INCIDENTS"),
-		},
-		"show_history_snake": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"show_component_history": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"show_summary_metrics": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"show_past_incidents": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"allow_pdf_report": schema.BoolAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  booldefault.StaticBool(false),
-		},
-		"google_analytics_code": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"contact_email": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"email_from": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"email_reply_to": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"custom_header_html": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"custom_footer_html": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"custom_css": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"company_website_url": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString(""),
-		},
-		"timezone": schema.StringAttribute{
-			Optional: true,
-			Computed: true,
-			Default:  stringdefault.StaticString("GMT"),
-		},
-	},
+func (m StatusPageResourceModel) PrimaryKey() upapi.PrimaryKey {
+	return upapi.PrimaryKey(m.ID.ValueInt64())
 }
 
-var _ genericResourceAPI[upapi.StatusPage, upapi.StatusPage] = (*statusPageResourceAPI)(nil)
+type StatusPageResourceModelAdapter struct{}
 
-type statusPageResourceAPI struct {
+func (c StatusPageResourceModelAdapter) Get(ctx context.Context, sg StateGetter) (*StatusPageResourceModel, diag.Diagnostics) {
+	model := *new(StatusPageResourceModel)
+	diags := sg.Get(ctx, &model)
+	if diags.HasError() {
+		return nil, diags
+	}
+	return &model, nil
+}
+
+func (c StatusPageResourceModelAdapter) ToAPIArgument(model StatusPageResourceModel) (*upapi.StatusPage, error) {
+	api := upapi.StatusPage{
+		Name:                      model.Name.ValueString(),
+		VisibilityLevel:           model.VisibilityLevel.ValueString(),
+		Description:               model.Description.ValueString(),
+		PageType:                  model.PageType.ValueString(),
+		Slug:                      model.Slug.ValueString(),
+		CNAME:                     model.CNAME.ValueString(),
+		AllowSubscriptions:        model.AllowSubscriptions.ValueBool(),
+		AllowSearchIndexing:       model.AllowSearchIndexing.ValueBool(),
+		AllowDrillDown:            model.AllowDrillDown.ValueBool(),
+		AuthUsername:              model.AuthUsername.ValueString(),
+		AuthPassword:              model.AuthPassword.ValueString(),
+		ShowStatusTab:             model.ShowStatusTab.ValueBool(),
+		ShowActiveIncidents:       model.ShowActiveIncidents.ValueBool(),
+		ShowComponentResponseTime: model.ShowComponentResponseTime.ValueBool(),
+		ShowHistoryTab:            model.ShowHistoryTab.ValueBool(),
+		DefaultHistoryDateRange:   model.DefaultHistoryDateRange.ValueInt64(),
+		UptimeCalculationType:     model.UptimeCalculationType.ValueString(),
+		ShowHistorySnake:          model.ShowHistorySnake.ValueBool(),
+		ShowComponentHistory:      model.ShowComponentHistory.ValueBool(),
+		ShowSummaryMetrics:        model.ShowSummaryMetrics.ValueBool(),
+		ShowPastIncidents:         model.ShowPastIncidents.ValueBool(),
+		AllowPdfReport:            model.AllowPdfReport.ValueBool(),
+		GoogleAnalyticsCode:       model.GoogleAnalyticsCode.ValueString(),
+		ContactEmail:              model.ContactEmail.ValueString(),
+		EmailFrom:                 model.EmailFrom.ValueString(),
+		EmailReplyTo:              model.EmailReplyTo.ValueString(),
+		CustomHeaderHtml:          model.CustomHeaderHtml.ValueString(),
+		CustomFooterHtml:          model.CustomFooterHtml.ValueString(),
+		CustomCss:                 model.CustomCss.ValueString(),
+		CompanyWebsiteUrl:         model.CompanyWebsiteUrl.ValueString(),
+		Timezone:                  model.Timezone.ValueString(),
+	}
+	return &api, nil
+}
+
+func (c StatusPageResourceModelAdapter) FromAPIResult(api upapi.StatusPage) (*StatusPageResourceModel, error) {
+	model := StatusPageResourceModel{
+		ID:                        types.Int64Value(api.PK),
+		URL:                       types.StringValue(api.URL),
+		Name:                      types.StringValue(api.Name),
+		VisibilityLevel:           types.StringValue(api.VisibilityLevel),
+		Description:               types.StringValue(api.Description),
+		PageType:                  types.StringValue(api.PageType),
+		Slug:                      types.StringValue(api.Slug),
+		CNAME:                     types.StringValue(api.CNAME),
+		AllowSubscriptions:        types.BoolValue(api.AllowSubscriptions),
+		AllowSearchIndexing:       types.BoolValue(api.AllowSearchIndexing),
+		AllowDrillDown:            types.BoolValue(api.AllowDrillDown),
+		AuthUsername:              types.StringValue(api.AuthUsername),
+		AuthPassword:              types.StringValue(api.AuthPassword),
+		ShowStatusTab:             types.BoolValue(api.ShowStatusTab),
+		ShowActiveIncidents:       types.BoolValue(api.ShowActiveIncidents),
+		ShowComponentResponseTime: types.BoolValue(api.ShowComponentResponseTime),
+		ShowHistoryTab:            types.BoolValue(api.ShowHistoryTab),
+		DefaultHistoryDateRange:   types.Int64Value(api.DefaultHistoryDateRange),
+		UptimeCalculationType:     types.StringValue(api.UptimeCalculationType),
+		ShowHistorySnake:          types.BoolValue(api.ShowHistorySnake),
+		ShowComponentHistory:      types.BoolValue(api.ShowComponentHistory),
+		ShowSummaryMetrics:        types.BoolValue(api.ShowSummaryMetrics),
+		ShowPastIncidents:         types.BoolValue(api.ShowPastIncidents),
+		AllowPdfReport:            types.BoolValue(api.AllowPdfReport),
+		GoogleAnalyticsCode:       types.StringValue(api.GoogleAnalyticsCode),
+		ContactEmail:              types.StringValue(api.ContactEmail),
+		EmailFrom:                 types.StringValue(api.EmailFrom),
+		EmailReplyTo:              types.StringValue(api.EmailReplyTo),
+		CustomHeaderHtml:          types.StringValue(api.CustomHeaderHtml),
+		CustomFooterHtml:          types.StringValue(api.CustomFooterHtml),
+		CustomCss:                 types.StringValue(api.CustomCss),
+		CompanyWebsiteUrl:         types.StringValue(api.CompanyWebsiteUrl),
+		Timezone:                  types.StringValue(api.Timezone),
+	}
+	return &model, nil
+}
+
+type StatusPageResourceAPI struct {
 	provider *providerImpl
 }
 
-func (s *statusPageResourceAPI) Create(ctx context.Context, arg upapi.StatusPage) (*upapi.StatusPage, error) {
+func (s StatusPageResourceAPI) Create(ctx context.Context, arg upapi.StatusPage) (*upapi.StatusPage, error) {
 	obj, err := s.provider.api.StatusPages().Create(ctx, arg)
 	return obj, err
 }
 
-func (s *statusPageResourceAPI) Read(ctx context.Context, arg upapi.PrimaryKeyable) (*upapi.StatusPage, error) {
+func (s StatusPageResourceAPI) Read(ctx context.Context, arg upapi.PrimaryKeyable) (*upapi.StatusPage, error) {
 	obj, err := s.provider.api.StatusPages().Get(ctx, arg)
 	return obj, err
 }
 
-func (s *statusPageResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.StatusPage) (*upapi.StatusPage, error) {
+func (s StatusPageResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.StatusPage) (*upapi.StatusPage, error) {
 	obj, err := s.provider.api.StatusPages().Update(ctx, pk, arg)
 	return obj, err
 }
 
-func (s *statusPageResourceAPI) Delete(ctx context.Context, keyable upapi.PrimaryKeyable) error {
+func (s StatusPageResourceAPI) Delete(ctx context.Context, keyable upapi.PrimaryKeyable) error {
 	return s.provider.api.StatusPages().Delete(ctx, keyable)
 }

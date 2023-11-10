@@ -3,23 +3,42 @@ package provider
 import (
 	"testing"
 
+	petname "github.com/dustinkirkland/golang-petname"
+	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
+// TODO: Extend the test to cover more fields
 func TestAccStatusPageResource(t *testing.T) {
+	t.Parallel()
+	names := [2]string{
+		petname.Generate(3, "-"),
+		petname.Generate(3, "-"),
+	}
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { _ = testAccAPIClient(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
 		Steps: []resource.TestStep{
 			{
-				Config: testRenderSnippet(t, "resource_statuspage.tf", 0, nil),
+				ConfigDirectory: config.StaticDirectory("testdata/resource_statuspage/_basic"),
+				ConfigVariables: config.Variables{
+					"name": config.StringVariable(names[0]),
+				},
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("uptime_statuspage.basic", "name", names[0]),
+				),
 			},
 			{
-				Config: testRenderSnippet(t, "resource_statuspage.tf", 1, nil),
-			},
-			{
-				Config: testRenderSnippet(t, "resource_statuspage.tf", 2, nil),
+				ConfigDirectory: config.StaticDirectory("testdata/resource_statuspage/_basic"),
+				ConfigVariables: config.Variables{
+					"name": config.StringVariable(names[1]),
+				},
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("uptime_statuspage.basic", "name", names[1]),
+				),
 			},
 		},
 	})
 }
+
+// TODO: Cover more fields
