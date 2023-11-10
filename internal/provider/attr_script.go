@@ -13,8 +13,7 @@ func ScriptSchemaAttribute() schema.StringAttribute {
 	return schema.StringAttribute{
 		CustomType:  RawJsonType{},
 		Description: `The script to run. Must be valid JSON.`,
-		Optional:    true,
-		Computed:    true,
+		Required:    true,
 		Validators: []validator.String{
 			scriptValidator{},
 		},

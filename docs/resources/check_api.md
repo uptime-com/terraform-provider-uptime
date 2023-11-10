@@ -18,6 +18,7 @@ Multi-step advanced check type that is intended to monitor API such as REST or S
 ### Required
 
 - `name` (String)
+- `script` (String) The script to run. Must be valid JSON.
 
 ### Optional
 
@@ -28,7 +29,6 @@ Multi-step advanced check type that is intended to monitor API such as REST or S
 - `locations` (Set of String)
 - `notes` (String)
 - `num_retries` (Number) How many times the check should be retried before a location is considered down
-- `script` (String) The script to run. Must be valid JSON.
 - `sensitivity` (Number) How many locations should be down before an alert is sent
 - `sla` (Attributes) SLA related attributes (see [below for nested schema](#nestedatt--sla))
 - `tags` (Set of String)
