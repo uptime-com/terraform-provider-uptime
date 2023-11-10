@@ -153,3 +153,40 @@ func TestAccCheckHTTPResource_Locations(t *testing.T) {
 		},
 	}))
 }
+
+func TestAccCheckHTTPResource_Headers(t *testing.T) {
+	t.Parallel()
+	name := petname.Generate(3, "-")
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/headers"),
+			ConfigVariables: config.Variables{
+				"name": config.StringVariable(name),
+				"headers": config.MapVariable(map[string]config.Variable{
+					"Foo": config.ListVariable(config.StringVariable("Bar")),
+				}),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.Foo.#", "1"),
+				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.Foo.0", "Bar"),
+			),
+		},
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/headers"),
+			ConfigVariables: config.Variables{
+				"name": config.StringVariable(name),
+				"headers": config.MapVariable(map[string]config.Variable{
+					"Foo": config.ListVariable(config.StringVariable("Bar"), config.StringVariable("Baz")),
+					"Qux": config.ListVariable(config.StringVariable("Quux")),
+				}),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.Foo.#", "2"),
+				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.Foo.0", "Bar"),
+				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.Foo.1", "Baz"),
+				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.Qux.#", "1"),
+				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.Qux.0", "Quux"),
+			),
+		},
+	}))
+}

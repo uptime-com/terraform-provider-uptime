@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -74,4 +75,13 @@ func (e zoyaDescriber) Description(context.Context) string {
 
 func (e zoyaDescriber) MarkdownDescription(context.Context) string {
 	return ""
+}
+
+func ErrorAccumulator[T any](acc *multierror.Error) func(T, error) T {
+	return func(v T, err error) T {
+		if err != nil {
+			acc = multierror.Append(acc, err)
+		}
+		return v
+	}
 }
