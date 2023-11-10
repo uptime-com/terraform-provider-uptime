@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -130,7 +131,8 @@ type CheckHTTPResourceModel struct {
 	IncludeInGlobalMetrics types.Bool   `tfsdk:"include_in_global_metrics"`
 	SLA                    types.Object `tfsdk:"sla"`
 
-	sla *SLAAttribute `tfsdk:"-"`
+	sla     *SLAAttribute `tfsdk:"-"`
+	headers string        `tfsdk:"-"`
 }
 
 func (m CheckHTTPResourceModel) PrimaryKey() upapi.PrimaryKey {
@@ -141,6 +143,7 @@ type CheckHTTPResourceModelAdapter struct {
 	ContactGroupsAttributeAdapter
 	LocationsAttributeAdapter
 	TagsAttributeAdapter
+	HeadersAttributeAdapter
 	SLAAttributeContextAdapter
 }
 
@@ -154,10 +157,14 @@ func (a CheckHTTPResourceModelAdapter) Get(ctx context.Context, sg StateGetter) 
 	if diags.HasError() {
 		return nil, diags
 	}
+	model.headers, diags = a.HeadersAttributeContext(ctx, model.Headers)
+	if diags.HasError() {
+		return nil, diags
+	}
 	return &model, nil
 }
 
-func (a CheckHTTPResourceModelAdapter) ToAPIArgument(model CheckHTTPResourceModel) (_ *upapi.CheckHTTP, err error) {
+func (a CheckHTTPResourceModelAdapter) ToAPIArgument(model CheckHTTPResourceModel) (*upapi.CheckHTTP, error) {
 	api := upapi.CheckHTTP{
 		Name:                   model.Name.ValueString(),
 		ContactGroups:          a.ContactGroups(model.ContactGroups),
@@ -169,6 +176,7 @@ func (a CheckHTTPResourceModelAdapter) ToAPIArgument(model CheckHTTPResourceMode
 		Port:                   model.Port.ValueInt64(),
 		Username:               model.Username.ValueString(),
 		Password:               model.Password.ValueString(),
+		Headers:                model.headers,
 		Proxy:                  model.Proxy.ValueString(),
 		StatusCode:             model.StatusCode.ValueString(),
 		SendString:             model.SendString.ValueString(),
@@ -195,7 +203,8 @@ func (a CheckHTTPResourceModelAdapter) ToAPIArgument(model CheckHTTPResourceMode
 	return &api, nil
 }
 
-func (a CheckHTTPResourceModelAdapter) FromAPIResult(api upapi.Check) (_ *CheckHTTPResourceModel, err error) {
+func (a CheckHTTPResourceModelAdapter) FromAPIResult(api upapi.Check) (*CheckHTTPResourceModel, error) {
+	merr := new(multierror.Error)
 	model := CheckHTTPResourceModel{
 		ID:                     types.Int64Value(api.PK),
 		URL:                    types.StringValue(api.URL),
@@ -209,7 +218,7 @@ func (a CheckHTTPResourceModelAdapter) FromAPIResult(api upapi.Check) (_ *CheckH
 		Port:                   types.Int64Value(api.Port),
 		Username:               types.StringValue(api.Username),
 		Password:               types.StringValue(api.Password),
-		Headers:                types.MapValueMust(types.ListType{ElemType: types.StringType}, nil), // TODO: fix this
+		Headers:                ErrorAccumulator[types.Map](merr)(a.HeadersAttributeValue(api.Headers)),
 		Proxy:                  types.StringValue(api.Proxy),
 		StatusCode:             types.StringValue(api.StatusCode),
 		SendString:             types.StringValue(api.SendString),
@@ -227,7 +236,7 @@ func (a CheckHTTPResourceModelAdapter) FromAPIResult(api upapi.Check) (_ *CheckH
 			Uptime:  DecimalValue(api.UptimeSLA),
 		}),
 	}
-	return &model, nil
+	return &model, merr.ErrorOrNil()
 }
 
 type CheckHTTPResourceAPI struct {
