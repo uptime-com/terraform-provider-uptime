@@ -4,11 +4,51 @@
 
 Changes since v2.0.0:
 
-* Added sensible default values to many previously required arguments thus making them optional. Backwards-compatible with v2.0.0.
 * Added `uptime_contact` resource
 * Added `uptime_statuspage` resource
 * Added `uptime_check_dns` resource
 * Added `uptime_check_icmp` resource
+* Added optional SLA parameters to the following resources: 
+  * `uptime_check_api`
+  * `uptime_check_dns`
+  * `uptime_check_heartbeat`
+  * `uptime_check_http`
+  * `uptime_check_icmp`
+  * `uptime_check_malware`
+  * `uptime_check_ntp`
+  * `uptime_check_whois`
+* Option `name` used to be optional and failed server-side if not provided. Now it is required for the following resources:
+  * `uptime_check_api`
+  * `uptime_check_blacklist`
+  * `uptime_check_dns`
+  * `uptime_check_heartbeat`
+  * `uptime_check_http`
+  * `uptime_check_icmp`
+  * `uptime_check_malware`
+  * `uptime_check_ntp`
+  * `uptime_check_sslcert`
+  * `uptime_check_whois`
+  * `uptime_contact`
+  * `uptime_statuspage`
+* The above change for `name` option is functionally backwards compatible since it used to be required by the server anyway.
+* Option `locations` is now optional and defaults to `["US-NY-New York", "US-CA-Los Angeles"]` for the following resources:
+  * `uptime_check_api`
+  * `uptime_check_http`
+  * `uptime_check_ntp`
+* Option `locations` now gets validated at Terraform side and fails early instead of being rejected by the server; 
+* Option `contact_groups` is now optional and defaults to `["Default"]` for the following resources:
+  * `uptime_check_api`
+  * `uptime_check_blacklist`
+  * `uptime_check_dns`
+  * `uptime_check_heartbeat`
+  * `uptime_check_http`
+  * `uptime_check_icmp`
+  * `uptime_check_malware`
+  * `uptime_check_ntp`
+  * `uptime_check_sslcert`
+  * `uptime_check_whois`
+* Option `theshold` is now optional and defaults to `30` for the following resources:
+  * `uptime_check_whois`
 
 ## v2.0.0
 
