@@ -31,7 +31,8 @@ variable tags_use {
 }
 
 resource uptime_check_api test {
-  name   = var.name
-  script = var.script
-  tags   = var.tags_use
+  depends_on = [uptime_tag.test]
+  name       = var.name
+  script     = var.script
+  tags       = var.tags_use
 }
