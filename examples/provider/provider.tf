@@ -23,13 +23,10 @@ resource random_integer location {
 }
 #
 resource "uptime_check_http" "http" {
+  name           = "Example HTTP Check"
   address        = "https://example.com"
   contact_groups = ["Default"]
 
   interval  = 5
   locations = [data.uptime_locations.all.locations.*.location[random_integer.location.result]]
-}
-
-output locations {
-  value = data.uptime_locations.all.locations.*.name[random_integer.location.result]
 }
