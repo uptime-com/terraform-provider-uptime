@@ -1,5 +1,11 @@
 # Uptime.com Terraform provider changelog
 
+## v2.1.1
+
+Changes since v2.1.0:
+
+* Fixed #35 (merely a dependency version increase, no functional changes)
+
 ## v2.1.0
 
 Changes since v2.0.0:
