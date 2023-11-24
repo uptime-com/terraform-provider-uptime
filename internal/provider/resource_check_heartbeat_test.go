@@ -9,7 +9,6 @@ import (
 )
 
 func TestAccCheckHeartbeatResource(t *testing.T) {
-	t.Parallel()
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),
@@ -37,7 +36,6 @@ func TestAccCheckHeartbeatResource(t *testing.T) {
 }
 
 func TestAccCheckHeartbeatResource_ContactGroups(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -72,7 +70,6 @@ func TestAccCheckHeartbeatResource_ContactGroups(t *testing.T) {
 }
 
 func TestAccCheckHeartbeatResource_Interval(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -99,7 +96,6 @@ func TestAccCheckHeartbeatResource_Interval(t *testing.T) {
 }
 
 func TestAccCheckHeartbeatResource_SLA_Uptime(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -126,7 +122,6 @@ func TestAccCheckHeartbeatResource_SLA_Uptime(t *testing.T) {
 }
 
 func TestAccCheckHeartbeatResource_SLA_Latency(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{

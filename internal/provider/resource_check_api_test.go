@@ -20,7 +20,6 @@ func TestCheckAPIResource(t *testing.T) {
 }
 
 func TestAccCheckAPIResource(t *testing.T) {
-	t.Parallel()
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),
@@ -49,7 +48,6 @@ func TestAccCheckAPIResource(t *testing.T) {
 }
 
 func TestAccCheckAPIResource_ContactGroups(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -84,7 +82,6 @@ func TestAccCheckAPIResource_ContactGroups(t *testing.T) {
 }
 
 func TestAccCheckAPIResource_Interval(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -111,7 +108,6 @@ func TestAccCheckAPIResource_Interval(t *testing.T) {
 }
 
 func TestAccCheckAPIResource_Locations(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -158,7 +154,6 @@ func TestAccCheckAPIResource_Locations(t *testing.T) {
 }
 
 func TestAccCheckAPIResource_Tags(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	tags := []string{
 		petname.Generate(2, "-"),
@@ -209,7 +204,6 @@ func TestAccCheckAPIResource_Tags(t *testing.T) {
 }
 
 func TestAccCheckAPIResource_SLA_Uptime(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -236,7 +230,6 @@ func TestAccCheckAPIResource_SLA_Uptime(t *testing.T) {
 }
 
 func TestAccCheckAPIResource_SLA_Latency(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{

@@ -10,7 +10,6 @@ import (
 )
 
 func TestAccCheckHTTPResource(t *testing.T) {
-	t.Parallel()
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),
@@ -56,7 +55,6 @@ func TestAccCheckHTTPResource(t *testing.T) {
 }
 
 func TestAccCheckHTTPResource_ContactGroups(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -91,7 +89,6 @@ func TestAccCheckHTTPResource_ContactGroups(t *testing.T) {
 }
 
 func TestAccCheckHTTPResource_Interval(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -118,7 +115,6 @@ func TestAccCheckHTTPResource_Interval(t *testing.T) {
 }
 
 func TestAccCheckHTTPResource_Locations(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -155,7 +151,6 @@ func TestAccCheckHTTPResource_Locations(t *testing.T) {
 }
 
 func TestAccCheckHTTPResource_Headers(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{

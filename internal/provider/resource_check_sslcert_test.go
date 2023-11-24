@@ -9,7 +9,6 @@ import (
 )
 
 func TestAccCheckSSLCertResource(t *testing.T) {
-	t.Parallel()
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),
@@ -41,7 +40,6 @@ func TestAccCheckSSLCertResource(t *testing.T) {
 }
 
 func TestAccCheckSSLCertResource_Config_CRL(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -78,7 +76,6 @@ func TestAccCheckSSLCertResource_Config_CRL(t *testing.T) {
 }
 
 func TestAccCheckSSLCertResource_ContactGroups(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{

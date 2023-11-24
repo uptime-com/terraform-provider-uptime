@@ -9,7 +9,6 @@ import (
 )
 
 func TestAccContactResource_EmailList(t *testing.T) {
-	t.Parallel()
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),
@@ -51,7 +50,6 @@ func TestAccContactResource_EmailList(t *testing.T) {
 }
 
 func TestAccContactResource_PhonecallList(t *testing.T) {
-	t.Parallel()
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),
@@ -93,7 +91,6 @@ func TestAccContactResource_PhonecallList(t *testing.T) {
 }
 
 func TestAccContactResource_SMSList(t *testing.T) {
-	t.Parallel()
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),

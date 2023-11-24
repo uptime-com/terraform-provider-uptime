@@ -94,7 +94,6 @@ func TestJsonType_ValueFromTerraform(t *testing.T) {
 	for name, testCase := range testCases {
 		name, testCase := name, testCase
 		t.Run(name, func(t *testing.T) {
-			t.Parallel()
 			ctx := context.Background()
 
 			got, err := new(provider.RawJsonType).ValueFromTerraform(ctx, testCase.in)
@@ -172,7 +171,6 @@ func TestRawJson_StringSemanticEquals(t *testing.T) {
 	for name, testCase := range testCases {
 		name, testCase := name, testCase
 		t.Run(name, func(t *testing.T) {
-			t.Parallel()
 			res, diags := testCase.value1.StringSemanticEquals(ctx, testCase.value2)
 			if diff := cmp.Diff(diags, testCase.expectedDiags); diff != "" {
 				t.Errorf("Unexpected diagnostics (-got, +expected): %s", diff)
