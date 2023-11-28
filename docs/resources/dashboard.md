@@ -37,10 +37,10 @@ Custom dashboard resource
 
 Optional:
 
-- `for_all_checks` (Boolean) Whether to show alerts for all checks
+- `for_all_checks` (Boolean) Whether to show block for all checks
 - `include` (Attributes) Alerts related attributes (see [below for nested schema](#nestedatt--alerts--include))
-- `num_to_show` (Number) The number of alerts to show
-- `show_section` (Boolean) Whether to show the alerts section
+- `num_to_show` (Number) The number of entities to show
+- `show_section` (Boolean) Whether to show the section
 
 <a id="nestedatt--alerts--include"></a>
 ### Nested Schema for `alerts.include`
@@ -72,8 +72,8 @@ Required:
 Optional:
 
 - `include` (Attributes) Which services to include (see [below for nested schema](#nestedatt--services--include))
-- `num_to_show` (Number) The number of services to show
-- `show_section` (Boolean) Whether to show the services section
+- `num_to_show` (Number) The number of entities to show
+- `show_section` (Boolean) Whether to show the section
 
 <a id="nestedatt--services--show"></a>
 ### Nested Schema for `services.show`
@@ -110,7 +110,7 @@ Optional:
 
 Optional:
 
-- `for_all_checks` (Boolean) Whether to show metrics for all checks
-- `show_section` (Boolean) Whether to show the metrics section
+- `for_all_checks` (Boolean) Whether to show block for all checks
+- `show_section` (Boolean) Whether to show the section
 
 

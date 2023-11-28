@@ -43,33 +43,16 @@ func NewDashboardResource(_ context.Context, p *providerImpl) resource.Resource 
 						Computed:    true,
 						Description: "Metrics related attributes",
 						Attributes: map[string]schema.Attribute{
-							"show_section": schema.BoolAttribute{
-								Optional:    true,
-								Computed:    true,
-								Description: "Whether to show the metrics section",
-							},
-							"for_all_checks": schema.BoolAttribute{
-								Optional:    true,
-								Computed:    true,
-								Description: "Whether to show metrics for all checks",
-							},
+							"show_section":   ShowSectionSchemaAttribute(nil),
+							"for_all_checks": ForAllChecksSchemaAttribute(),
 						},
 					},
 					"services": schema.SingleNestedAttribute{
 						Required:    true,
 						Description: "Services related attributes",
 						Attributes: map[string]schema.Attribute{
-							"show_section": schema.BoolAttribute{
-								Optional:    true,
-								Computed:    true,
-								Description: "Whether to show the services section",
-							},
-							"num_to_show": schema.Int64Attribute{
-								Optional:    true,
-								Computed:    true,
-								Description: "The number of services to show",
-								Default:     int64default.StaticInt64(4),
-							},
+							"show_section": ShowSectionSchemaAttribute(nil),
+							"num_to_show":  NumToShowSchemaAttribute(int64default.StaticInt64(4)),
 							"include": schema.SingleNestedAttribute{
 								Optional:    true,
 								Computed:    true,
@@ -139,23 +122,9 @@ func NewDashboardResource(_ context.Context, p *providerImpl) resource.Resource 
 						Required:    true,
 						Description: "Alerts related attributes",
 						Attributes: map[string]schema.Attribute{
-							"show_section": schema.BoolAttribute{
-								Optional:    true,
-								Computed:    true,
-								Description: "Whether to show the alerts section",
-								Default:     booldefault.StaticBool(true),
-							},
-							"num_to_show": schema.Int64Attribute{
-								Optional:    true,
-								Computed:    true,
-								Description: "The number of alerts to show",
-								Default:     int64default.StaticInt64(10),
-							},
-							"for_all_checks": schema.BoolAttribute{
-								Optional:    true,
-								Computed:    true,
-								Description: "Whether to show alerts for all checks",
-							},
+							"show_section":   ShowSectionSchemaAttribute(booldefault.StaticBool(true)),
+							"num_to_show":    NumToShowSchemaAttribute(int64default.StaticInt64(10)),
+							"for_all_checks": ForAllChecksSchemaAttribute(),
 							"include": schema.SingleNestedAttribute{
 								Optional:    true,
 								Computed:    true,
