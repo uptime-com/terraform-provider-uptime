@@ -1,5 +1,11 @@
 # Uptime.com Terraform provider changelog
 
+## v2.2.0
+
+Changes since v2.1.2:
+
+* Added `uptime_dashboard` resource
+
 ## v2.1.2
 
 Changes since v2.1.1:
