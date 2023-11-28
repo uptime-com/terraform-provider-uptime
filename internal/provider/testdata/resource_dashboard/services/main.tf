@@ -6,7 +6,7 @@ variable "check_name" {
   type = string
 }
 
-variable script {
+variable "script" {
   type    = string
   default = <<SCRIPT
 [
@@ -20,7 +20,7 @@ variable script {
 SCRIPT
 }
 
-resource uptime_check_api test {
+resource "uptime_check_api" "services" {
   name   = var.check_name
   script = var.script
 }
@@ -65,28 +65,29 @@ variable "services_show_response_time" {
   type = bool
 }
 
-resource "uptime_dashboard" "basic" {
-  depends_on   = [uptime_check_api.test]
-  name = var.name
-  selected = {
-    services = [uptime_check_api.test.name]
-  }
+resource "uptime_dashboard" "services" {
+  depends_on = [uptime_check_api.services]
+  name       = var.name
+  alerts     = {}
   services = {
     show_section = var.services_show_section
-    num_to_show = var.services_num_to_show
+    num_to_show  = var.services_num_to_show
     include = {
-      up = var.services_include_up
-      down = var.services_include_down
-      paused = var.services_include_paused
+      up          = var.services_include_up
+      down        = var.services_include_down
+      paused      = var.services_include_paused
       maintenance = var.services_include_maintenance
     }
     sort = {
-      primary = var.services_primary_sort
+      primary   = var.services_primary_sort
       secondary = var.services_secondary_sort
     }
     show = {
-      uptime = var.services_show_uptime
+      uptime        = var.services_show_uptime
       response_time = var.services_show_response_time
     }
+  }
+  selected = {
+    services = [uptime_check_api.services.name]
   }
 }

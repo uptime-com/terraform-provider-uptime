@@ -20,20 +20,32 @@ variable "script" {
 SCRIPT
 }
 
-resource "uptime_check_api" "basic" {
+variable "metrics_show_section" {
+  type = bool
+}
+
+variable "metrics_for_all_checks" {
+  type = bool
+}
+
+resource "uptime_check_api" "metrics" {
   name   = var.check_name
   script = var.script
 }
 
-resource "uptime_dashboard" "basic" {
-  depends_on = [uptime_check_api.basic]
+resource "uptime_dashboard" "metrics" {
+  depends_on = [uptime_check_api.metrics]
   name       = var.name
+  metrics = {
+    show_section    = var.metrics_show_section
+    for_all_checks  = var.metrics_for_all_checks
+  }
   alerts     = {}
   services = {
     show = {}
     sort = {}
   }
   selected = {
-    services = [uptime_check_api.basic.name]
+    services = [uptime_check_api.metrics.name]
   }
 }
