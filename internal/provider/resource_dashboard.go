@@ -56,8 +56,7 @@ func NewDashboardResource(_ context.Context, p *providerImpl) resource.Resource 
 						},
 					},
 					"services": schema.SingleNestedAttribute{
-						Optional:    true,
-						Computed:    true,
+						Required:    true,
 						Description: "Services related attributes",
 						Attributes: map[string]schema.Attribute{
 							"show_section": schema.BoolAttribute{
@@ -99,8 +98,7 @@ func NewDashboardResource(_ context.Context, p *providerImpl) resource.Resource 
 								},
 							},
 							"sort": schema.SingleNestedAttribute{
-								Optional:    true,
-								Computed:    true,
+								Required:    true,
 								Description: "How to sort services",
 								Attributes: map[string]schema.Attribute{
 									"primary": schema.StringAttribute{
@@ -118,8 +116,7 @@ func NewDashboardResource(_ context.Context, p *providerImpl) resource.Resource 
 								},
 							},
 							"show": schema.SingleNestedAttribute{
-								Optional:    true,
-								Computed:    true,
+								Required:    true,
 								Description: "Which service attributes to show",
 								Attributes: map[string]schema.Attribute{
 									"uptime": schema.BoolAttribute{
@@ -139,8 +136,7 @@ func NewDashboardResource(_ context.Context, p *providerImpl) resource.Resource 
 						},
 					},
 					"alerts": schema.SingleNestedAttribute{
-						Optional:    true,
-						Computed:    true,
+						Required:    true,
 						Description: "Alerts related attributes",
 						Attributes: map[string]schema.Attribute{
 							"show_section": schema.BoolAttribute{
@@ -180,8 +176,7 @@ func NewDashboardResource(_ context.Context, p *providerImpl) resource.Resource 
 						},
 					},
 					"selected": schema.SingleNestedAttribute{
-						Optional:    true,
-						Computed:    true,
+						Required:    true,
 						Description: "Selected services to show on the dashboard",
 						Attributes: map[string]schema.Attribute{
 							"services": schema.SetAttribute{

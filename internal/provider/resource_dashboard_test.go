@@ -10,7 +10,6 @@ import (
 )
 
 func TestAccDashboardResource(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { _ = testAccAPIClient(t) },
@@ -33,7 +32,6 @@ func TestAccDashboardResource(t *testing.T) {
 }
 
 func TestAccDashboardResource_Root(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { _ = testAccAPIClient(t) },
@@ -60,7 +58,6 @@ func TestAccDashboardResource_Root(t *testing.T) {
 }
 
 func TestAccDashboardResource_Metrics(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { _ = testAccAPIClient(t) },
@@ -87,7 +84,6 @@ func TestAccDashboardResource_Metrics(t *testing.T) {
 }
 
 func TestAccDashboardResource_Services(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { _ = testAccAPIClient(t) },
@@ -130,7 +126,6 @@ func TestAccDashboardResource_Services(t *testing.T) {
 }
 
 func TestAccDashboardResource_Alerts(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { _ = testAccAPIClient(t) },
@@ -163,7 +158,6 @@ func TestAccDashboardResource_Alerts(t *testing.T) {
 }
 
 func TestAccDashboardResource_Tags(t *testing.T) {
-	t.Parallel()
 	names := []string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),

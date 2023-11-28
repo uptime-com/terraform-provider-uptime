@@ -17,34 +17,100 @@ Custom dashboard resource
 
 ### Required
 
+- `alerts` (Attributes) Alerts related attributes (see [below for nested schema](#nestedatt--alerts))
 - `name` (String)
+- `selected` (Attributes) Selected services to show on the dashboard (see [below for nested schema](#nestedatt--selected))
+- `services` (Attributes) Services related attributes (see [below for nested schema](#nestedatt--services))
 
 ### Optional
 
-- `alerts_for_all_checks` (Boolean) Whether to show alerts for all checks
-- `alerts_include_ignored` (Boolean) Whether to include ignored alerts
-- `alerts_include_resolved` (Boolean) Whether to include resolved alerts
-- `alerts_num_to_show` (Number) The number of alerts to show
-- `alerts_show_section` (Boolean) Whether to show the alerts section
 - `is_pinned` (Boolean) Whether the dashboard is pinned to the top of the dashboard list
-- `metrics_for_all_checks` (Boolean) Whether to show metrics for all checks
-- `metrics_show_section` (Boolean) Whether to show the metrics section
+- `metrics` (Attributes) Metrics related attributes (see [below for nested schema](#nestedatt--metrics))
 - `ordering` (Number) Where to place the dashboard in the list
-- `services_include_down` (Boolean) Whether to include down services
-- `services_include_maintenance` (Boolean) Whether to include services in maintenance mode
-- `services_include_paused` (Boolean) Whether to include paused services
-- `services_include_up` (Boolean) Whether to include up services
-- `services_num_to_show` (Number) The number of services to show
-- `services_primary_sort` (String) The primary sort for services
-- `services_secondary_sort` (String) The secondary sort for services
-- `services_selected` (Set of String)
-- `services_show_response_time` (Boolean) Whether to show response time for services
-- `services_show_section` (Boolean) Whether to show the services section
-- `services_show_uptime` (Boolean) Whether to show uptime for services
-- `services_tags` (Set of String)
 
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
+
+<a id="nestedatt--alerts"></a>
+### Nested Schema for `alerts`
+
+Optional:
+
+- `for_all_checks` (Boolean) Whether to show alerts for all checks
+- `include` (Attributes) Alerts related attributes (see [below for nested schema](#nestedatt--alerts--include))
+- `num_to_show` (Number) The number of alerts to show
+- `show_section` (Boolean) Whether to show the alerts section
+
+<a id="nestedatt--alerts--include"></a>
+### Nested Schema for `alerts.include`
+
+Optional:
+
+- `ignored` (Boolean) Whether to include ignored alerts
+- `resolved` (Boolean) Whether to include resolved alerts
+
+
+
+<a id="nestedatt--selected"></a>
+### Nested Schema for `selected`
+
+Optional:
+
+- `services` (Set of String) The services collection to show on the dashboard
+- `tags` (Set of String)
+
+
+<a id="nestedatt--services"></a>
+### Nested Schema for `services`
+
+Required:
+
+- `show` (Attributes) Which service attributes to show (see [below for nested schema](#nestedatt--services--show))
+- `sort` (Attributes) How to sort services (see [below for nested schema](#nestedatt--services--sort))
+
+Optional:
+
+- `include` (Attributes) Which services to include (see [below for nested schema](#nestedatt--services--include))
+- `num_to_show` (Number) The number of services to show
+- `show_section` (Boolean) Whether to show the services section
+
+<a id="nestedatt--services--show"></a>
+### Nested Schema for `services.show`
+
+Optional:
+
+- `response_time` (Boolean) Whether to show response time for services
+- `uptime` (Boolean) Whether to show uptime for services
+
+
+<a id="nestedatt--services--sort"></a>
+### Nested Schema for `services.sort`
+
+Optional:
+
+- `primary` (String) The primary sort for services
+- `secondary` (String) The secondary sort for services
+
+
+<a id="nestedatt--services--include"></a>
+### Nested Schema for `services.include`
+
+Optional:
+
+- `down` (Boolean) Whether to include down services
+- `maintenance` (Boolean) Whether to include services in maintenance mode
+- `paused` (Boolean) Whether to include paused services
+- `up` (Boolean) Whether to include up services
+
+
+
+<a id="nestedatt--metrics"></a>
+### Nested Schema for `metrics`
+
+Optional:
+
+- `for_all_checks` (Boolean) Whether to show metrics for all checks
+- `show_section` (Boolean) Whether to show the metrics section
 
 
