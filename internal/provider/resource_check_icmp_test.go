@@ -9,7 +9,6 @@ import (
 )
 
 func TestAccCheckICMPResource(t *testing.T) {
-	t.Parallel()
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),
@@ -41,7 +40,6 @@ func TestAccCheckICMPResource(t *testing.T) {
 }
 
 func TestAccCheckICMPResource_ContactGroups(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -76,7 +74,6 @@ func TestAccCheckICMPResource_ContactGroups(t *testing.T) {
 }
 
 func TestAccCheckICMPResource_Interval(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -103,7 +100,6 @@ func TestAccCheckICMPResource_Interval(t *testing.T) {
 }
 
 func TestAccCheckICMPResource_Locations(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -140,7 +136,6 @@ func TestAccCheckICMPResource_Locations(t *testing.T) {
 }
 
 func TestAccCheckICMPResource_NumRetries(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{

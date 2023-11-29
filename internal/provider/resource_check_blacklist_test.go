@@ -18,7 +18,6 @@ func TestAccCheckBlacklistResource_impl(t *testing.T) {
 }
 
 func TestAccCheckBlacklistResource(t *testing.T) {
-	t.Parallel()
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),

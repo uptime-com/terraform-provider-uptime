@@ -55,7 +55,7 @@ func NotesSchemaAttribute() schema.StringAttribute {
 	return schema.StringAttribute{
 		Optional: true,
 		Computed: true,
-		Default:  stringdefault.StaticString(""),
+		Default:  stringdefault.StaticString("Managed by Terraform"),
 	}
 }
 

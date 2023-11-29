@@ -9,7 +9,6 @@ import (
 )
 
 func TestAccCheckWHOISResource(t *testing.T) {
-	t.Parallel()
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),
@@ -47,7 +46,6 @@ func TestAccCheckWHOISResource(t *testing.T) {
 }
 
 func TestAccCheckWHOISResource_ContactGroups(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -82,7 +80,6 @@ func TestAccCheckWHOISResource_ContactGroups(t *testing.T) {
 }
 
 func TestAccCheckWHOISResource_Threshold(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
