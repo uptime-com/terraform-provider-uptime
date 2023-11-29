@@ -10,7 +10,6 @@ import (
 )
 
 func TestAccCheckNTPResource(t *testing.T) {
-	t.Parallel()
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),
@@ -42,7 +41,6 @@ func TestAccCheckNTPResource(t *testing.T) {
 }
 
 func TestAccCheckNTPResource_ContactGroups(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -77,7 +75,6 @@ func TestAccCheckNTPResource_ContactGroups(t *testing.T) {
 }
 
 func TestAccCheckNTPResource_Interval(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -104,7 +101,6 @@ func TestAccCheckNTPResource_Interval(t *testing.T) {
 }
 
 func TestAccCheckNTPResource_Locations(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -152,7 +148,6 @@ func TestAccCheckNTPResource_Locations(t *testing.T) {
 }
 
 func TestAccCheckNTPResource_NumRetries(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{

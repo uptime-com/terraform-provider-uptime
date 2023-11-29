@@ -11,7 +11,6 @@ import (
 )
 
 func TestAccLocationsDataSource(t *testing.T) {
-	t.Parallel()
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
 			ConfigDirectory: config.StaticDirectory("testdata/data_locations"),

@@ -19,7 +19,6 @@ func TestTarResourceImpl(t *testing.T) {
 }
 
 func TestAccTagResource(t *testing.T) {
-	t.Parallel()
 	names := [2]string{
 		petname.Generate(3, "-"),
 	}

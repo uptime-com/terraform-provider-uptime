@@ -9,7 +9,6 @@ import (
 )
 
 func TestAccCheckDNSResource(t *testing.T) {
-	t.Parallel()
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),
@@ -41,7 +40,6 @@ func TestAccCheckDNSResource(t *testing.T) {
 }
 
 func TestAccCheckDNSResource_ContactGroups(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -76,7 +74,6 @@ func TestAccCheckDNSResource_ContactGroups(t *testing.T) {
 }
 
 func TestAccCheckDNSResource_DNSRecordType(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -103,7 +100,6 @@ func TestAccCheckDNSResource_DNSRecordType(t *testing.T) {
 }
 
 func TestAccCheckDNSResource_Interval(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -130,7 +126,6 @@ func TestAccCheckDNSResource_Interval(t *testing.T) {
 }
 
 func TestAccCheckDNSResource_Locations(t *testing.T) {
-	t.Parallel()
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
