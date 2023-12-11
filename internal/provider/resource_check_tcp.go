@@ -19,13 +19,15 @@ func NewCheckTCPResource(_ context.Context, p *providerImpl) resource.Resource {
 		APIResourceMetadata{
 			TypeNameSuffix: "check_tcp",
 			Schema: schema.Schema{
-				Description: "Monitor network activity for a specific domain or IP address",
+				Description: "Monitor a TCP port for a response",
 				Attributes: map[string]schema.Attribute{
 					"id":                        IDSchemaAttribute(),
 					"url":                       URLSchemaAttribute(),
 					"name":                      NameSchemaAttribute(),
 					"address":                   AddressHostnameSchemaAttribute(),
 					"port":                      RequiredPortSchemaAttribute(),
+					"send_string":               StringToSendSchemaAttribute(),
+					"expect_string":             StringToExpectSchemaAttribute(),
 					"contact_groups":            ContactGroupsSchemaAttribute(),
 					"locations":                 LocationsSchemaAttribute(p),
 					"tags":                      TagsSchemaAttribute(),
@@ -48,6 +50,8 @@ type CheckTCPResourceModel struct {
 	Name                   types.String `tfsdk:"name"`
 	Address                types.String `tfsdk:"address"`
 	Port                   types.Int64  `tfsdk:"port"`
+	SendString             types.String `tfsdk:"send_string"`
+	ExpectString           types.String `tfsdk:"expect_string"`
 	ContactGroups          types.Set    `tfsdk:"contact_groups"`
 	Locations              types.Set    `tfsdk:"locations"`
 	Tags                   types.Set    `tfsdk:"tags"`
@@ -91,6 +95,8 @@ func (a CheckTCPResourceModelAdapter) ToAPIArgument(model CheckTCPResourceModel)
 		Name:                   model.Name.ValueString(),
 		Address:                model.Address.ValueString(),
 		Port:                   model.Port.ValueInt64(),
+		SendString:             model.SendString.ValueString(),
+		ExpectString:           model.ExpectString.ValueString(),
 		ContactGroups:          a.ContactGroups(model.ContactGroups),
 		Locations:              a.Locations(model.Locations),
 		Tags:                   a.Tags(model.Tags),
@@ -121,6 +127,8 @@ func (a CheckTCPResourceModelAdapter) FromAPIResult(api upapi.Check) (*CheckTCPR
 		Name:                   types.StringValue(api.Name),
 		Address:                types.StringValue(api.Address),
 		Port:                   types.Int64Value(api.Port),
+		SendString:             types.StringValue(api.SendString),
+		ExpectString:           types.StringValue(api.ExpectString),
 		ContactGroups:          a.ContactGroupsValue(api.ContactGroups),
 		Locations:              a.LocationsValue(api.Locations),
 		Tags:                   a.TagsValue(api.Tags),
