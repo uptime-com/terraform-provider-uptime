@@ -117,6 +117,7 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewCheckSSLCertResource(ctx, p) },
 		func() resource.Resource { return NewCheckWHOISResource(ctx, p) },
 		func() resource.Resource { return NewCheckPageSpeedResource(ctx, p) },
+		func() resource.Resource { return NewCheckGroupResource(ctx, p) },
 
 		func() resource.Resource { return NewContactResource(ctx, p) },
 		func() resource.Resource { return NewStatusPageResource(ctx, p) },
