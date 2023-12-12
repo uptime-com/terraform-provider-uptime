@@ -13,3 +13,10 @@ func PortSchemaAttribute(defaultValue int64) schema.Attribute {
 		Default:     int64default.StaticInt64(defaultValue),
 	}
 }
+
+func RequiredPortSchemaAttribute() schema.Attribute {
+	return schema.Int64Attribute{
+		Description: "The port to check",
+		Required:    true,
+	}
+}
