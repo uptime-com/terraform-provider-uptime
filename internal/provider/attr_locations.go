@@ -14,16 +14,18 @@ import (
 )
 
 func LocationsSchemaAttribute(l LocationsGetter) schema.SetAttribute {
+	return LocationsSchemaAttributeWithDefaults(l, "US-NY-New York", "US-CA-Los Angeles")
+}
+
+func LocationsSchemaAttributeWithDefaults(l LocationsGetter, defaults ...string) schema.SetAttribute {
+	defaultValues := make([]attr.Value, len(defaults))
+	for i := range defaults {
+		defaultValues[i] = types.StringValue(defaults[i])
+	}
 	return schema.SetAttribute{
 		ElementType: types.StringType,
 		Default: setdefault.StaticValue(
-			types.SetValueMust(
-				types.StringType,
-				[]attr.Value{
-					types.StringValue("US-NY-New York"),
-					types.StringValue("US-CA-Los Angeles"),
-				},
-			),
+			types.SetValueMust(types.StringType, defaultValues),
 		),
 		Optional: true,
 		Computed: true,
