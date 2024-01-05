@@ -107,6 +107,7 @@ func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.Data
 func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		func() resource.Resource { return NewCheckAPIResource(ctx, p) },
+		func() resource.Resource { return NewCheckTransactionResource(ctx, p) },
 		func() resource.Resource { return NewCheckBlacklistResource(ctx, p) },
 		func() resource.Resource { return NewCheckDNSResource(ctx, p) },
 		func() resource.Resource { return NewCheckHeartbeatResource(ctx, p) },
