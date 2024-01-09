@@ -116,6 +116,7 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewCheckIMAPResource(ctx, p) },
 		func() resource.Resource { return NewCheckMalwareResource(ctx, p) },
 		func() resource.Resource { return NewCheckNTPResource(ctx, p) },
+		func() resource.Resource { return NewCheckSMTPResource(ctx, p) },
 		func() resource.Resource { return NewCheckSSLCertResource(ctx, p) },
 		func() resource.Resource { return NewCheckTCPResource(ctx, p) },
 		func() resource.Resource { return NewCheckWHOISResource(ctx, p) },
