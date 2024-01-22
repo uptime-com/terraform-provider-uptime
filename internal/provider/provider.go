@@ -120,6 +120,7 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewCheckTCPResource(ctx, p) },
 		func() resource.Resource { return NewCheckWHOISResource(ctx, p) },
 		func() resource.Resource { return NewCheckPageSpeedResource(ctx, p) },
+		func() resource.Resource { return NewCheckPOPResource(ctx, p) },
 		func() resource.Resource { return NewCheckGroupResource(ctx, p) },
 		func() resource.Resource { return NewCheckWebhookResource(ctx, p) },
 
