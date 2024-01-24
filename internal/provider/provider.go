@@ -107,17 +107,21 @@ func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.Data
 func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		func() resource.Resource { return NewCheckAPIResource(ctx, p) },
+		func() resource.Resource { return NewCheckTransactionResource(ctx, p) },
 		func() resource.Resource { return NewCheckBlacklistResource(ctx, p) },
 		func() resource.Resource { return NewCheckDNSResource(ctx, p) },
 		func() resource.Resource { return NewCheckHeartbeatResource(ctx, p) },
 		func() resource.Resource { return NewCheckHTTPResource(ctx, p) },
 		func() resource.Resource { return NewCheckICMPResource(ctx, p) },
+		func() resource.Resource { return NewCheckIMAPResource(ctx, p) },
 		func() resource.Resource { return NewCheckMalwareResource(ctx, p) },
 		func() resource.Resource { return NewCheckNTPResource(ctx, p) },
+		func() resource.Resource { return NewCheckSMTPResource(ctx, p) },
 		func() resource.Resource { return NewCheckSSLCertResource(ctx, p) },
 		func() resource.Resource { return NewCheckTCPResource(ctx, p) },
 		func() resource.Resource { return NewCheckWHOISResource(ctx, p) },
 		func() resource.Resource { return NewCheckPageSpeedResource(ctx, p) },
+		func() resource.Resource { return NewCheckPOPResource(ctx, p) },
 		func() resource.Resource { return NewCheckGroupResource(ctx, p) },
 		func() resource.Resource { return NewCheckWebhookResource(ctx, p) },
 
