@@ -1,8 +1,17 @@
 # Uptime.com Terraform provider changelog
 
-## v2.3.0
+## v2.4.0
 
 Changes since v2.3.0
+
+- Added `uptime_check_imap` resource
+- Added `uptime_check_pop` resource
+- Added `uptime_check_smtp` resource
+- Added `uptime_check_transaction` resource
+
+## v2.3.0
+
+Changes since v2.2.0
 
 - Added `uptime_check_webhook` resource
 - Added `uptime_check_tcp` resource
