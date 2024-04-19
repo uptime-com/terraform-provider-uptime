@@ -12,7 +12,7 @@ require (
 	github.com/nsf/jsondiff v0.0.0-20230430225905-43f6cf3098c1
 	github.com/pkg/errors v0.9.1
 	github.com/shopspring/decimal v1.3.1
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/uptime-com/uptime-client-go/v2 v2.0.0-20240415154944-54fa3a069e1d
 )
 
