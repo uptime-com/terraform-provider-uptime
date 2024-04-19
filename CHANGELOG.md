@@ -1,5 +1,16 @@
 # Uptime.com Terraform provider changelog
 
+## v2.4.2
+
+- Fix transaction check resource
+- Upgrade dependencies
+
+## v2.4.1
+
+Changes since v2.4.0
+
+- Upgrade dependencies
+
 ## v2.4.0
 
 Changes since v2.3.0
