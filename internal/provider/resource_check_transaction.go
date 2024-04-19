@@ -12,7 +12,7 @@ import (
 )
 
 func NewCheckTransactionResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckTransactionResourceModel, upapi.CheckAPI, upapi.Check]{
+	return APIResource[CheckTransactionResourceModel, upapi.CheckTransaction, upapi.Check]{
 		CheckTransactionResourceAPI{provider: p},
 		CheckTransactionResourceModelAdapter{},
 		APIResourceMetadata{
@@ -91,8 +91,8 @@ func (a CheckTransactionResourceModelAdapter) Get(ctx context.Context, sg StateG
 	return &model, nil
 }
 
-func (a CheckTransactionResourceModelAdapter) ToAPIArgument(model CheckTransactionResourceModel) (_ *upapi.CheckAPI, err error) {
-	api := upapi.CheckAPI{
+func (a CheckTransactionResourceModelAdapter) ToAPIArgument(model CheckTransactionResourceModel) (_ *upapi.CheckTransaction, err error) {
+	api := upapi.CheckTransaction{
 		Name:                   model.Name.ValueString(),
 		ContactGroups:          a.ContactGroups(model.ContactGroups),
 		Locations:              a.Locations(model.Locations),
@@ -143,22 +143,22 @@ func (a CheckTransactionResourceModelAdapter) FromAPIResult(api upapi.Check) (_ 
 	return &model, nil
 }
 
-var _ API[upapi.CheckAPI, upapi.Check] = (*CheckTransactionResourceAPI)(nil)
+var _ API[upapi.CheckTransaction, upapi.Check] = (*CheckTransactionResourceAPI)(nil)
 
 type CheckTransactionResourceAPI struct {
 	provider *providerImpl
 }
 
-func (a CheckTransactionResourceAPI) Create(ctx context.Context, arg upapi.CheckAPI) (*upapi.Check, error) {
-	return a.provider.api.Checks().CreateAPI(ctx, arg)
+func (a CheckTransactionResourceAPI) Create(ctx context.Context, arg upapi.CheckTransaction) (*upapi.Check, error) {
+	return a.provider.api.Checks().CreateTransaction(ctx, arg)
 }
 
 func (a CheckTransactionResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
 	return a.provider.api.Checks().Get(ctx, pk)
 }
 
-func (a CheckTransactionResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckAPI) (*upapi.Check, error) {
-	return a.provider.api.Checks().UpdateAPI(ctx, pk, arg)
+func (a CheckTransactionResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckTransaction) (*upapi.Check, error) {
+	return a.provider.api.Checks().UpdateTransaction(ctx, pk, arg)
 }
 
 func (a CheckTransactionResourceAPI) Delete(ctx context.Context, pk upapi.PrimaryKeyable) error {
