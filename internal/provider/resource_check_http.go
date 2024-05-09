@@ -63,7 +63,7 @@ func NewCheckHTTPResource(_ context.Context, p *providerImpl) resource.Resource 
 					"status_code": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default:  stringdefault.StaticString("200"),
+						Default:  stringdefault.StaticString(""),
 					},
 					"send_string": schema.StringAttribute{
 						Optional:    true,
