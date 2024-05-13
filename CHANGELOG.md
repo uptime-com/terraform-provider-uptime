@@ -1,5 +1,10 @@
 # Uptime.com Terraform provider changelog
 
+## v2.4.3
+
+- Fix default status code for http check
+- Upgrade dependencies
+
 ## v2.4.2
 
 - Fix transaction check resource
