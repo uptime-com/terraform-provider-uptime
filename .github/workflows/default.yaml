@@ -2,6 +2,10 @@ name: default
 on:
   push:
 
+concurrency:
+  group:              default
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
