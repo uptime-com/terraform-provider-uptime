@@ -121,6 +121,7 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewCheckPageSpeedResource(ctx, p) },
 		func() resource.Resource { return NewCheckRUM2Resource(ctx, p) },
 		func() resource.Resource { return NewCheckSMTPResource(ctx, p) },
+		func() resource.Resource { return NewCheckSSHResource(ctx, p) },
 		func() resource.Resource { return NewCheckSSLCertResource(ctx, p) },
 		func() resource.Resource { return NewCheckTCPResource(ctx, p) },
 		func() resource.Resource { return NewCheckUDPResource(ctx, p) },
