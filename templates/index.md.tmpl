@@ -14,3 +14,9 @@ This Terraform provider allows you to manage Uptime.com resources.
 {{ tffile "examples/provider/provider.tf" }}
 
 {{ .SchemaMarkdown | trimspace }}
+
+
+## Rate Limits
+
+Terraform has a tendency to use many API requests when managing a large group of Uptime.com checks.
+If this becomes a problem, please contact Uptime.com support to request a rate limit increase.

@@ -55,3 +55,9 @@ resource "uptime_check_http" "http" {
 - `rate_limit` (Number) The rate limit to use for API calls in requests per second, defaults to 0.5
 - `token` (String, Sensitive)
 - `trace` (Boolean)
+
+
+## Rate Limits
+
+Terraform has a tendency to use many API requests when managing a large group of Uptime.com checks.
+If this becomes a problem, please contact Uptime.com support to request a rate limit increase.
