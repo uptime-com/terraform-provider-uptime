@@ -1,5 +1,13 @@
 # Uptime.com Terraform provider changelog
 
+## v2.5.0
+
+- Added `uptime_check_udp` resource
+- Added `uptime_check_rum` resource
+- Added `uptime_check_ssh` resource
+- Update TF registry documentation about rate limits
+- Upgrade dependencies
+
 ## v2.4.3
 
 - Fix default status code for http check
