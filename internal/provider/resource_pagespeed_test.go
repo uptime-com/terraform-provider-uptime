@@ -57,6 +57,27 @@ func TestAccCheckPageSpeedResource_Config(t *testing.T) {
 	})
 }
 
+func TestAccCheckPageSpeedResource_Password(t *testing.T) {
+	name := petname.Generate(3, "-")
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { _ = testAccAPIClient(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				ConfigDirectory: config.StaticDirectory("testdata/resource_check_pagespeed/password"),
+				ConfigVariables: config.Variables{
+					"name":     config.StringVariable(name),
+					"password": config.StringVariable("fakePassword"),
+				},
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("uptime_check_pagespeed.test", "name", name),
+					resource.TestCheckResourceAttr("uptime_check_pagespeed.test", "password", "fakePassword"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccCheckPageSpeedResource_Tags(t *testing.T) {
 	name := petname.Generate(3, "-")
 	tags := []string{

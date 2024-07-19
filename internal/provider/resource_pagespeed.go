@@ -222,15 +222,30 @@ type CheckPageSpeedResourceAPI struct {
 }
 
 func (c CheckPageSpeedResourceAPI) Create(ctx context.Context, arg upapi.CheckPageSpeed) (*upapi.Check, error) {
-	return c.provider.api.Checks().CreatePageSpeed(ctx, arg)
+	resp, err := c.provider.api.Checks().CreatePageSpeed(ctx, arg)
+	if err != nil {
+		return nil, err
+	}
+	resp.Password = arg.Password
+	return resp, nil
 }
 
 func (c CheckPageSpeedResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return c.provider.api.Checks().Get(ctx, pk)
+	resp, err := c.provider.api.Checks().Get(ctx, pk)
+	if err != nil {
+		return nil, err
+	}
+	resp.Password = pk.(CheckPageSpeedResourceModel).Password.ValueString()
+	return resp, nil
 }
 
 func (c CheckPageSpeedResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckPageSpeed) (*upapi.Check, error) {
-	return c.provider.api.Checks().UpdatePageSpeed(ctx, pk, arg)
+	resp, err := c.provider.api.Checks().UpdatePageSpeed(ctx, pk, arg)
+	if err != nil {
+		return nil, err
+	}
+	resp.Password = arg.Password
+	return resp, nil
 }
 
 func (c CheckPageSpeedResourceAPI) Delete(ctx context.Context, pk upapi.PrimaryKeyable) error {
