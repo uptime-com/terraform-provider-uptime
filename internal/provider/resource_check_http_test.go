@@ -27,7 +27,7 @@ func TestAccCheckHTTPResource(t *testing.T) {
 				resource.TestCheckResourceAttr("uptime_check_http.test", "name", names[0]),
 				resource.TestCheckResourceAttr("uptime_check_http.test", "address", "https://example.com"),
 			),
-			//ExpectNonEmptyPlan: true,
+			// ExpectNonEmptyPlan: true,
 			ConfigPlanChecks: resource.ConfigPlanChecks{
 				PreApply: []plancheck.PlanCheck{
 					&planCheckNoOp{},
@@ -181,6 +181,23 @@ func TestAccCheckHTTPResource_Headers(t *testing.T) {
 				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.Foo.1", "Baz"),
 				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.Qux.#", "1"),
 				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.Qux.0", "Quux"),
+			),
+		},
+	}))
+}
+
+func TestAccCheckHTTPResource_Password(t *testing.T) {
+	name := petname.Generate(3, "-")
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/password"),
+			ConfigVariables: config.Variables{
+				"name":     config.StringVariable(name),
+				"address":  config.StringVariable("https://example.com"),
+				"password": config.StringVariable("fakePassword"),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_http.test", "password", "fakePassword"),
 			),
 		},
 	}))
