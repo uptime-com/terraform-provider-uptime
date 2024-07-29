@@ -1,5 +1,9 @@
 # Uptime.com Terraform provider changelog
 
+## v2.5.2
+
+- Fix goreleaser configuration
+
 ## v2.5.1
 
 - Fix `uptime_check_http` resource password property handling
