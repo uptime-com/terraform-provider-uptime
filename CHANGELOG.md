@@ -1,5 +1,10 @@
 # Uptime.com Terraform provider changelog
 
+## v2.5.1
+
+- Fix `uptime_check_http` resource password property handling
+- Upgrade dependencies
+
 ## v2.5.0
 
 - Added `uptime_check_udp` resource
