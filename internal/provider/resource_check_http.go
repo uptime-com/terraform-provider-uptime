@@ -244,15 +244,30 @@ type CheckHTTPResourceAPI struct {
 }
 
 func (a CheckHTTPResourceAPI) Create(ctx context.Context, arg upapi.CheckHTTP) (*upapi.Check, error) {
-	return a.provider.api.Checks().CreateHTTP(ctx, arg)
+	resp, err := a.provider.api.Checks().CreateHTTP(ctx, arg)
+	if err != nil {
+		return nil, err
+	}
+	resp.Password = arg.Password
+	return resp, nil
 }
 
 func (a CheckHTTPResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return a.provider.api.Checks().Get(ctx, pk)
+	resp, err := a.provider.api.Checks().Get(ctx, pk)
+	if err != nil {
+		return nil, err
+	}
+	resp.Password = pk.(CheckHTTPResourceModel).Password.ValueString()
+	return resp, nil
 }
 
 func (a CheckHTTPResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckHTTP) (*upapi.Check, error) {
-	return a.provider.api.Checks().UpdateHTTP(ctx, pk, arg)
+	resp, err := a.provider.api.Checks().UpdateHTTP(ctx, pk, arg)
+	if err != nil {
+		return nil, err
+	}
+	resp.Password = arg.Password
+	return resp, nil
 }
 
 func (a CheckHTTPResourceAPI) Delete(ctx context.Context, pk upapi.PrimaryKeyable) error {
