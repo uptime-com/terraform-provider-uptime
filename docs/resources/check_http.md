@@ -34,7 +34,7 @@ Monitor a URL for specific status code(s)
 - `notes` (String)
 - `num_retries` (Number) How many times the check should be retried before a location is considered down
 - `password` (String, Sensitive)
-- `port` (Number)
+- `port` (Number) The `Port` value is mandatory if the address URL contains a custom, non-standard port. It should be set to the same value.
 - `proxy` (String)
 - `send_string` (String) String to post
 - `sensitivity` (Number) How many locations should be down before an alert is sent

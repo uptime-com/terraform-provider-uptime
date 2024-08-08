@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
@@ -43,6 +44,8 @@ func NewCheckHTTPResource(_ context.Context, p *providerImpl) resource.Resource 
 						Computed: true,
 						Optional: true,
 						Default:  int64default.StaticInt64(0),
+						Description: ("The `Port` value is mandatory if the address URL contains a custom, non-standard port. " +
+							"It should be set to the same value."),
 					},
 					"username": schema.StringAttribute{
 						Optional: true,
@@ -98,6 +101,10 @@ func NewCheckHTTPResource(_ context.Context, p *providerImpl) resource.Resource 
 						Description: "Whether to verify SSL/TLS certificates",
 					},
 				},
+			},
+			ConfigValidators: func(context.Context) []resource.ConfigValidator {
+				return []resource.ConfigValidator{PortMatchConfigValidator(
+					path.Root("address"), path.Root("port"))}
 			},
 		},
 	}
