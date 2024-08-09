@@ -25,7 +25,7 @@ Monitor a URL for specific status code(s)
 - `contact_groups` (Set of String)
 - `encryption` (String) Whether to verify SSL/TLS certificates
 - `expect_string` (String)
-- `expect_string_type` (String)
+- `expect_string_type` (String) Valid values for this property are: "STRING" - exact match, "REGEX" - match by regular expression, "INVERSE_REGEX" - fail if the regular expression matches
 - `headers` (Map of List of String)
 - `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
 - `interval` (Number) The interval between checks in minutes
@@ -34,7 +34,7 @@ Monitor a URL for specific status code(s)
 - `notes` (String)
 - `num_retries` (Number) How many times the check should be retried before a location is considered down
 - `password` (String, Sensitive)
-- `port` (Number)
+- `port` (Number) The `Port` value is mandatory if the address URL contains a custom, non-standard port. It should be set to the same value.
 - `proxy` (String)
 - `send_string` (String) String to post
 - `sensitivity` (Number) How many locations should be down before an alert is sent
