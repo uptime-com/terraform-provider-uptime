@@ -83,6 +83,9 @@ func NewCheckHTTPResource(_ context.Context, p *providerImpl) resource.Resource 
 						Optional: true,
 						Computed: true,
 						Default:  stringdefault.StaticString("STRING"),
+						Description: (`Valid values for this property are: "STRING" - exact match, ` +
+							`"REGEX" - match by regular expression, ` +
+							`"INVERSE_REGEX" - fail if the regular expression matches`),
 						Validators: []validator.String{
 							OneOfStringValidator([]string{"STRING", "REGEX", "INVERSE_REGEX"}),
 						},

@@ -222,7 +222,7 @@ func TestAccCheckHTTPResource_PortValidation(t *testing.T) {
 			),
 		},
 		{
-			// basic manifest doesn't contain posrt definition, so it must fail
+			// basic manifest doesn't contain port definition, so it must fail
 			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/_basic"),
 			ConfigVariables: config.Variables{
 				"name":    config.StringVariable(names[1]),
