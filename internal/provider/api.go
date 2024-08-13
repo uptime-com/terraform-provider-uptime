@@ -33,7 +33,8 @@ type APIModeler[M APIModel, A, R any] interface {
 
 type APIResourceMetadata struct {
 	schema.Schema
-	TypeNameSuffix string
+	TypeNameSuffix   string
+	ConfigValidators func(context.Context) []resource.ConfigValidator
 }
 
 type APIResource[M APIModel, A, R any] struct {
@@ -48,6 +49,13 @@ func (r APIResource[M, A, R]) Metadata(_ context.Context, rq resource.MetadataRe
 
 func (r APIResource[M, A, R]) Schema(_ context.Context, _ resource.SchemaRequest, rs *resource.SchemaResponse) {
 	rs.Schema = r.meta.Schema
+}
+
+func (r APIResource[M, A, R]) ConfigValidators(ctx context.Context) []resource.ConfigValidator {
+	if r.meta.ConfigValidators == nil {
+		return []resource.ConfigValidator{}
+	}
+	return r.meta.ConfigValidators(ctx)
 }
 
 const (
