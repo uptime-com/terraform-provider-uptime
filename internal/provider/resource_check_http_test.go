@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"regexp"
 	"testing"
 
 	petname "github.com/dustinkirkland/golang-petname"
@@ -199,6 +200,35 @@ func TestAccCheckHTTPResource_Password(t *testing.T) {
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_http.test", "password", "fakePassword"),
 			),
+		},
+	}))
+}
+
+func TestAccCheckHTTPResource_PortValidation(t *testing.T) {
+	names := []string{
+		petname.Generate(3, "-"),
+		petname.Generate(3, "-"),
+	}
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/port_validation"),
+			ConfigVariables: config.Variables{
+				"name":    config.StringVariable(names[0]),
+				"address": config.StringVariable("https://example.com:9383"),
+				"port":    config.IntegerVariable(9383),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_http.test", "address", "https://example.com:9383"),
+			),
+		},
+		{
+			// basic manifest doesn't contain port definition, so it must fail
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/_basic"),
+			ConfigVariables: config.Variables{
+				"name":    config.StringVariable(names[1]),
+				"address": config.StringVariable("https://example.com:9383"),
+			},
+			ExpectError: regexp.MustCompile("Port value should match"),
 		},
 	}))
 }
