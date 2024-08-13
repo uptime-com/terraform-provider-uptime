@@ -1,5 +1,10 @@
 # Uptime.com Terraform provider changelog
 
+## v2.6.0
+- Add validation for HTTP check custom port field
+- Update documentation
+- Upgrade dependencies
+
 ## v2.5.2
 
 - Fix goreleaser configuration
