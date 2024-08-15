@@ -24,6 +24,7 @@ Monitor a TCP port for a response
 ### Optional
 
 - `contact_groups` (Set of String)
+- `encryption` (String) Whether to use TLS
 - `expect_string` (String) String to expect in server response (may be repeated)
 - `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
 - `interval` (Number) The interval between checks in minutes
