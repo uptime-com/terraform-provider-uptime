@@ -130,6 +130,7 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 
 		func() resource.Resource { return NewContactResource(ctx, p) },
 		func() resource.Resource { return NewStatusPageResource(ctx, p) },
+		func() resource.Resource { return NewSLAReportResource(ctx, p) },
 		func() resource.Resource { return NewDashboardResource(ctx, p) },
 		func() resource.Resource { return NewTagResource(ctx, p) },
 	}
