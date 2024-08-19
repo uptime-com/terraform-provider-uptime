@@ -204,3 +204,40 @@ func TestAccCheckTCPResource_SendExpectString(t *testing.T) {
 		},
 	}))
 }
+
+func TestAccCheckTCPResource_Encryption(t *testing.T) {
+	names := [2]string{
+		petname.Generate(3, "-"),
+		petname.Generate(3, "-"),
+	}
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigVariables: config.Variables{
+				"name":       config.StringVariable(names[0]),
+				"address":    config.StringVariable("example.com"),
+				"port":       config.IntegerVariable(80),
+				"encryption": config.StringVariable("SSL_TLS"),
+			},
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_tcp/encryption"),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_tcp.test", "name", names[0]),
+				resource.TestCheckResourceAttr("uptime_check_tcp.test", "address", "example.com"),
+				resource.TestCheckResourceAttr("uptime_check_tcp.test", "encryption", "SSL_TLS"),
+			),
+		},
+		{
+			ConfigVariables: config.Variables{
+				"name":       config.StringVariable(names[1]),
+				"address":    config.StringVariable("example.net"),
+				"port":       config.IntegerVariable(80),
+				"encryption": config.StringVariable(""),
+			},
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_tcp/encryption"),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_tcp.test", "name", names[1]),
+				resource.TestCheckResourceAttr("uptime_check_tcp.test", "address", "example.net"),
+				resource.TestCheckResourceAttr("uptime_check_tcp.test", "encryption", ""),
+			),
+		},
+	}))
+}
