@@ -38,6 +38,11 @@ func NewCheckTCPResource(_ context.Context, p *providerImpl) resource.Resource {
 					"notes":                     NotesSchemaAttribute(),
 					"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
 					"sla":                       SLASchemaAttribute(),
+					"encryption": schema.StringAttribute{
+						Optional:    true,
+						Computed:    true,
+						Description: "Whether to use TLS",
+					},
 				},
 			},
 		},
@@ -62,6 +67,7 @@ type CheckTCPResourceModel struct {
 	Notes                  types.String `tfsdk:"notes"`
 	IncludeInGlobalMetrics types.Bool   `tfsdk:"include_in_global_metrics"`
 	SLA                    types.Object `tfsdk:"sla"`
+	Encryption             types.String `tfsdk:"encryption"`
 
 	sla *SLAAttribute `tfsdk:"-"`
 }
@@ -106,6 +112,7 @@ func (a CheckTCPResourceModelAdapter) ToAPIArgument(model CheckTCPResourceModel)
 		UseIpVersion:           model.UseIpVersion.ValueString(),
 		Notes:                  model.Notes.ValueString(),
 		IncludeInGlobalMetrics: model.IncludeInGlobalMetrics.ValueBool(),
+		Encryption:             model.Encryption.ValueString(),
 	}
 
 	if model.sla != nil {
@@ -142,6 +149,7 @@ func (a CheckTCPResourceModelAdapter) FromAPIResult(api upapi.Check) (*CheckTCPR
 			Latency: DurationValueFromDecimalSeconds(api.ResponseTimeSLA),
 			Uptime:  DecimalValue(api.UptimeSLA),
 		}),
+		Encryption: types.StringValue(api.Encryption),
 	}
 	return &model, nil
 }
