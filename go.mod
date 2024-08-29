@@ -14,7 +14,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/shopspring/decimal v1.4.0
 	github.com/stretchr/testify v1.9.0
-	github.com/uptime-com/uptime-client-go/v2 v2.0.0-20240826143229-a0300708e548
+	github.com/uptime-com/uptime-client-go/v2 v2.0.0-20240829075731-38b4feeffc12
 )
 
 require (

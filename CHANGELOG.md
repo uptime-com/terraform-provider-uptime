@@ -1,5 +1,9 @@
 # Uptime.com Terraform provider changelog
 
+## v2.7.0
+- Add `uptime_sla_report` resource
+- Fix TCP check SSL configuration option
+
 ## v2.6.0
 - Add validation for HTTP check custom port field
 - Update documentation
