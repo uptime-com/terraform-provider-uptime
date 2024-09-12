@@ -1,5 +1,8 @@
 # Uptime.com Terraform provider changelog
 
+## v2.8.0
+- Add `uptime_scheduled_report` resource
+
 ## v2.7.0
 - Add `uptime_sla_report` resource
 - Fix TCP check SSL configuration option
