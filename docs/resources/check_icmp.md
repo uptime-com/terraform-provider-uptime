@@ -29,6 +29,7 @@ Monitor network activity for a specific domain or IP address
 - `locations` (Set of String)
 - `notes` (String)
 - `num_retries` (Number) How many times the check should be retried before a location is considered down
+- `sensitivity` (Number) How many locations should be down before an alert is sent
 - `sla` (Attributes) SLA related attributes (see [below for nested schema](#nestedatt--sla))
 - `tags` (Set of String)
 - `use_ip_version` (String) Whether to use IPv4 or IPv6 for the check.

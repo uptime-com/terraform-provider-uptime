@@ -160,3 +160,29 @@ func TestAccCheckICMPResource_NumRetries(t *testing.T) {
 		},
 	}))
 }
+
+func TestAccCheckICMPResource_Sensitivity(t *testing.T) {
+	name := petname.Generate(3, "-")
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_icmp/sensitivity"),
+			ConfigVariables: config.Variables{
+				"name":        config.StringVariable(name),
+				"sensitivity": config.IntegerVariable(3),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_icmp.test", "sensitivity", "3"),
+			),
+		},
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_icmp/sensitivity"),
+			ConfigVariables: config.Variables{
+				"name":        config.StringVariable(name),
+				"sensitivity": config.IntegerVariable(1),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_icmp.test", "sensitivity", "1"),
+			),
+		},
+	}))
+}
