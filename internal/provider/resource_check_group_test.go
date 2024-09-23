@@ -56,3 +56,36 @@ func TestAccCheckGroupResource_ResponseTime(t *testing.T) {
 		},
 	}))
 }
+
+func TestAccCheckGroupResource_PercentCalculation(t *testing.T) {
+	names := []string{
+		petname.Generate(3, "-"),
+		petname.Generate(3, "-"),
+	}
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigVariables: config.Variables{
+				"name":                       config.StringVariable(names[0]),
+				"uptime_percent_calculation": config.StringVariable("UP_DOWN_STATES"),
+			},
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_group/percent_calculation"),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_group.test", "name", names[0]),
+				resource.TestCheckResourceAttr("uptime_check_group.test", "config.response_time.check_type", "HTTP"),
+				resource.TestCheckResourceAttr("uptime_check_group.test", "config.uptime_percent_calculation", "UP_DOWN_STATES"),
+			),
+		},
+		{
+			ConfigVariables: config.Variables{
+				"name":                       config.StringVariable(names[1]),
+				"uptime_percent_calculation": config.StringVariable("AVERAGE"),
+			},
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_group/percent_calculation"),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_group.test", "name", names[1]),
+				resource.TestCheckResourceAttr("uptime_check_group.test", "config.response_time.check_type", "HTTP"),
+				resource.TestCheckResourceAttr("uptime_check_group.test", "config.uptime_percent_calculation", "AVERAGE"),
+			),
+		},
+	}))
+}
