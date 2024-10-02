@@ -9,7 +9,7 @@ import (
 )
 
 type SetPrimitives interface {
-	string | int64 | float64 | bool
+	string | int64 | float64 | int32 | bool
 }
 
 type SetAttributeAdapter[P SetPrimitives] struct{}
@@ -26,6 +26,8 @@ func (a SetAttributeAdapter[P]) Slice(v types.Set) []P {
 			res[i] = any(elems[i].(types.String).ValueString()).(P)
 		case types.BoolType:
 			res[i] = any(elems[i].(types.Bool).ValueBool()).(P)
+		case types.Int32Type:
+			res[i] = any(elems[i].(types.Int32).ValueInt32()).(P)
 		case types.Int64Type:
 			res[i] = any(elems[i].(types.Int64).ValueInt64()).(P)
 		case types.Float64Type:
@@ -45,6 +47,8 @@ func (a SetAttributeAdapter[P]) SliceValue(p []P) types.Set {
 			elems = append(elems, types.StringValue(x))
 		case bool:
 			elems = append(elems, types.BoolValue(x))
+		case int32:
+			elems = append(elems, types.Int32Value(x))
 		case int64:
 			elems = append(elems, types.Int64Value(x))
 		case float64:
@@ -58,6 +62,8 @@ func (a SetAttributeAdapter[P]) SliceValue(p []P) types.Set {
 		return types.SetValueMust(types.StringType, elems)
 	case []bool:
 		return types.SetValueMust(types.BoolType, elems)
+	case []int32:
+		return types.SetValueMust(types.Int32Type, elems)
 	case []int64:
 		return types.SetValueMust(types.Int64Type, elems)
 	case []float64:
