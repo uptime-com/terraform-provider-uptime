@@ -34,6 +34,7 @@ func NewCheckICMPResource(_ context.Context, p *providerImpl) resource.Resource 
 					"use_ip_version":            UseIPVersionSchemaAttribute(),
 					"notes":                     NotesSchemaAttribute(),
 					"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
+					"sensitivity":               SensitivitySchemaAttribute(2),
 					"sla":                       SLASchemaAttribute(),
 				},
 			},
@@ -55,6 +56,7 @@ type CheckICMPResourceModel struct {
 	UseIPVersion           types.String `tfsdk:"use_ip_version"`
 	Notes                  types.String `tfsdk:"notes"`
 	IncludeInGlobalMetrics types.Bool   `tfsdk:"include_in_global_metrics"`
+	Sensitivity            types.Int64  `tfsdk:"sensitivity"`
 	SLA                    types.Object `tfsdk:"sla"`
 
 	sla *SLAAttribute `tfsdk:"-"`
@@ -97,6 +99,7 @@ func (a CheckICMPResourceModelAdapter) ToAPIArgument(model CheckICMPResourceMode
 		UseIPVersion:           model.UseIPVersion.ValueString(),
 		Notes:                  model.Notes.ValueString(),
 		IncludeInGlobalMetrics: model.IncludeInGlobalMetrics.ValueBool(),
+		Sensitivity:            model.Sensitivity.ValueInt64(),
 	}
 
 	if model.sla != nil {
@@ -126,6 +129,7 @@ func (a CheckICMPResourceModelAdapter) FromAPIResult(api upapi.Check) (*CheckICM
 		UseIPVersion:           types.StringValue(api.UseIPVersion),
 		Notes:                  types.StringValue(api.Notes),
 		IncludeInGlobalMetrics: types.BoolValue(api.IncludeInGlobalMetrics),
+		Sensitivity:            types.Int64Value(api.Sensitivity),
 		SLA: a.SLAAttributeValue(SLAAttribute{
 			Latency: DurationValueFromDecimalSeconds(api.ResponseTimeSLA),
 			Uptime:  DecimalValue(api.UptimeSLA),
