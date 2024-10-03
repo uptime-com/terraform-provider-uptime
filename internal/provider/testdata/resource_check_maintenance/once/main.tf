@@ -7,7 +7,11 @@ variable address {
   default = "https://example.com"
 }
 
-variable state {
+variable once_start_date {
+  type    = string
+}
+
+variable once_end_date {
   type    = string
 }
 
@@ -18,5 +22,10 @@ resource uptime_check_http test {
 
 resource uptime_check_maintenance test {
   check_id   = uptime_check_http.test.id
-  state      = var.state
+  state      = "SCHEDULED"
+  schedule   = [{
+    type = "ONCE"
+    once_start_date = var.once_start_date
+    once_end_date   = var.once_end_date
+  }]
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int32default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -30,7 +31,6 @@ func NewCheckMaintenanceResource(_ context.Context, p *providerImpl) resource.Re
 				Description: "Set maintenance windows for a check",
 				Attributes: map[string]schema.Attribute{
 					"check_id": schema.Int64Attribute{
-						Optional: false,
 						Required: true,
 					},
 					"state": schema.StringAttribute{
@@ -58,7 +58,8 @@ func NewCheckMaintenanceResource(_ context.Context, p *providerImpl) resource.Re
 									Computed: true,
 									Validators: []validator.String{
 										stringvalidator.RegexMatches(
-											regexp.MustCompile(`^([01]?[0-9]|2[0-3]):[0-5][0-9]$`), "Time must be in HH:MM format, 00:00 - 23:59",
+											regexp.MustCompile(`^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$`),
+											"Time must be in HH:MM format, 00:00:00 - 23:59:59",
 										),
 									},
 								},
@@ -67,7 +68,8 @@ func NewCheckMaintenanceResource(_ context.Context, p *providerImpl) resource.Re
 									Computed: true,
 									Validators: []validator.String{
 										stringvalidator.RegexMatches(
-											regexp.MustCompile(`^([01]?[0-9]|2[0-3]):[0-5][0-9]$`), "Time must be in HH:MM format, 00:00 - 23:59",
+											regexp.MustCompile(`^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$`),
+											"Time must be in HH:MM format, 00:00:00 - 23:59:59",
 										),
 									},
 								},
@@ -76,7 +78,7 @@ func NewCheckMaintenanceResource(_ context.Context, p *providerImpl) resource.Re
 									Computed:    true,
 									ElementType: types.Int32Type,
 									Validators: []validator.Set{
-										setvalidator.SizeBetween(1, 7),
+										setvalidator.SizeBetween(0, 7),
 										setvalidator.ValueInt32sAre(
 											int32validator.Between(0, 6),
 										),
@@ -85,6 +87,7 @@ func NewCheckMaintenanceResource(_ context.Context, p *providerImpl) resource.Re
 								"monthday": schema.Int32Attribute{
 									Optional: true,
 									Computed: true,
+									Default:  int32default.StaticInt32(0),
 									Validators: []validator.Int32{
 										int32validator.Between(0, 30),
 									},
@@ -92,6 +95,7 @@ func NewCheckMaintenanceResource(_ context.Context, p *providerImpl) resource.Re
 								"monthday_from": schema.Int32Attribute{
 									Optional: true,
 									Computed: true,
+									Default:  int32default.StaticInt32(0),
 									Validators: []validator.Int32{
 										int32validator.Between(0, 30),
 									},
@@ -99,18 +103,17 @@ func NewCheckMaintenanceResource(_ context.Context, p *providerImpl) resource.Re
 								"monthday_to": schema.Int32Attribute{
 									Optional: true,
 									Computed: true,
+									Default:  int32default.StaticInt32(0),
 									Validators: []validator.Int32{
 										int32validator.Between(0, 30),
 									},
 								},
 								"once_start_date": schema.StringAttribute{
 									Optional:   true,
-									Computed:   true,
 									CustomType: timetypes.RFC3339Type{},
 								},
 								"once_end_date": schema.StringAttribute{
 									Optional:   true,
-									Computed:   true,
 									CustomType: timetypes.RFC3339Type{},
 								},
 							},
@@ -241,14 +244,19 @@ func (a CheckMaintenanceResourceModelAdapter) ToAPIArgument(
 	if len(model.schedule) > 0 {
 		for _, v := range model.schedule {
 			s := upapi.CheckMaintenanceSchedule{
-				Type:          v.Type.ValueString(),
-				FromTime:      v.FromTime.ValueString(),
-				ToTime:        v.ToTime.ValueString(),
-				Monthday:      int(v.Monthday.ValueInt32()),
-				MonthdayFrom:  int(v.MonthdayFrom.ValueInt32()),
-				MonthdayTo:    int(v.MonthdayTo.ValueInt32()),
-				OnceStartDate: v.OnceStartDate.ValueString(),
-				OnceEndDate:   v.OnceStartDate.ValueString(),
+				Type:         v.Type.ValueString(),
+				FromTime:     v.FromTime.ValueString(),
+				ToTime:       v.ToTime.ValueString(),
+				Monthday:     int(v.Monthday.ValueInt32()),
+				MonthdayFrom: int(v.MonthdayFrom.ValueInt32()),
+				MonthdayTo:   int(v.MonthdayTo.ValueInt32()),
+			}
+
+			if !v.OnceStartDate.IsNull() && !v.OnceStartDate.IsUnknown() {
+				s.OnceStartDate = v.OnceStartDate.ValueString()
+			}
+			if !v.OnceEndDate.IsNull() && !v.OnceEndDate.IsUnknown() {
+				s.OnceEndDate = v.OnceEndDate.ValueString()
 			}
 			for _, v := range a.Slice(v.Weekdays) {
 				s.Weekdays = append(s.Weekdays, int(v))
@@ -273,32 +281,51 @@ func (a CheckMaintenanceResourceModelAdapter) FromAPIResult(
 
 	schedule := []CheckMaintenanceScheduleAttribute{}
 	for _, item := range api.Schedule {
-		wd := make([]int32, len(item.Weekdays))
-		for i := range item.Weekdays {
-			wd[i] = int32(item.Weekdays[i])
+		s := CheckMaintenanceScheduleAttribute{
+			Type:         types.StringValue(item.Type),
+			Monthday:     types.Int32Value(int32(item.Monthday)),
+			MonthdayFrom: types.Int32Value(int32(item.MonthdayFrom)),
+			MonthdayTo:   types.Int32Value(int32(item.MonthdayTo)),
 		}
 
-		onceStartDate, d := timetypes.NewRFC3339PointerValue(&item.OnceStartDate)
-		if d.HasError() {
-			return nil, fmt.Errorf("error parsing OnceStartDate: %v", d)
+		if item.Type != "ONCE" {
+			s.FromTime = types.StringValue(item.FromTime)
+			s.ToTime = types.StringValue(item.ToTime)
+		} else {
+			s.FromTime = types.StringNull()
+			s.ToTime = types.StringNull()
 		}
 
-		onceEndDate, d := timetypes.NewRFC3339PointerValue(&item.OnceEndDate)
-		if d.HasError() {
-			return nil, fmt.Errorf("error parsing OnceEndDate: %v", d)
+		if len(item.Weekdays) > 0 {
+			wd := make([]int32, len(item.Weekdays))
+			for i := range item.Weekdays {
+				wd[i] = int32(item.Weekdays[i])
+			}
+			s.Weekdays = a.SliceValue(wd)
+		} else {
+			s.Weekdays = types.SetNull(types.Int32Type)
 		}
 
-		schedule = append(schedule, CheckMaintenanceScheduleAttribute{
-			Type:          types.StringValue(item.Type),
-			FromTime:      types.StringValue(item.FromTime),
-			ToTime:        types.StringValue(item.ToTime),
-			Weekdays:      a.SliceValue(wd),
-			Monthday:      types.Int32Value(int32(item.Monthday)),
-			MonthdayFrom:  types.Int32Value(int32(item.MonthdayFrom)),
-			MonthdayTo:    types.Int32Value(int32(item.MonthdayTo)),
-			OnceStartDate: onceStartDate,
-			OnceEndDate:   onceEndDate,
-		})
+		var d diag.Diagnostics
+		if item.OnceStartDate != "" {
+			s.OnceStartDate, d = timetypes.NewRFC3339PointerValue(&item.OnceStartDate)
+			if d.HasError() {
+				return nil, fmt.Errorf("error parsing OnceStartDate: %v", d)
+			}
+		}
+
+		if item.OnceEndDate != "" {
+			s.OnceEndDate, d = timetypes.NewRFC3339PointerValue(&item.OnceEndDate)
+			if d.HasError() {
+				return nil, fmt.Errorf("error parsing OnceEndDate: %v", d)
+			}
+		}
+
+		if item.Monthday != 0 {
+			s.MonthdayTo = types.Int32Value(int32(0))
+			s.MonthdayFrom = types.Int32Value(int32(0))
+		}
+		schedule = append(schedule, s)
 	}
 	var diags diag.Diagnostics
 	if model.Schedule, diags = a.ScheduleValue(schedule); diags.HasError() {
