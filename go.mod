@@ -1,13 +1,14 @@
 module github.com/uptime-com/terraform-provider-uptime
 
-go 1.21.3
-toolchain go1.22.5
+go 1.22.0
+
+toolchain go1.23.1
 
 require (
 	github.com/dustinkirkland/golang-petname v0.0.0-20230927204539-348648eed816
 	github.com/google/go-cmp v0.6.0
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/hashicorp/terraform-plugin-framework v1.11.0
+	github.com/hashicorp/terraform-plugin-framework v1.12.0
 	github.com/hashicorp/terraform-plugin-framework-timetypes v0.5.0
 	github.com/hashicorp/terraform-plugin-framework-validators v0.13.0
 	github.com/hashicorp/terraform-plugin-go v0.24.0
