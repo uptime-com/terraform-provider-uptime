@@ -1,13 +1,23 @@
 # Uptime.com Terraform provider changelog
 
+## v2.9.0
+
+- Add `uptime_check_maintenance` resource
+- Add `sensitivity` to `uptime_check_icmp`, fix #97
+- Fix `uptime_percent_calculation` value `AVERAGE` for `uptime_check_group` resource, fix #87
+- Upgrade dependencies
+
 ## v2.8.0
+
 - Add `uptime_scheduled_report` resource
 
 ## v2.7.0
+
 - Add `uptime_sla_report` resource
 - Fix TCP check SSL configuration option
 
 ## v2.6.0
+
 - Add validation for HTTP check custom port field
 - Update documentation
 - Upgrade dependencies
