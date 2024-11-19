@@ -70,7 +70,7 @@ type hostnameValidator struct {
 	zoyaDescriber
 }
 
-var hostnameRE = regexp.MustCompile(`^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])`)
+var hostnameRE = regexp.MustCompile(`^(?:(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}|(?:\d{1,3}\.){3}\d{1,3}|(?:[a-fA-F0-9:]+:+)+[a-fA-F0-9]+)$`)
 
 func (hostnameValidator) ValidateString(_ context.Context, rq validator.StringRequest, rs *validator.StringResponse) {
 	if rq.ConfigValue.IsNull() {
