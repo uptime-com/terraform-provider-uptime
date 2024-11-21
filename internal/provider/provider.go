@@ -131,6 +131,13 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 
 		func() resource.Resource { return NewContactResource(ctx, p) },
 		func() resource.Resource { return NewStatusPageResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageComponentResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageIncidentResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageMetricResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageSubscriberResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageSubsDomainAllowResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageSubsDomainBlockResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageUserResource(ctx, p) },
 		func() resource.Resource { return NewSLAReportResource(ctx, p) },
 		func() resource.Resource { return NewDashboardResource(ctx, p) },
 		func() resource.Resource { return NewTagResource(ctx, p) },
