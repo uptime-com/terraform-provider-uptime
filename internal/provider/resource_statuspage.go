@@ -185,6 +185,51 @@ func NewStatusPageResource(_ context.Context, p *providerImpl) resource.Resource
 						Computed: true,
 						Default:  stringdefault.StaticString("GMT"),
 					},
+					"allow_subscriptions_email": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"allow_subscriptions_rss": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"allow_subscriptions_slack": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"allow_subscriptions_sms": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"allow_subscriptions_webhook": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"hide_empty_tabs_history": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+					},
+					"theme": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("LEGACY"),
+					},
+					"custom_header_bg_color_hex": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("#002E52"),
+					},
+					"custom_header_text_color_hex": schema.StringAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString("#FFFFFF"),
+					},
 				},
 			},
 		},
@@ -225,6 +270,15 @@ type StatusPageResourceModel struct {
 	CustomCss                 types.String `tfsdk:"custom_css"`
 	CompanyWebsiteUrl         types.String `tfsdk:"company_website_url"`
 	Timezone                  types.String `tfsdk:"timezone"`
+	AllowSubscriptionsEmail   types.Bool   `tfsdk:"allow_subscriptions_email"`
+	AllowSubscriptionsRss     types.Bool   `tfsdk:"allow_subscriptions_rss"`
+	AllowSubscriptionsSlack   types.Bool   `tfsdk:"allow_subscriptions_slack"`
+	AllowSubscriptionsSms     types.Bool   `tfsdk:"allow_subscriptions_sms"`
+	AllowSubscriptionsWebhook types.Bool   `tfsdk:"allow_subscriptions_webhook"`
+	HideEmptyTabsHistory      types.Bool   `tfsdk:"hide_empty_tabs_history"`
+	Theme                     types.String `tfsdk:"theme"`
+	CustomHeaderBgColorHex    types.String `tfsdk:"custom_header_bg_color_hex"`
+	CustomHeaderTextColorHex  types.String `tfsdk:"custom_header_text_color_hex"`
 }
 
 func (m StatusPageResourceModel) PrimaryKey() upapi.PrimaryKey {
@@ -275,6 +329,15 @@ func (c StatusPageResourceModelAdapter) ToAPIArgument(model StatusPageResourceMo
 		CustomCss:                 model.CustomCss.ValueString(),
 		CompanyWebsiteUrl:         model.CompanyWebsiteUrl.ValueString(),
 		Timezone:                  model.Timezone.ValueString(),
+		AllowSubscriptionsEmail:   model.AllowSubscriptionsEmail.ValueBool(),
+		AllowSubscriptionsRss:     model.AllowSubscriptionsRss.ValueBool(),
+		AllowSubscriptionsSlack:   model.AllowSubscriptionsSlack.ValueBool(),
+		AllowSubscriptionsSms:     model.AllowSubscriptionsSms.ValueBool(),
+		AllowSubscriptionsWebhook: model.AllowSubscriptionsWebhook.ValueBool(),
+		HideEmptyTabsHistory:      model.HideEmptyTabsHistory.ValueBool(),
+		Theme:                     model.Theme.ValueString(),
+		CustomHeaderBgColorHex:    model.CustomHeaderBgColorHex.ValueString(),
+		CustomHeaderTextColorHex:  model.CustomHeaderTextColorHex.ValueString(),
 	}
 	return &api, nil
 }
@@ -314,6 +377,15 @@ func (c StatusPageResourceModelAdapter) FromAPIResult(api upapi.StatusPage) (*St
 		CustomCss:                 types.StringValue(api.CustomCss),
 		CompanyWebsiteUrl:         types.StringValue(api.CompanyWebsiteUrl),
 		Timezone:                  types.StringValue(api.Timezone),
+		AllowSubscriptionsEmail:   types.BoolValue(api.AllowSubscriptionsEmail),
+		AllowSubscriptionsRss:     types.BoolValue(api.AllowSubscriptionsRss),
+		AllowSubscriptionsSlack:   types.BoolValue(api.AllowSubscriptionsSlack),
+		AllowSubscriptionsSms:     types.BoolValue(api.AllowSubscriptionsSms),
+		AllowSubscriptionsWebhook: types.BoolValue(api.AllowSubscriptionsWebhook),
+		HideEmptyTabsHistory:      types.BoolValue(api.HideEmptyTabsHistory),
+		Theme:                     types.StringValue(api.Theme),
+		CustomHeaderBgColorHex:    types.StringValue(api.CustomHeaderBgColorHex),
+		CustomHeaderTextColorHex:  types.StringValue(api.CustomHeaderTextColorHex),
 	}
 	return &model, nil
 }

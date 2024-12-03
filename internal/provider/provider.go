@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strconv"
 	"sync"
 	"time"
 
@@ -69,6 +70,9 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 		rs.Diagnostics.Append(diags...)
 		return
 	}
+	if cfg.Endpoint.IsNull() {
+		cfg.Endpoint = types.StringValue(os.Getenv("UPTIME_ENDPOINT"))
+	}
 	if cfg.Token.IsNull() {
 		cfg.Token = types.StringValue(os.Getenv("UPTIME_TOKEN"))
 	}
@@ -76,7 +80,13 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 		cfg.Trace = types.BoolValue(os.Getenv("UPTIME_TRACE") != "")
 	}
 	if cfg.RateLimit.IsNull() {
-		cfg.RateLimit = types.Float64Value(0.5)
+		rateLimit := 0.5
+		if val := os.Getenv("UPTIME_RATE_LIMIT"); val != "" {
+			if parsedVal, err := strconv.ParseFloat(val, 64); err != nil {
+				rateLimit = parsedVal
+			}
+		}
+		cfg.RateLimit = types.Float64Value(rateLimit)
 	}
 	opts := []upapi.Option{
 		upapi.WithToken(cfg.Token.ValueString()),
@@ -131,6 +141,13 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 
 		func() resource.Resource { return NewContactResource(ctx, p) },
 		func() resource.Resource { return NewStatusPageResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageComponentResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageIncidentResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageMetricResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageSubscriberResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageSubsDomainAllowResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageSubsDomainBlockResource(ctx, p) },
+		func() resource.Resource { return NewStatusPageUserResource(ctx, p) },
 		func() resource.Resource { return NewSLAReportResource(ctx, p) },
 		func() resource.Resource { return NewDashboardResource(ctx, p) },
 		func() resource.Resource { return NewTagResource(ctx, p) },
