@@ -52,7 +52,7 @@ func testAccAPIClient(t testing.TB) upapi.API {
 	token := os.Getenv("UPTIME_TOKEN")
 	require.NotEmpty(t, token, "UPTIME_TOKEN must be set for acceptance tests")
 
-	api, err := upapi.New(upapi.WithToken(token), upapi.WithRateLimit(0.2))
+	api, err := upapi.New(upapi.WithToken(token), upapi.WithRateLimit(0.15))
 	require.NoError(t, err, "failed to initialize uptime.com api client")
 
 	return api
