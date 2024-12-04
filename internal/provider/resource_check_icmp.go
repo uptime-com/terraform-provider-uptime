@@ -24,7 +24,7 @@ func NewCheckICMPResource(_ context.Context, p *providerImpl) resource.Resource 
 					"id":                        IDSchemaAttribute(),
 					"url":                       URLSchemaAttribute(),
 					"name":                      NameSchemaAttribute(),
-					"address":                   AddressHostnameSchemaAttribute(),
+					"address":                   AddressHostnameOrIPSchemaAttribute(),
 					"contact_groups":            ContactGroupsSchemaAttribute(),
 					"locations":                 LocationsSchemaAttribute(p),
 					"tags":                      TagsSchemaAttribute(),
