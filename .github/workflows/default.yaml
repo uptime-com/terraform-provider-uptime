@@ -43,7 +43,8 @@ jobs:
         env:
           TF_ACC:       'yup'
           UPTIME_TOKEN: '${{ secrets.UPTIME_TOKEN }}'
-        run:  go test -v ./... -run ^TestAcc[A-Z]
+          UPTIME_RATE_LIMIT: '0.15'
+        run:  go test -test.timeout=50m -test.parallel=1 -v ./... -run ^TestAcc[A-Z]
 
   release:
     if:      startsWith(github.ref, 'refs/tags/v')
