@@ -1,5 +1,15 @@
 # Uptime.com Terraform provider changelog
 
+## v2.10.0
+
+- Add `uptime_statuspage_component`, `uptime_statuspage_incident`, `uptime_statuspage_metric`
+  `uptime_statuspage_subscriber`, `uptime_statuspage_metric`, `uptime_statuspage_subscription_domain_allow`
+  `uptime_statuspage_subscription_domain_block` and `uptime_statuspage_user` resources.
+- Add `uptime_credential` resource.
+- Add `uptime_integration_opsgenie` resource.
+- Remove ICMP check DNS hostname validation for `address` field.
+- Upgrade dependencies
+
 ## v2.9.0
 
 - Add `uptime_check_maintenance` resource
