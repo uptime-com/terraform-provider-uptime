@@ -53,6 +53,7 @@ resource "uptime_check_http" "http" {
 
 - `endpoint` (String)
 - `rate_limit` (Number) The rate limit to use for API calls in requests per second, defaults to 0.5
+- `subaccount` (Number) Subaccount ID to use for API calls
 - `token` (String, Sensitive)
 - `trace` (Boolean)
 
