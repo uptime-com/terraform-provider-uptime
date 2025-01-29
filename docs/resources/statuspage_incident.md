@@ -18,18 +18,18 @@ Status page incident or maintenance window resource
 ### Required
 
 - `name` (String)
+- `starts_at` (String) When this incident occurred in GMT
 - `statuspage_id` (Number)
 - `updates` (Attributes Set) (see [below for nested schema](#nestedatt--updates))
 
 ### Optional
 
 - `affected_components` (Attributes Set) (see [below for nested schema](#nestedatt--affected_components))
-- `ends_at` (String)
+- `ends_at` (String) When this incident ended in GMT
 - `incident_type` (String)
 - `include_in_global_metrics` (Boolean)
 - `notify_subscribers` (Boolean)
 - `send_maintenance_start_notification` (Boolean)
-- `starts_at` (String)
 - `update_component_status` (Boolean)
 
 ### Read-Only

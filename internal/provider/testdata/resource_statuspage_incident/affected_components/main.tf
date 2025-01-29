@@ -18,6 +18,10 @@ variable "incident_component_status" {
   type = string
 }
 
+variable "starts_at" {
+  type    = string
+}
+
 resource "uptime_check_api" "test" {
   name          = var.check_name
   script = <<SCRIPT
@@ -46,6 +50,7 @@ resource "uptime_statuspage_incident" "test" {
   statuspage_id  = uptime_statuspage.test.id
   name           = var.incident_name
   incident_type  = "INCIDENT"
+  starts_at      = var.starts_at
   updates        = [{
       incident_state = var.incident_state
   }]
