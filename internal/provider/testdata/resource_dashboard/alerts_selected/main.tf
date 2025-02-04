@@ -2,6 +2,29 @@ variable "name" {
   type = string
 }
 
+variable "check_name" {
+  type = string
+}
+
+variable "script" {
+  type    = string
+  default = <<SCRIPT
+[
+  {
+    "step_def": "C_GET",
+    "values": {
+      "url": "https://example.com/"
+    }
+  }
+]
+SCRIPT
+}
+
+resource "uptime_check_api" "alerts" {
+  name   = var.check_name
+  script = var.script
+}
+
 variable "alerts_show_section" {
   type = bool
 }
@@ -23,6 +46,7 @@ variable "alerts_include_resolved" {
 }
 
 resource "uptime_dashboard" "alerts" {
+  depends_on = [uptime_check_api.alerts]
   name       = var.name
   alerts = {
     show           = var.alerts_show_section
@@ -38,6 +62,6 @@ resource "uptime_dashboard" "alerts" {
     show = {}
   }
   selected = {
-    services = []
+    services = [var.name]
   }
 }

@@ -135,6 +135,26 @@ func TestAccDashboardResource_Alerts(t *testing.T) {
 				ConfigDirectory: config.StaticDirectory("testdata/resource_dashboard/alerts"),
 				ConfigVariables: config.Variables{
 					"name":                    config.StringVariable(name),
+					"alerts_show_section":     config.BoolVariable(true),
+					"alerts_for_all_checks":   config.BoolVariable(true),
+					"alerts_num_to_show":      config.IntegerVariable(5),
+					"alerts_include_ignored":  config.BoolVariable(true),
+					"alerts_include_resolved": config.BoolVariable(true),
+				},
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("uptime_dashboard.alerts", "name", name),
+					resource.TestCheckResourceAttr("uptime_dashboard.alerts", "alerts.show_section", "true"),
+					resource.TestCheckResourceAttr("uptime_dashboard.alerts", "alerts.for_all_checks", "true"),
+					resource.TestCheckResourceAttr("uptime_dashboard.alerts", "alerts.num_to_show", "5"),
+					resource.TestCheckResourceAttr("uptime_dashboard.alerts", "alerts.include.ignored", "true"),
+					resource.TestCheckResourceAttr("uptime_dashboard.alerts", "alerts.include.resolved", "true"),
+					resource.TestCheckResourceAttr("uptime_dashboard.alerts", "selected.services.#", "0"),
+				),
+			},
+			{
+				ConfigDirectory: config.StaticDirectory("testdata/resource_dashboard/alerts_selected"),
+				ConfigVariables: config.Variables{
+					"name":                    config.StringVariable(name),
 					"check_name":              config.StringVariable(name),
 					"alerts_show_section":     config.BoolVariable(true),
 					"alerts_for_all_checks":   config.BoolVariable(true),
