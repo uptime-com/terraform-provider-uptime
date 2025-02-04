@@ -165,7 +165,7 @@ func NewDashboardResource(_ context.Context, p *providerImpl) resource.Resource 
 }
 
 type DashboardResourceModel struct {
-	ID       types.Int64  `tfsdk:"id" ref:"PK,opt"`
+	ID       types.Int64  `tfsdk:"id"`
 	Name     types.String `tfsdk:"name"`
 	Ordering types.Int64  `tfsdk:"ordering"`
 	IsPinned types.Bool   `tfsdk:"is_pinned"`
@@ -550,6 +550,7 @@ func (a DashboardResourceModelAdapter) Get(ctx context.Context, sg StateGetter) 
 
 func (a DashboardResourceModelAdapter) ToAPIArgument(model DashboardResourceModel) (*upapi.Dashboard, error) {
 	api := upapi.Dashboard{
+		PK:       model.ID.ValueInt64(),
 		Name:     model.Name.ValueString(),
 		IsPinned: model.IsPinned.ValueBool(),
 		Ordering: model.Ordering.ValueInt64(),
@@ -646,9 +647,7 @@ func (a DashboardResourceModelAdapter) FromAPIResult(api upapi.Dashboard) (*Dash
 		}
 		selectedAttribute.Tags = types.SetValueMust(types.StringType, selectedTags)
 	}
-	if len(selectedAttribute.Services.Elements()) > 0 || len(selectedAttribute.Tags.Elements()) > 0 {
-		model.Selected = a.SelectedAttributeValue(selectedAttribute)
-	}
+	model.Selected = a.SelectedAttributeValue(selectedAttribute)
 	return &model, nil
 }
 
