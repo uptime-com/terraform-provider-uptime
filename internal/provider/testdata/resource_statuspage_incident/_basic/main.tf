@@ -10,6 +10,10 @@ variable "incident_state" {
   type = string
 }
 
+variable "starts_at" {
+  type    = string
+}
+
 variable "ends_at" {
   type    = string
   default = null
@@ -23,6 +27,7 @@ resource "uptime_statuspage_incident" "test" {
   statuspage_id  = uptime_statuspage.test.id
   name           = var.incident_name
   incident_type  = "INCIDENT"
+  starts_at      = var.starts_at
   ends_at        = var.ends_at
   updates        = [
     {
