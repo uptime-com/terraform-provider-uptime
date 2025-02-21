@@ -121,19 +121,27 @@ func (a StatusPageComponentResourceModelAdapter) Get(
 func (a StatusPageComponentResourceModelAdapter) ToAPIArgument(
 	model StatusPageComponentResourceModel,
 ) (*StatusPageComponentWrapper, error) {
-	return &StatusPageComponentWrapper{
+	arg := &StatusPageComponentWrapper{
 		StatusPageID: model.StatusPageID.ValueInt64(),
 		StatusPageComponent: upapi.StatusPageComponent{
 			Name:           model.Name.ValueString(),
 			Description:    model.Description.ValueString(),
+			ServiceID:      model.ServiceID.ValueInt64Pointer(),
+			GroupID:        model.GroupID.ValueInt64Pointer(),
 			IsGroup:        model.IsGroup.ValueBool(),
-			GroupID:        model.GroupID.ValueInt64(),
-			ServiceID:      model.ServiceID.ValueInt64(),
 			Status:         model.Status.ValueString(),
 			AutoStatusDown: model.AutoStatusDown.ValueString(),
 			AutoStatusUp:   model.AutoStatusUp.ValueString(),
 		},
-	}, nil
+	}
+	if model.ServiceID.IsUnknown() {
+		arg.ServiceID = nil
+	}
+	if model.GroupID.IsUnknown() {
+		arg.GroupID = nil
+	}
+
+	return arg, nil
 }
 
 func (a StatusPageComponentResourceModelAdapter) FromAPIResult(
@@ -145,9 +153,9 @@ func (a StatusPageComponentResourceModelAdapter) FromAPIResult(
 		URL:            types.StringValue(api.URL),
 		Name:           types.StringValue(api.Name),
 		Description:    types.StringValue(api.Description),
+		ServiceID:      types.Int64PointerValue(api.ServiceID),
+		GroupID:        types.Int64PointerValue(api.GroupID),
 		IsGroup:        types.BoolValue(api.IsGroup),
-		GroupID:        types.Int64Value(api.GroupID),
-		ServiceID:      types.Int64Value(api.ServiceID),
 		Status:         types.StringValue(api.Status),
 		AutoStatusDown: types.StringValue(api.AutoStatusDown),
 		AutoStatusUp:   types.StringValue(api.AutoStatusUp),
