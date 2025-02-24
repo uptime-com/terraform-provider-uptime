@@ -17,12 +17,16 @@ Monitor for DNS failures or changes
 
 ### Required
 
-- `address` (String)
+- `address` (String) A valid DNS hostname (e.g., 'example.com', 'sub.example.com'). 
+Must start and end with alphanumeric characters, can contain hyphens but not at the start or end, 
+and must have at least one dot separator between valid DNS labels.
 - `name` (String)
 
 ### Optional
 
-- `contact_groups` (Set of String)
+- `contact_groups` (Set of String) List of contact group names to receive notifications. 
+Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations) 
+that will be notified when alerts are triggered. Defaults to ['Default'] if not specified.
 - `dns_record_type` (String)
 - `dns_server` (String) DNS server to query
 - `expect_string` (String) IP Address, Domain Name or String to expect in response
@@ -34,7 +38,11 @@ Monitor for DNS failures or changes
 - `num_retries` (Number) How many times the check should be retried before a location is considered down
 - `sensitivity` (Number) How many locations should be down before an alert is sent
 - `sla` (Attributes) SLA related attributes (see [below for nested schema](#nestedatt--sla))
-- `tags` (Set of String)
+- `tags` (Set of String) List of tags to organize and filter monitoring checks. 
+Each account can have up to 3,000 unique tags, with a 100-character limit per tag. 
+Tags help categorize resources for filtering in Dashboards, Public Status Pages, and SLA Reports. 
+Common use cases include tagging by team ('dev-team', 'ops'), environment ('production', 'staging'), 
+or purpose ('api', 'customer-facing'). Defaults to an empty list if not specified.
 - `threshold` (Number) A timeout alert will be issued if the check takes longer than this many seconds to complete
 
 ### Read-Only

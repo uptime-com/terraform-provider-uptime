@@ -10,6 +10,9 @@ import (
 func ContactGroupsSchemaAttribute() schema.SetAttribute {
 	return schema.SetAttribute{
 		ElementType: types.StringType,
+		Description: `List of contact group names to receive notifications. 
+Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations) 
+that will be notified when alerts are triggered. Defaults to ['Default'] if not specified.`,
 		Default: setdefault.StaticValue(
 			types.SetValueMust(
 				types.StringType,
