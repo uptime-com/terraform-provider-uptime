@@ -32,15 +32,16 @@ func NewStatusPageIncidentResource(_ context.Context, p *providerImpl) resource.
 					"id":   IDSchemaAttribute(),
 					"url":  URLSchemaAttribute(),
 					"name": NameSchemaAttribute(),
-					"ends_at": schema.StringAttribute{
-						Optional:   true,
-						Computed:   true,
-						CustomType: timetypes.RFC3339Type{},
-					},
 					"starts_at": schema.StringAttribute{
-						Optional:   true,
-						Computed:   true,
-						CustomType: timetypes.RFC3339Type{},
+						Description: "When this incident occurred in GMT",
+						Required:    true,
+						CustomType:  timetypes.RFC3339Type{},
+					},
+					"ends_at": schema.StringAttribute{
+						Description: "When this incident ended in GMT",
+						Optional:    true,
+						Computed:    true,
+						CustomType:  timetypes.RFC3339Type{},
 					},
 					"include_in_global_metrics": schema.BoolAttribute{
 						Optional: true,

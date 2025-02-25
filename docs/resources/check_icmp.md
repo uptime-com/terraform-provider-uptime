@@ -17,12 +17,16 @@ Monitor network activity for a specific domain or IP address
 
 ### Required
 
-- `address` (String)
+- `address` (String) A valid DNS hostname (e.g., 'example.com') or IP address (IPv4 or IPv6). 
+For hostnames: must start and end with alphanumeric characters. For IP addresses: supports 
+both IPv4 (e.g., '192.168.1.1') and IPv6 (e.g., '2001:db8::1') formats.
 - `name` (String)
 
 ### Optional
 
-- `contact_groups` (Set of String)
+- `contact_groups` (Set of String) List of contact group names to receive notifications. 
+Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations) 
+that will be notified when alerts are triggered. Defaults to ['Default'] if not specified.
 - `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
 - `interval` (Number) The interval between checks in minutes
 - `is_paused` (Boolean)
@@ -31,7 +35,11 @@ Monitor network activity for a specific domain or IP address
 - `num_retries` (Number) How many times the check should be retried before a location is considered down
 - `sensitivity` (Number) How many locations should be down before an alert is sent
 - `sla` (Attributes) SLA related attributes (see [below for nested schema](#nestedatt--sla))
-- `tags` (Set of String)
+- `tags` (Set of String) List of tags to organize and filter monitoring checks. 
+Each account can have up to 3,000 unique tags, with a 100-character limit per tag. 
+Tags help categorize resources for filtering in Dashboards, Public Status Pages, and SLA Reports. 
+Common use cases include tagging by team ('dev-team', 'ops'), environment ('production', 'staging'), 
+or purpose ('api', 'customer-facing'). Defaults to an empty list if not specified.
 - `use_ip_version` (String) Whether to use IPv4 or IPv6 for the check.
 
 ### Read-Only

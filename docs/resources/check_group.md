@@ -22,12 +22,18 @@ Combine multiple checks
 
 ### Optional
 
-- `contact_groups` (Set of String)
+- `contact_groups` (Set of String) List of contact group names to receive notifications. 
+Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations) 
+that will be notified when alerts are triggered. Defaults to ['Default'] if not specified.
 - `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
 - `is_paused` (Boolean)
 - `notes` (String)
 - `sla` (Attributes) SLA related attributes (see [below for nested schema](#nestedatt--sla))
-- `tags` (Set of String)
+- `tags` (Set of String) List of tags to organize and filter monitoring checks. 
+Each account can have up to 3,000 unique tags, with a 100-character limit per tag. 
+Tags help categorize resources for filtering in Dashboards, Public Status Pages, and SLA Reports. 
+Common use cases include tagging by team ('dev-team', 'ops'), environment ('production', 'staging'), 
+or purpose ('api', 'customer-facing'). Defaults to an empty list if not specified.
 
 ### Read-Only
 
@@ -40,8 +46,14 @@ Optional:
 
 - `down_condition` (String)
 - `response_time` (Attributes) (see [below for nested schema](#nestedatt--config--response_time))
-- `services` (Set of String)
-- `tags` (Set of String)
+- `services` (Set of String) List of check IDs to be included in the group. 
+A group can contain up to 200 individual checks of any type (except other group checks). 
+Checks can be part of multiple groups simultaneously. Defaults to an empty list if not specified.
+- `tags` (Set of String) List of tags to organize and filter monitoring checks. 
+Each account can have up to 3,000 unique tags, with a 100-character limit per tag. 
+Tags help categorize resources for filtering in Dashboards, Public Status Pages, and SLA Reports. 
+Common use cases include tagging by team ('dev-team', 'ops'), environment ('production', 'staging'), 
+or purpose ('api', 'customer-facing'). Defaults to an empty list if not specified.
 - `uptime_percent_calculation` (String)
 
 <a id="nestedatt--config--response_time"></a>

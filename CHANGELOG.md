@@ -1,5 +1,18 @@
 # Uptime.com Terraform provider changelog
 
+## v2.11.0
+
+- Add subaccount ID handling in provider configuration
+- Fix dashboard selected items update
+- Fix status page component service_id and group_id cleanup
+- Fix status page incident test implementation
+- Update documentation for complex attributes
+- Upgrade dependencies:
+  - github.com/hashicorp/terraform-plugin-framework
+  - github.com/hashicorp/terraform-plugin-framework-validators
+  - github.com/hashicorp/terraform-plugin-go
+  - github.com/google/go-cmp from 0.6.0 to 0.7.0
+
 ## v2.10.0
 
 - Add `uptime_statuspage_component`, `uptime_statuspage_incident`, `uptime_statuspage_metric`

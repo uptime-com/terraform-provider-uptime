@@ -10,8 +10,10 @@ import (
 
 func ColorHexSchemaAttribute() schema.Attribute {
 	return schema.StringAttribute{
-		Optional:   true,
-		Computed:   true,
+		Optional: true,
+		Computed: true,
+		Description: `A valid hex color code in 6-digit format with # prefix (e.g., '#abc0ff'). 
+Must be lowercase and include the # symbol followed by exactly 6 hexadecimal characters (0-9, a-f).`,
 		Validators: []validator.String{colorHexValidator{}},
 	}
 }

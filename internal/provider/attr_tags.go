@@ -13,6 +13,11 @@ func TagsSchemaAttribute() schema.SetAttribute {
 		Optional:    true,
 		Computed:    true,
 		Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
+		Description: `List of tags to organize and filter monitoring checks. 
+Each account can have up to 3,000 unique tags, with a 100-character limit per tag. 
+Tags help categorize resources for filtering in Dashboards, Public Status Pages, and SLA Reports. 
+Common use cases include tagging by team ('dev-team', 'ops'), environment ('production', 'staging'), 
+or purpose ('api', 'customer-facing'). Defaults to an empty list if not specified.`,
 	}
 }
 

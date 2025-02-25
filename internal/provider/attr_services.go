@@ -10,9 +10,12 @@ import (
 func ServicesSchemaAttribute() schema.SetAttribute {
 	return schema.SetAttribute{
 		ElementType: types.StringType,
-		Optional:    true,
-		Computed:    true,
-		Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
+		Description: `List of check IDs to be included in the group. 
+A group can contain up to 200 individual checks of any type (except other group checks). 
+Checks can be part of multiple groups simultaneously. Defaults to an empty list if not specified.`,
+		Optional: true,
+		Computed: true,
+		Default:  setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 	}
 }
 

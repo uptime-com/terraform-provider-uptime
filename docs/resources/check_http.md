@@ -17,16 +17,21 @@ Monitor a URL for specific status code(s)
 
 ### Required
 
-- `address` (String)
+- `address` (String) A valid URL with a required scheme (e.g., 'https://example.com', 'http://192.168.1.1:8080').
+Must include protocol scheme and valid hostname or IP address. Port numbers are optional.
 - `name` (String)
 
 ### Optional
 
-- `contact_groups` (Set of String)
+- `contact_groups` (Set of String) List of contact group names to receive notifications. 
+Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations) 
+that will be notified when alerts are triggered. Defaults to ['Default'] if not specified.
 - `encryption` (String) Whether to verify SSL/TLS certificates
 - `expect_string` (String)
 - `expect_string_type` (String) Valid values for this property are: "STRING" - exact match, "REGEX" - match by regular expression, "INVERSE_REGEX" - fail if the regular expression matches
-- `headers` (Map of List of String)
+- `headers` (Map of List of String) A map of HTTP headers where each header name maps to a list of values. 
+Header names are case-insensitive. Multiple values for the same header are supported 
+(e.g., { 'Accept': ['application/json', 'text/plain'] }). Defaults to an empty map if not specified.
 - `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
 - `interval` (Number) The interval between checks in minutes
 - `is_paused` (Boolean)
@@ -40,7 +45,11 @@ Monitor a URL for specific status code(s)
 - `sensitivity` (Number) How many locations should be down before an alert is sent
 - `sla` (Attributes) SLA related attributes (see [below for nested schema](#nestedatt--sla))
 - `status_code` (String)
-- `tags` (Set of String)
+- `tags` (Set of String) List of tags to organize and filter monitoring checks. 
+Each account can have up to 3,000 unique tags, with a 100-character limit per tag. 
+Tags help categorize resources for filtering in Dashboards, Public Status Pages, and SLA Reports. 
+Common use cases include tagging by team ('dev-team', 'ops'), environment ('production', 'staging'), 
+or purpose ('api', 'customer-facing'). Defaults to an empty list if not specified.
 - `threshold` (Number) A timeout alert will be issued if the check takes longer than this many seconds to complete
 - `username` (String)
 - `version` (Number) Check version to use. Keep default value unless you are absolutely sure you need to change it

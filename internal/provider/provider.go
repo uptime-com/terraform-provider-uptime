@@ -28,10 +28,11 @@ type providerImpl struct {
 }
 
 type providerConfig struct {
-	Endpoint  types.String  `tfsdk:"endpoint"`
-	Token     types.String  `tfsdk:"token"`
-	RateLimit types.Float64 `tfsdk:"rate_limit"`
-	Trace     types.Bool    `tfsdk:"trace"`
+	Subaccount types.Int64   `tfsdk:"subaccount"`
+	Endpoint   types.String  `tfsdk:"endpoint"`
+	Token      types.String  `tfsdk:"token"`
+	RateLimit  types.Float64 `tfsdk:"rate_limit"`
+	Trace      types.Bool    `tfsdk:"trace"`
 }
 
 func (p *providerImpl) Metadata(_ context.Context, _ provider.MetadataRequest, rs *provider.MetadataResponse) {
@@ -42,6 +43,10 @@ func (p *providerImpl) Metadata(_ context.Context, _ provider.MetadataRequest, r
 func (p *providerImpl) Schema(_ context.Context, _ provider.SchemaRequest, rs *provider.SchemaResponse) {
 	rs.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"subaccount": schema.Int64Attribute{
+				Optional:    true,
+				Description: "Subaccount ID to use for API calls",
+			},
 			"endpoint": schema.StringAttribute{
 				Optional: true,
 			},
@@ -70,6 +75,14 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 		rs.Diagnostics.Append(diags...)
 		return
 	}
+	if cfg.Subaccount.IsNull() && os.Getenv("UPTIME_SUBACCOUNT") != "" {
+		subaccount, err := strconv.ParseInt(os.Getenv("UPTIME_SUBACCOUNT"), 10, 64)
+		if err != nil {
+			rs.Diagnostics.AddError("Failed to parse UPTIME_SUBACCOUNT", err.Error())
+			return
+		}
+		cfg.Subaccount = types.Int64Value(subaccount)
+	}
 	if cfg.Endpoint.IsNull() {
 		cfg.Endpoint = types.StringValue(os.Getenv("UPTIME_ENDPOINT"))
 	}
@@ -89,6 +102,7 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 		cfg.RateLimit = types.Float64Value(rateLimit)
 	}
 	opts := []upapi.Option{
+		upapi.WithSubaccount(cfg.Subaccount.ValueInt64()),
 		upapi.WithToken(cfg.Token.ValueString()),
 		upapi.WithUserAgent(p.UserAgentString()),
 		upapi.WithRateLimit(cfg.RateLimit.ValueFloat64()),
