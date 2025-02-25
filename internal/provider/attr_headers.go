@@ -20,6 +20,9 @@ import (
 
 func HeadersSchemaAttribute() schema.Attribute {
 	return schema.MapAttribute{
+		Description: `A map of HTTP headers where each header name maps to a list of values. 
+Header names are case-insensitive. Multiple values for the same header are supported 
+(e.g., { 'Accept': ['application/json', 'text/plain'] }). Defaults to an empty map if not specified.`,
 		ElementType: types.ListType{
 			ElemType: types.StringType,
 		},

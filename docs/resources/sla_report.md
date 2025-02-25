@@ -29,7 +29,11 @@ description: |-
 - `reporting_groups` (Attributes Set) (see [below for nested schema](#nestedatt--reporting_groups))
 - `response_time_section_sort` (String)
 - `services_selected` (Attributes Set) (see [below for nested schema](#nestedatt--services_selected))
-- `services_tags` (Set of String)
+- `services_tags` (Set of String) List of tags to organize and filter monitoring checks. 
+Each account can have up to 3,000 unique tags, with a 100-character limit per tag. 
+Tags help categorize resources for filtering in Dashboards, Public Status Pages, and SLA Reports. 
+Common use cases include tagging by team ('dev-team', 'ops'), environment ('production', 'staging'), 
+or purpose ('api', 'customer-facing'). Defaults to an empty list if not specified.
 - `show_response_time_section` (Boolean)
 - `show_response_time_sla` (Boolean)
 - `show_uptime_section` (Boolean)

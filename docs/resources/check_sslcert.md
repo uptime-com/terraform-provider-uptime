@@ -17,18 +17,26 @@ Verify SSL certificate validity
 
 ### Required
 
-- `address` (String)
+- `address` (String) A valid DNS hostname (e.g., 'example.com', 'sub.example.com'). 
+Must start and end with alphanumeric characters, can contain hyphens but not at the start or end, 
+and must have at least one dot separator between valid DNS labels.
 - `name` (String)
 
 ### Optional
 
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
-- `contact_groups` (Set of String)
+- `contact_groups` (Set of String) List of contact group names to receive notifications. 
+Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations) 
+that will be notified when alerts are triggered. Defaults to ['Default'] if not specified.
 - `is_paused` (Boolean)
 - `notes` (String)
 - `num_retries` (Number) How many times the check should be retried before a location is considered down
 - `port` (Number) The port to check
-- `tags` (Set of String)
+- `tags` (Set of String) List of tags to organize and filter monitoring checks. 
+Each account can have up to 3,000 unique tags, with a 100-character limit per tag. 
+Tags help categorize resources for filtering in Dashboards, Public Status Pages, and SLA Reports. 
+Common use cases include tagging by team ('dev-team', 'ops'), environment ('production', 'staging'), 
+or purpose ('api', 'customer-facing'). Defaults to an empty list if not specified.
 - `threshold` (Number) Raise an alert if there are less than this many days before the SSL certificate needs to be renewed
 
 ### Read-Only

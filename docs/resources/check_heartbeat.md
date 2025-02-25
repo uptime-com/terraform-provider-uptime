@@ -21,13 +21,19 @@ Monitor a periodic process, such as Cron, and issue alerts if the expected inter
 
 ### Optional
 
-- `contact_groups` (Set of String)
+- `contact_groups` (Set of String) List of contact group names to receive notifications. 
+Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations) 
+that will be notified when alerts are triggered. Defaults to ['Default'] if not specified.
 - `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
 - `interval` (Number) The interval between checks in minutes
 - `is_paused` (Boolean)
 - `notes` (String)
 - `sla` (Attributes) SLA related attributes (see [below for nested schema](#nestedatt--sla))
-- `tags` (Set of String)
+- `tags` (Set of String) List of tags to organize and filter monitoring checks. 
+Each account can have up to 3,000 unique tags, with a 100-character limit per tag. 
+Tags help categorize resources for filtering in Dashboards, Public Status Pages, and SLA Reports. 
+Common use cases include tagging by team ('dev-team', 'ops'), environment ('production', 'staging'), 
+or purpose ('api', 'customer-facing'). Defaults to an empty list if not specified.
 
 ### Read-Only
 
