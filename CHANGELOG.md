@@ -1,5 +1,9 @@
 # Uptime.com Terraform provider changelog
 
+## v2.11.1
+
+- Update Uptime Go client version
+
 ## v2.11.0
 
 - Add subaccount ID handling in provider configuration
