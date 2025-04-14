@@ -167,6 +167,8 @@ github.com/uptime-com/uptime-client-go/v2 v2.0.0-20250221105410-2aefcbabd43b h1:
 github.com/uptime-com/uptime-client-go/v2 v2.0.0-20250221105410-2aefcbabd43b/go.mod h1:jtWeB/tQ00fLX2r9OwKfTnxQ/PMR0YjmhTuc9RZH2h0=
 github.com/uptime-com/uptime-client-go/v2 v2.0.0-20250224092123-a5a0508f4e0d h1:Af+o5a7EBWaxIaUofgwfnH8W2y6JCQl9SWeSQTnPtPk=
 github.com/uptime-com/uptime-client-go/v2 v2.0.0-20250224092123-a5a0508f4e0d/go.mod h1:jtWeB/tQ00fLX2r9OwKfTnxQ/PMR0YjmhTuc9RZH2h0=
+github.com/uptime-com/uptime-client-go/v2 v2.0.0-20250414100609-839d2ed25611 h1:a7YPCnBLLLAxfcNQSvkqJgoOnu5THkCDDU+/co/Ip34=
+github.com/uptime-com/uptime-client-go/v2 v2.0.0-20250414100609-839d2ed25611/go.mod h1:jtWeB/tQ00fLX2r9OwKfTnxQ/PMR0YjmhTuc9RZH2h0=
 github.com/vmihailenco/msgpack v3.3.3+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=
 github.com/vmihailenco/msgpack v4.0.4+incompatible h1:dSLoQfGFAo3F6OoNhwUmLwVgaUXK79GlxNBwueZn0xI=
 github.com/vmihailenco/msgpack v4.0.4+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=

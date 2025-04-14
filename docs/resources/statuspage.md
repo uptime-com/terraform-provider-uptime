@@ -46,6 +46,7 @@ description: |-
 - `email_reply_to` (String)
 - `google_analytics_code` (String)
 - `hide_empty_tabs_history` (Boolean)
+- `max_visible_component_days` (Number) Defines the widest range of time users can select or view on the date picker on the check drill-down, by default all data is available when no value is provided.
 - `page_type` (String)
 - `show_active_incidents` (Boolean)
 - `show_component_history` (Boolean)
