@@ -85,6 +85,14 @@ func NewStatusPageResource(_ context.Context, p *providerImpl) resource.Resource
 						Computed:  true,
 						Default:   stringdefault.StaticString(""),
 					},
+					"max_visible_component_days": schema.Int64Attribute{
+						Description: ("Defines the widest range of time users can select or view " +
+							"on the date picker on the check drill-down, by default all data is available " +
+							"when no value is provided."),
+						Optional: true,
+						Computed: true,
+						Default:  int64default.StaticInt64(0),
+					},
 					"show_status_tab": schema.BoolAttribute{
 						Optional: true,
 						Computed: true,
@@ -250,6 +258,7 @@ type StatusPageResourceModel struct {
 	AllowDrillDown            types.Bool   `tfsdk:"allow_drill_down"`
 	AuthUsername              types.String `tfsdk:"auth_username"`
 	AuthPassword              types.String `tfsdk:"auth_password"`
+	MaxVisibleComponentDays   types.Int64  `tfsdk:"max_visible_component_days"`
 	ShowStatusTab             types.Bool   `tfsdk:"show_status_tab"`
 	ShowActiveIncidents       types.Bool   `tfsdk:"show_active_incidents"`
 	ShowComponentResponseTime types.Bool   `tfsdk:"show_component_response_time"`
@@ -309,6 +318,7 @@ func (c StatusPageResourceModelAdapter) ToAPIArgument(model StatusPageResourceMo
 		AllowDrillDown:            model.AllowDrillDown.ValueBool(),
 		AuthUsername:              model.AuthUsername.ValueString(),
 		AuthPassword:              model.AuthPassword.ValueString(),
+		MaxVisibleComponentDays:   model.MaxVisibleComponentDays.ValueInt64(),
 		ShowStatusTab:             model.ShowStatusTab.ValueBool(),
 		ShowActiveIncidents:       model.ShowActiveIncidents.ValueBool(),
 		ShowComponentResponseTime: model.ShowComponentResponseTime.ValueBool(),
@@ -357,6 +367,7 @@ func (c StatusPageResourceModelAdapter) FromAPIResult(api upapi.StatusPage) (*St
 		AllowDrillDown:            types.BoolValue(api.AllowDrillDown),
 		AuthUsername:              types.StringValue(api.AuthUsername),
 		AuthPassword:              types.StringValue(api.AuthPassword),
+		MaxVisibleComponentDays:   types.Int64Value(api.MaxVisibleComponentDays),
 		ShowStatusTab:             types.BoolValue(api.ShowStatusTab),
 		ShowActiveIncidents:       types.BoolValue(api.ShowActiveIncidents),
 		ShowComponentResponseTime: types.BoolValue(api.ShowComponentResponseTime),

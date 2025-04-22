@@ -64,6 +64,10 @@ func NewStatusPageIncidentResource(_ context.Context, p *providerImpl) resource.
 										OneOfStringValidator([]string{"investigating", "identified", "monitoring", "resolved", "notification", "maintenance"}),
 									},
 								},
+								"updated_at": schema.StringAttribute{
+									Required:   true,
+									CustomType: timetypes.RFC3339Type{},
+								},
 							},
 						},
 					},
@@ -198,10 +202,14 @@ func (a StatusPageIncidentResourceModelAdapter) ToAPIArgument(
 	if len(model.updates) != 0 {
 		updates := make([]upapi.IncidentUpdate, 0)
 		for _, v := range model.updates {
-			updates = append(updates, upapi.IncidentUpdate{
+			incidentUpdate := upapi.IncidentUpdate{
 				Description:   v.Description.ValueString(),
 				IncidentState: v.IncidentState.ValueString(),
-			})
+			}
+			if !v.UpdatedAt.IsNull() && !v.UpdatedAt.IsUnknown() {
+				incidentUpdate.UpdatedAt = v.UpdatedAt.ValueString()
+			}
+			updates = append(updates, incidentUpdate)
 		}
 		api.Updates = updates
 	}
@@ -255,11 +263,19 @@ func (a StatusPageIncidentResourceModelAdapter) FromAPIResult(
 
 	updates := []StatusPageIncidentUpdateAttribute{}
 	for _, item := range api.Updates {
-		updates = append(updates, StatusPageIncidentUpdateAttribute{
+		update := StatusPageIncidentUpdateAttribute{
 			ID:            types.Int64Value(item.PK),
 			Description:   types.StringValue(item.Description),
 			IncidentState: types.StringValue(item.IncidentState),
-		})
+		}
+		var d diag.Diagnostics
+		if item.UpdatedAt != "" {
+			update.UpdatedAt, d = timetypes.NewRFC3339PointerValue(&item.UpdatedAt)
+			if d.HasError() {
+				return nil, fmt.Errorf("error parsing UpdateAt: %v", d)
+			}
+		}
+		updates = append(updates, update)
 	}
 
 	var diags diag.Diagnostics
@@ -313,6 +329,7 @@ func (a StatusPageIncidentResourceModelAdapter) updatesAttributeTypes() map[stri
 		"id":             types.Int64Type,
 		"description":    types.StringType,
 		"incident_state": types.StringType,
+		"updated_at":     timetypes.RFC3339Type{},
 	}
 }
 
@@ -325,6 +342,7 @@ func (a StatusPageIncidentResourceModelAdapter) updatesAttributeValues(
 			"id":             model[i].ID,
 			"description":    model[i].Description,
 			"incident_state": model[i].IncidentState,
+			"updated_at":     model[i].UpdatedAt,
 		})
 		if diags.HasError() {
 			return
@@ -393,6 +411,12 @@ func (a StatusPageIncidentResourceAPI) Create(ctx context.Context, arg StatusPag
 		return nil, err
 	}
 
+	for i, req := range arg.StatusPageIncident.Updates {
+		if i < len(obj.Updates) && req.UpdatedAt != "" {
+			obj.Updates[i].UpdatedAt = req.UpdatedAt
+		}
+	}
+
 	return &StatusPageIncidentWrapper{StatusPageIncident: *obj, StatusPageID: arg.StatusPageID}, nil
 }
 
@@ -433,9 +457,10 @@ func (a StatusPageIncidentResourceAPI) Delete(ctx context.Context, arg upapi.Pri
 }
 
 type StatusPageIncidentUpdateAttribute struct {
-	ID            types.Int64  `tfsdk:"id"`
-	Description   types.String `tfsdk:"description"`
-	IncidentState types.String `tfsdk:"incident_state"`
+	ID            types.Int64       `tfsdk:"id"`
+	Description   types.String      `tfsdk:"description"`
+	IncidentState types.String      `tfsdk:"incident_state"`
+	UpdatedAt     timetypes.RFC3339 `tfsdk:"updated_at"`
 }
 
 type StatusPageIncidentAffectedComponentAttribute struct {
