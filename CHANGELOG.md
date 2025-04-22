@@ -1,5 +1,12 @@
 # Uptime.com Terraform provider changelog
 
+## v2.11.2
+
+- Add `updated_at` to status page incident resource
+- Add `max_visible_component_days` to status page component
+- Upgrade Go version to 1.24
+- Upgrade dependencies
+
 ## v2.11.1
 
 - Update Uptime Go client version
