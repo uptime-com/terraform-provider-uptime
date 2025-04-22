@@ -1,8 +1,6 @@
 module github.com/uptime-com/terraform-provider-uptime
 
-go 1.22.0
-
-toolchain go1.23.1
+go 1.24
 
 require (
 	github.com/dustinkirkland/golang-petname v0.0.0-20230927204539-348648eed816
@@ -17,7 +15,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/shopspring/decimal v1.4.0
 	github.com/stretchr/testify v1.10.0
-	github.com/uptime-com/uptime-client-go/v2 v2.0.0-20250224092123-a5a0508f4e0d
+	github.com/uptime-com/uptime-client-go/v2 v2.0.0-20250422131219-888f91b5b6c3
 )
 
 require (

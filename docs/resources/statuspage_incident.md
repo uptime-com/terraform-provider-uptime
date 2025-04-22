@@ -40,6 +40,10 @@ Status page incident or maintenance window resource
 <a id="nestedatt--updates"></a>
 ### Nested Schema for `updates`
 
+Required:
+
+- `updated_at` (String)
+
 Optional:
 
 - `description` (String)

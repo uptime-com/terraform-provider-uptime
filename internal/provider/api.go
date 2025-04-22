@@ -69,7 +69,7 @@ const (
 )
 
 func (r APIResource[M, A, R]) apiOperationError(op string, err error) diag.Diagnostic {
-	return diag.NewErrorDiagnostic(op, fmt.Sprintf(err.Error()))
+	return diag.NewErrorDiagnostic(op, err.Error())
 }
 
 func (r APIResource[M, A, R]) apiConversionError(op string, src, dst any, err error) diag.Diagnostic {

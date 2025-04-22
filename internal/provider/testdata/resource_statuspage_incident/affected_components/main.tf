@@ -19,11 +19,16 @@ variable "incident_component_status" {
 }
 
 variable "starts_at" {
+  type = string
+}
+
+variable "updated_at" {
   type    = string
+  default = null
 }
 
 resource "uptime_check_api" "test" {
-  name          = var.check_name
+  name   = var.check_name
   script = <<SCRIPT
 [
   {
@@ -47,15 +52,20 @@ resource "uptime_statuspage_component" "test" {
 }
 
 resource "uptime_statuspage_incident" "test" {
-  statuspage_id  = uptime_statuspage.test.id
-  name           = var.incident_name
-  incident_type  = "INCIDENT"
-  starts_at      = var.starts_at
-  updates        = [{
+  statuspage_id = uptime_statuspage.test.id
+  name          = var.incident_name
+  incident_type = "INCIDENT"
+  starts_at     = var.starts_at
+  updates = [
+    {
+      updated_at     = var.updated_at
       incident_state = var.incident_state
-  }]
-  affected_components = [{
-    status = var.incident_component_status
-    component_id = uptime_statuspage_component.test.id
-  }]
+    }
+  ]
+  affected_components = [
+    {
+      status       = var.incident_component_status
+      component_id = uptime_statuspage_component.test.id
+    }
+  ]
 }
