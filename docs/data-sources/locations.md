@@ -27,6 +27,9 @@ Read-Only:
 
 - `id` (String)
 - `ip` (String)
+- `ipv4_addresses` (List of String)
+- `ipv6` (String)
+- `ipv6_addresses` (List of String)
 - `location` (String)
 - `name` (String)
 
