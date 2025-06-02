@@ -1,5 +1,10 @@
 # Uptime.com Terraform provider changelog
 
+## v2.11.3
+
+- Fix IPv4 and IPv6 addresses for locations
+- Upgrade dependencies
+
 ## v2.11.2
 
 - Add `updated_at` to status page incident resource
