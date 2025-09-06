@@ -76,4 +76,3 @@ func TestAccCheckRDAPResource_Threshold(t *testing.T) {
 		},
 	}))
 }
-
