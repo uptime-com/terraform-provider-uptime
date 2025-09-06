@@ -1,0 +1,31 @@
+variable "name" {
+  type = string
+}
+
+variable "address" {
+  type    = string
+  default = "example.com"
+}
+
+variable "expect_string" {
+  type    = string
+  default = "example.com"
+}
+
+variable "contact_groups" {
+  type = list(string)
+}
+
+variable "threshold" {
+  type = number
+}
+
+resource "uptime_check_rdap" "test" {
+  name          = var.name
+  address       = var.address
+  expect_string = var.expect_string
+
+  contact_groups = var.contact_groups
+  threshold      = var.threshold
+}
+
