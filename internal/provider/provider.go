@@ -150,6 +150,7 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewCheckTCPResource(ctx, p) },
 		func() resource.Resource { return NewCheckUDPResource(ctx, p) },
 		func() resource.Resource { return NewCheckWHOISResource(ctx, p) },
+		func() resource.Resource { return NewCheckRDAPResource(ctx, p) },
 		func() resource.Resource { return NewCheckWebhookResource(ctx, p) },
 		func() resource.Resource { return NewCheckMaintenanceResource(ctx, p) },
 
