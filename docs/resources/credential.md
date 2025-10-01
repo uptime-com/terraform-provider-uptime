@@ -28,7 +28,11 @@ description: |-
 
 ### Read-Only
 
+- `created_by` (Number)
+- `hint` (String)
 - `id` (Number) The ID of this resource.
+- `used_secret_properties` (List of String)
+- `version` (String)
 
 <a id="nestedatt--secret"></a>
 ### Nested Schema for `secret`
@@ -40,5 +44,3 @@ Optional:
 - `passphrase` (String, Sensitive)
 - `password` (String, Sensitive)
 - `secret` (String, Sensitive)
-
-

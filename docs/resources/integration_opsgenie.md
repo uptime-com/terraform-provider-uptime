@@ -34,5 +34,3 @@ that will be notified when alerts are triggered. Defaults to ['Default'] if not 
 
 - `id` (Number) The ID of this resource.
 - `url` (String)
-
-

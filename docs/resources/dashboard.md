@@ -116,5 +116,3 @@ Optional:
 
 - `for_all_checks` (Boolean) Whether to show block for all checks
 - `show_section` (Boolean) Whether to show the section
-
-

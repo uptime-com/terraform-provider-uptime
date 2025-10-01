@@ -28,5 +28,3 @@ Must be lowercase and include the # symbol followed by exactly 6 hexadecimal cha
 
 - `id` (Number) The ID of this resource.
 - `url` (String)
-
-

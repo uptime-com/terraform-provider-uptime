@@ -39,5 +39,3 @@ or purpose ('api', 'customer-facing'). Defaults to an empty list if not specifie
 - `id` (Number) The ID of this resource.
 - `locations` (Set of String)
 - `url` (String)
-
-
