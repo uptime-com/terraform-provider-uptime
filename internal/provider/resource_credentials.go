@@ -37,9 +37,22 @@ func NewCredentialResource(_ context.Context, p *providerImpl) resource.Resource
 							OneOfStringValidator([]string{"BASIC", "CERTIFICATE", "TOKEN"}),
 						},
 					},
+					"hint": schema.StringAttribute{
+						Computed: true,
+					},
 					"username": schema.StringAttribute{
 						Computed: true,
 						Optional: true,
+					},
+					"version": schema.StringAttribute{
+						Computed: true,
+					},
+					"used_secret_properties": schema.ListAttribute{
+						Computed:    true,
+						ElementType: types.StringType,
+					},
+					"created_by": schema.Int64Attribute{
+						Computed: true,
 					},
 					"secret": schema.SingleNestedAttribute{
 						Required: true,
@@ -81,12 +94,16 @@ func NewCredentialResource(_ context.Context, p *providerImpl) resource.Resource
 }
 
 type CredentialResourceModel struct {
-	ID             types.Int64  `tfsdk:"id"  ref:"PK,opt"`
-	DisplayName    types.String `tfsdk:"display_name"`
-	Description    types.String `tfsdk:"description"`
-	CredentialType types.String `tfsdk:"credential_type"`
-	Username       types.String `tfsdk:"username"`
-	Secret         types.Object `tfsdk:"secret"`
+	ID                   types.Int64  `tfsdk:"id"  ref:"PK,opt"`
+	DisplayName          types.String `tfsdk:"display_name"`
+	Description          types.String `tfsdk:"description"`
+	CredentialType       types.String `tfsdk:"credential_type"`
+	Hint                 types.String `tfsdk:"hint"`
+	Username             types.String `tfsdk:"username"`
+	Version              types.String `tfsdk:"version"`
+	UsedSecretProperties types.List   `tfsdk:"used_secret_properties"`
+	CreatedBy            types.Int64  `tfsdk:"created_by"`
+	Secret               types.Object `tfsdk:"secret"`
 
 	secret *CredentialSecretAttribute
 }
@@ -127,7 +144,10 @@ func (a CredentialResourceModelAdapter) ToAPIArgument(model CredentialResourceMo
 		DisplayName:    model.DisplayName.ValueString(),
 		Description:    model.Description.ValueString(),
 		CredentialType: model.CredentialType.ValueString(),
+		Hint:           model.Hint.ValueString(),
 		Username:       model.Username.ValueString(),
+		Version:        model.Version.ValueString(),
+		CreatedBy:      model.CreatedBy.ValueInt64(),
 		Secret: upapi.CredentialSecret{
 			Certificate: model.secret.Certificate.ValueString(),
 			Key:         model.secret.Key.ValueString(),
@@ -136,16 +156,40 @@ func (a CredentialResourceModelAdapter) ToAPIArgument(model CredentialResourceMo
 			Secret:      model.secret.Secret.ValueString(),
 		},
 	}
+
+	// Handle UsedSecretProperties list
+	if !model.UsedSecretProperties.IsNull() && !model.UsedSecretProperties.IsUnknown() {
+		var props []string
+		model.UsedSecretProperties.ElementsAs(context.Background(), &props, false)
+		api.UsedSecretProperties = props
+	}
+
 	return &api, nil
 }
 
 func (a CredentialResourceModelAdapter) FromAPIResult(api upapi.Credential) (*CredentialResourceModel, error) {
+	// Convert UsedSecretProperties to types.List
+	var usedSecretPropsList types.List
+	if len(api.UsedSecretProperties) > 0 {
+		elements := make([]attr.Value, len(api.UsedSecretProperties))
+		for i, prop := range api.UsedSecretProperties {
+			elements[i] = types.StringValue(prop)
+		}
+		usedSecretPropsList = types.ListValueMust(types.StringType, elements)
+	} else {
+		usedSecretPropsList = types.ListNull(types.StringType)
+	}
+
 	model := CredentialResourceModel{
-		ID:             types.Int64Value(api.PK),
-		DisplayName:    types.StringValue(api.DisplayName),
-		Description:    types.StringValue(api.Description),
-		CredentialType: types.StringValue(api.CredentialType),
-		Username:       types.StringValue(api.Username),
+		ID:                   types.Int64Value(api.PK),
+		DisplayName:          types.StringValue(api.DisplayName),
+		Description:          types.StringValue(api.Description),
+		CredentialType:       types.StringValue(api.CredentialType),
+		Hint:                 types.StringValue(api.Hint),
+		Username:             types.StringValue(api.Username),
+		Version:              types.StringValue(api.Version),
+		UsedSecretProperties: usedSecretPropsList,
+		CreatedBy:            types.Int64Value(api.CreatedBy),
 		Secret: a.SecretAttributeValue(CredentialSecretAttribute{
 			Certificate: types.StringValue(api.Secret.Certificate),
 			Key:         types.StringValue(api.Secret.Key),

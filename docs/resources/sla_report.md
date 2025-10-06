@@ -65,5 +65,3 @@ Optional:
 
 - `id` (Number)
 - `name` (String)
-
-

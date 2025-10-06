@@ -28,5 +28,3 @@ Status page subscriber resource
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
-
-

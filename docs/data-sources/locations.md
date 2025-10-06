@@ -32,5 +32,3 @@ Read-Only:
 - `ipv6_addresses` (List of String)
 - `location` (String)
 - `name` (String)
-
-

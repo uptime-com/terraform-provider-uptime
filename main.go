@@ -1,6 +1,6 @@
 package main
 
-//go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.13.0
+//go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.23.0
 
 import (
 	"context"

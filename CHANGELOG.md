@@ -1,5 +1,11 @@
 # Uptime.com Terraform provider changelog
 
+## v2.13.0
+
+* Add `uptime_credentials` data source
+* Add `uptime_service_variable` resource
+* Upgrade dependencies
+
 ## v2.12.0
 
 * Add `uptime_check_rdap` resource

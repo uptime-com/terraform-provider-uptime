@@ -29,5 +29,3 @@ Status page metric resource
 
 - `id` (Number) The ID of this resource.
 - `url` (String)
-
-

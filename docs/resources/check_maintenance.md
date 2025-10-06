@@ -38,5 +38,3 @@ Optional:
 - `to_time` (String)
 - `type` (String)
 - `weekdays` (Set of Number)
-
-

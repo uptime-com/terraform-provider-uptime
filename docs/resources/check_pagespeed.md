@@ -53,5 +53,3 @@ Optional:
 - `emulated_device` (String)
 - `exclude_urls` (String)
 - `uptime_grade_threshold` (String)
-
-
