@@ -34,5 +34,3 @@ Status page component resource
 
 - `id` (Number) The ID of this resource.
 - `url` (String)
-
-

@@ -59,5 +59,3 @@ Optional:
 - `protocol` (String) Application level protocol
 - `self_signed` (Boolean)
 - `url` (String) Specify location of certificate or CRL file by URL, instead of retrieving from main domain address.
-
-

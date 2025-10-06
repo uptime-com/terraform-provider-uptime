@@ -3,7 +3,7 @@ on:
   push:
 
 concurrency:
-  group:              default
+  group: default
   cancel-in-progress: false
 
 permissions:
@@ -19,13 +19,13 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version-file: go.mod
-          cache:           true
+          cache: true
       - name: Format code
-        run:  go fmt ./...
+        run: go fmt ./...
       - name: Generate docs
-        run:  go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.13
+        run: go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.23
       - name: Check if any files have changed
-        run:  test -z "$(git status --porcelain)" || ( git diff && exit 1 )
+        run: test -z "$(git status --porcelain)" || ( git diff && exit 1 )
 
   test:
     runs-on: ubuntu-22.04
@@ -36,18 +36,18 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version-file: go.mod
-          cache:           true
+          cache: true
       - name: Run unit tests
-        run:  go test -v ./...
+        run: go test -v ./...
       - name: Run acceptance tests
         env:
-          TF_ACC:       'yup'
-          UPTIME_TOKEN: '${{ secrets.UPTIME_TOKEN }}'
-          UPTIME_RATE_LIMIT: '0.15'
-        run:  go test -test.timeout=50m -test.parallel=1 -v ./... -run ^TestAcc[A-Z]
+          TF_ACC: "yup"
+          UPTIME_TOKEN: "${{ secrets.UPTIME_TOKEN }}"
+          UPTIME_RATE_LIMIT: "0.15"
+        run: go test -test.timeout=50m -test.parallel=1 -v ./... -run ^TestAcc[A-Z]
 
   release:
-    if:      startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-22.04
     needs:
       - validate
@@ -61,10 +61,10 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version-file: go.mod
-          cache:           true
+          cache: true
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v5
-        id:   import_gpg
+        id: import_gpg
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
       - name: Run GoReleaser
@@ -74,4 +74,4 @@ jobs:
           version: "~> v2"
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
-          GITHUB_TOKEN:    ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

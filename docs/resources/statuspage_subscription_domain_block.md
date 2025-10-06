@@ -23,5 +23,3 @@ Status page subscription domain block resource
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
-
-

@@ -34,5 +34,3 @@ description: |-
 
 - `id` (Number) The ID of this resource.
 - `url` (String)
-
-

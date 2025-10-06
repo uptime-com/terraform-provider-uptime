@@ -26,5 +26,3 @@ Status page user resource
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
-
-

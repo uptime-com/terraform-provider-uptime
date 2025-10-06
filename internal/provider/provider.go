@@ -125,6 +125,7 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		func() datasource.DataSource { return NewLocationsDataSource(ctx, p) },
+		func() datasource.DataSource { return NewCredentialsDataSource(ctx, p) },
 	}
 }
 
@@ -169,6 +170,7 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewDashboardResource(ctx, p) },
 		func() resource.Resource { return NewTagResource(ctx, p) },
 		func() resource.Resource { return NewScheduledReportResource(ctx, p) },
+		func() resource.Resource { return NewServiceVariableResource(ctx, p) },
 	}
 }
 
