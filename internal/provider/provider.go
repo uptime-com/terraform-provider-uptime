@@ -126,6 +126,12 @@ func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.Data
 	return []func() datasource.DataSource{
 		func() datasource.DataSource { return NewLocationsDataSource(ctx, p) },
 		func() datasource.DataSource { return NewCredentialsDataSource(ctx, p) },
+		func() datasource.DataSource { return NewStatusPageDataSource(ctx, p) },
+		func() datasource.DataSource { return NewStatusPageComponentDataSource(ctx, p) },
+		func() datasource.DataSource { return NewStatusPageIncidentDataSource(ctx, p) },
+		func() datasource.DataSource { return NewStatusPageMetricDataSource(ctx, p) },
+		func() datasource.DataSource { return NewStatusPageSubscriberDataSource(ctx, p) },
+		func() datasource.DataSource { return NewStatusPageUserDataSource(ctx, p) },
 	}
 }
 
