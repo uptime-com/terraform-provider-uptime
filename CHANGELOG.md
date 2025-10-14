@@ -1,5 +1,14 @@
 # Uptime.com Terraform provider changelog
 
+## v2.14.0
+
+* Add `uptime_statuspages` data source
+* Add `uptime_statuspage_components` data source
+* Add `uptime_statuspage_incidents` data source
+* Add `uptime_statuspage_metrics` data source
+* Add `uptime_statuspage_subscribers` data source
+* Add `uptime_statuspage_users` data source
+
 ## v2.13.0
 
 * Add `uptime_credentials` data source
