@@ -1,5 +1,9 @@
 # Uptime.com Terraform provider changelog
 
+## v2.15.0
+
+* Add `uptime_check_escalations` resource
+
 ## v2.14.0
 
 * Add `uptime_statuspages` data source
