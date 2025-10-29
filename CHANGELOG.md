@@ -1,5 +1,10 @@
 # Uptime.com Terraform provider changelog
 
+## v2.16.0
+
+* Add `uptime_user` resource
+* Upgrade dependencies
+
 ## v2.15.0
 
 * Add `uptime_check_escalations` resource
