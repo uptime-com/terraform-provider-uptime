@@ -178,6 +178,7 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewTagResource(ctx, p) },
 		func() resource.Resource { return NewScheduledReportResource(ctx, p) },
 		func() resource.Resource { return NewServiceVariableResource(ctx, p) },
+		func() resource.Resource { return NewUserResource(ctx, p) },
 	}
 }
 
