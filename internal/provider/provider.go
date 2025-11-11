@@ -126,6 +126,7 @@ func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.Data
 	return []func() datasource.DataSource{
 		func() datasource.DataSource { return NewLocationsDataSource(ctx, p) },
 		func() datasource.DataSource { return NewCredentialsDataSource(ctx, p) },
+		func() datasource.DataSource { return NewPushNotificationsDataSource(ctx, p) },
 		func() datasource.DataSource { return NewStatusPageDataSource(ctx, p) },
 		func() datasource.DataSource { return NewStatusPageComponentDataSource(ctx, p) },
 		func() datasource.DataSource { return NewStatusPageIncidentDataSource(ctx, p) },
@@ -163,6 +164,7 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewCheckEscalationsResource(ctx, p) },
 
 		func() resource.Resource { return NewIntegrationOpsgenieResource(ctx, p) },
+		func() resource.Resource { return NewPushNotificationResource(ctx, p) },
 		func() resource.Resource { return NewContactResource(ctx, p) },
 		func() resource.Resource { return NewCredentialResource(ctx, p) },
 		func() resource.Resource { return NewStatusPageResource(ctx, p) },
