@@ -108,3 +108,34 @@ func TestAccCheckSSLCertResource_ContactGroups(t *testing.T) {
 		},
 	}))
 }
+func TestAccCheckSSLCertResource_Config_Resolve(t *testing.T) {
+	name := petname.Generate(3, "-")
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_sslcert/resolve"),
+			ConfigVariables: config.Variables{
+				"name":    config.StringVariable(name),
+				"address": config.StringVariable("example.com"),
+				"resolve": config.StringVariable("example.com:443:93.184.216.34"),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_sslcert.test", "config.resolve", "example.com:443:93.184.216.34"),
+				resource.TestCheckResourceAttr("uptime_check_sslcert.test", "config.ignore_authority_warnings", "true"),
+				resource.TestCheckResourceAttr("uptime_check_sslcert.test", "config.ignore_sct", "false"),
+			),
+		},
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_sslcert/resolve"),
+			ConfigVariables: config.Variables{
+				"name":    config.StringVariable(name),
+				"address": config.StringVariable("example.com"),
+				"resolve": config.StringVariable("example.com:443:203.0.113.1"),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_sslcert.test", "config.resolve", "example.com:443:203.0.113.1"),
+				resource.TestCheckResourceAttr("uptime_check_sslcert.test", "config.ignore_authority_warnings", "true"),
+				resource.TestCheckResourceAttr("uptime_check_sslcert.test", "config.ignore_sct", "false"),
+			),
+		},
+	}))
+}

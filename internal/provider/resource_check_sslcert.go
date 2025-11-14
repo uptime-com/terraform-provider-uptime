@@ -107,6 +107,24 @@ func NewCheckSSLCertResource(_ context.Context, p *providerImpl) resource.Resour
 								Default:     stringdefault.StaticString(""),
 								Description: "Specify location of certificate or CRL file by URL, instead of retrieving from main domain address.",
 							},
+							"resolve": schema.StringAttribute{
+								Optional:    true,
+								Computed:    true,
+								Default:     stringdefault.StaticString(""),
+								Description: "Force host IP address resolution. Format: hostname:port:ip_address (e.g., example.com:443:1.2.3.4)",
+							},
+							"ignore_authority_warnings": schema.BoolAttribute{
+								Optional:    true,
+								Computed:    true,
+								Default:     booldefault.StaticBool(false),
+								Description: "Ignore certificate authority warnings",
+							},
+							"ignore_sct": schema.BoolAttribute{
+								Optional:    true,
+								Computed:    true,
+								Default:     booldefault.StaticBool(false),
+								Description: "Ignore signed certificate timestamp (SCT) validation",
+							},
 						},
 					},
 				},
@@ -138,15 +156,18 @@ func (m CheckSSLCertResourceModel) PrimaryKey() upapi.PrimaryKey {
 }
 
 type CheckSSLCertConfigAttribute struct {
-	Protocol         types.String `tfsdk:"protocol"`
-	CRL              types.Bool   `tfsdk:"crl"`
-	FirstElementOnly types.Bool   `tfsdk:"first_element_only"`
-	Match            types.String `tfsdk:"match"`
-	Issuer           types.String `tfsdk:"issuer"`
-	MinVersion       types.String `tfsdk:"min_version"`
-	Fingerprint      types.String `tfsdk:"fingerprint"`
-	SelfSigned       types.Bool   `tfsdk:"self_signed"`
-	URL              types.String `tfsdk:"url"`
+	Protocol                types.String `tfsdk:"protocol"`
+	CRL                     types.Bool   `tfsdk:"crl"`
+	FirstElementOnly        types.Bool   `tfsdk:"first_element_only"`
+	Match                   types.String `tfsdk:"match"`
+	Issuer                  types.String `tfsdk:"issuer"`
+	MinVersion              types.String `tfsdk:"min_version"`
+	Fingerprint             types.String `tfsdk:"fingerprint"`
+	SelfSigned              types.Bool   `tfsdk:"self_signed"`
+	URL                     types.String `tfsdk:"url"`
+	Resolve                 types.String `tfsdk:"resolve"`
+	IgnoreAuthorityWarnings types.Bool   `tfsdk:"ignore_authority_warnings"`
+	IgnoreSCT               types.Bool   `tfsdk:"ignore_sct"`
 }
 
 type CheckSSLCertResourceModelAdapter struct {
@@ -169,29 +190,35 @@ func (a CheckSSLCertResourceModelAdapter) ConfigAttributeContext(ctx context.Con
 
 func (a CheckSSLCertResourceModelAdapter) configAttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
-		"protocol":           types.StringType,
-		"crl":                types.BoolType,
-		"first_element_only": types.BoolType,
-		"match":              types.StringType,
-		"issuer":             types.StringType,
-		"min_version":        types.StringType,
-		"fingerprint":        types.StringType,
-		"self_signed":        types.BoolType,
-		"url":                types.StringType,
+		"protocol":                  types.StringType,
+		"crl":                       types.BoolType,
+		"first_element_only":        types.BoolType,
+		"match":                     types.StringType,
+		"issuer":                    types.StringType,
+		"min_version":               types.StringType,
+		"fingerprint":               types.StringType,
+		"self_signed":               types.BoolType,
+		"url":                       types.StringType,
+		"resolve":                   types.StringType,
+		"ignore_authority_warnings": types.BoolType,
+		"ignore_sct":                types.BoolType,
 	}
 }
 
 func (a CheckSSLCertResourceModelAdapter) configAttributeValues(model CheckSSLCertConfigAttribute) map[string]attr.Value {
 	return map[string]attr.Value{
-		"protocol":           model.Protocol,
-		"crl":                model.CRL,
-		"first_element_only": model.FirstElementOnly,
-		"match":              model.Match,
-		"issuer":             model.Issuer,
-		"min_version":        model.MinVersion,
-		"fingerprint":        model.Fingerprint,
-		"self_signed":        model.SelfSigned,
-		"url":                model.URL,
+		"protocol":                  model.Protocol,
+		"crl":                       model.CRL,
+		"first_element_only":        model.FirstElementOnly,
+		"match":                     model.Match,
+		"issuer":                    model.Issuer,
+		"min_version":               model.MinVersion,
+		"fingerprint":               model.Fingerprint,
+		"self_signed":               model.SelfSigned,
+		"url":                       model.URL,
+		"resolve":                   model.Resolve,
+		"ignore_authority_warnings": model.IgnoreAuthorityWarnings,
+		"ignore_sct":                model.IgnoreSCT,
 	}
 }
 
@@ -227,15 +254,18 @@ func (a CheckSSLCertResourceModelAdapter) ToAPIArgument(model CheckSSLCertResour
 	}
 	if model.config != nil {
 		api.SSLConfig = upapi.CheckSSLCertConfig{
-			Protocol:         model.config.Protocol.ValueString(),
-			CRL:              model.config.CRL.ValueBool(),
-			FirstElementOnly: model.config.FirstElementOnly.ValueBool(),
-			Match:            model.config.Match.ValueString(),
-			Issuer:           model.config.Issuer.ValueString(),
-			MinVersion:       model.config.MinVersion.ValueString(),
-			Fingerprint:      model.config.Fingerprint.ValueString(),
-			SelfSigned:       model.config.SelfSigned.ValueBool(),
-			URL:              model.config.URL.ValueString(),
+			Protocol:                model.config.Protocol.ValueString(),
+			CRL:                     model.config.CRL.ValueBool(),
+			FirstElementOnly:        model.config.FirstElementOnly.ValueBool(),
+			Match:                   model.config.Match.ValueString(),
+			Issuer:                  model.config.Issuer.ValueString(),
+			MinVersion:              model.config.MinVersion.ValueString(),
+			Fingerprint:             model.config.Fingerprint.ValueString(),
+			SelfSigned:              model.config.SelfSigned.ValueBool(),
+			URL:                     model.config.URL.ValueString(),
+			Resolve:                 model.config.Resolve.ValueString(),
+			IgnoreAuthorityWarnings: model.config.IgnoreAuthorityWarnings.ValueBool(),
+			IgnoreSCT:               model.config.IgnoreSCT.ValueBool(),
 		}
 	}
 	return &api, nil
@@ -256,15 +286,18 @@ func (a CheckSSLCertResourceModelAdapter) FromAPIResult(api upapi.Check) (*Check
 		NumRetries:    types.Int64Value(api.NumRetries),
 		Notes:         types.StringValue(api.Notes),
 		Config: a.ConfigAttributeValue(CheckSSLCertConfigAttribute{
-			Protocol:         types.StringValue(api.SSLConfig.Protocol),
-			CRL:              types.BoolValue(api.SSLConfig.CRL),
-			FirstElementOnly: types.BoolValue(api.SSLConfig.FirstElementOnly),
-			Match:            types.StringValue(api.SSLConfig.Match),
-			Issuer:           types.StringValue(api.SSLConfig.Issuer),
-			MinVersion:       types.StringValue(api.SSLConfig.MinVersion),
-			Fingerprint:      types.StringValue(api.SSLConfig.Fingerprint),
-			SelfSigned:       types.BoolValue(api.SSLConfig.SelfSigned),
-			URL:              types.StringValue(api.SSLConfig.URL),
+			Protocol:                types.StringValue(api.SSLConfig.Protocol),
+			CRL:                     types.BoolValue(api.SSLConfig.CRL),
+			FirstElementOnly:        types.BoolValue(api.SSLConfig.FirstElementOnly),
+			Match:                   types.StringValue(api.SSLConfig.Match),
+			Issuer:                  types.StringValue(api.SSLConfig.Issuer),
+			MinVersion:              types.StringValue(api.SSLConfig.MinVersion),
+			Fingerprint:             types.StringValue(api.SSLConfig.Fingerprint),
+			SelfSigned:              types.BoolValue(api.SSLConfig.SelfSigned),
+			URL:                     types.StringValue(api.SSLConfig.URL),
+			Resolve:                 types.StringValue(api.SSLConfig.Resolve),
+			IgnoreAuthorityWarnings: types.BoolValue(api.SSLConfig.IgnoreAuthorityWarnings),
+			IgnoreSCT:               types.BoolValue(api.SSLConfig.IgnoreSCT),
 		}),
 	}
 	return &model, nil
