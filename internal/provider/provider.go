@@ -126,10 +126,20 @@ func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.Data
 	return []func() datasource.DataSource{
 		func() datasource.DataSource { return NewLocationsDataSource(ctx, p) },
 		func() datasource.DataSource { return NewCredentialsDataSource(ctx, p) },
+		func() datasource.DataSource { return NewContactsDataSource(ctx, p) },
+		func() datasource.DataSource { return NewUsersDataSource(ctx, p) },
+		func() datasource.DataSource { return NewDashboardsDataSource(ctx, p) },
+		func() datasource.DataSource { return NewScheduledReportsDataSource(ctx, p) },
+		func() datasource.DataSource { return NewSLAReportsDataSource(ctx, p) },
+		func() datasource.DataSource { return NewAlertsDataSource(ctx, p) },
+		func() datasource.DataSource { return NewOutagesDataSource(ctx, p) },
+		func() datasource.DataSource { return NewPushNotificationProfilesDataSource(ctx, p) },
 		func() datasource.DataSource { return NewStatusPageDataSource(ctx, p) },
 		func() datasource.DataSource { return NewStatusPageComponentDataSource(ctx, p) },
+		func() datasource.DataSource { return NewStatusPageCurrentStatusDataSource(ctx, p) },
 		func() datasource.DataSource { return NewStatusPageIncidentDataSource(ctx, p) },
 		func() datasource.DataSource { return NewStatusPageMetricDataSource(ctx, p) },
+		func() datasource.DataSource { return NewStatusPageStatusHistoryDataSource(ctx, p) },
 		func() datasource.DataSource { return NewStatusPageSubscriberDataSource(ctx, p) },
 		func() datasource.DataSource { return NewStatusPageUserDataSource(ctx, p) },
 	}
@@ -179,6 +189,7 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewScheduledReportResource(ctx, p) },
 		func() resource.Resource { return NewServiceVariableResource(ctx, p) },
 		func() resource.Resource { return NewUserResource(ctx, p) },
+		func() resource.Resource { return NewSubaccountResource(ctx, p) },
 	}
 }
 
