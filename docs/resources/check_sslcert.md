@@ -53,9 +53,12 @@ Optional:
 - `crl` (Boolean)
 - `fingerprint` (String)
 - `first_element_only` (Boolean)
+- `ignore_authority_warnings` (Boolean) Ignore certificate authority warnings
+- `ignore_sct` (Boolean) Ignore signed certificate timestamp (SCT) validation
 - `issuer` (String)
 - `match` (String)
 - `min_version` (String)
 - `protocol` (String) Application level protocol
+- `resolve` (String) Force host IP address resolution. Format: hostname:port:ip_address (e.g., example.com:443:1.2.3.4)
 - `self_signed` (Boolean)
 - `url` (String) Specify location of certificate or CRL file by URL, instead of retrieving from main domain address.

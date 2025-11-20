@@ -3,6 +3,7 @@ package provider
 import (
 	"regexp"
 	"testing"
+	"time"
 
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/hashicorp/terraform-plugin-testing/config"
@@ -103,18 +104,22 @@ func TestAccCheckMaintenanceResource_Monthly(t *testing.T) {
 
 func TestAccCheckMaintenanceResource_Once(t *testing.T) {
 	name := petname.Generate(3, "-")
+	// Generate future dates to avoid issues with past maintenance windows
+	startDate := time.Now().UTC().Add(24 * time.Hour).Format(time.RFC3339)
+	endDate := time.Now().UTC().Add(72 * time.Hour).Format(time.RFC3339)
+
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
 			ConfigVariables: config.Variables{
 				"name":            config.StringVariable(name),
-				"once_start_date": config.StringVariable("2024-10-23T13:01:03Z"),
-				"once_end_date":   config.StringVariable("2024-10-25T14:59:59Z"),
+				"once_start_date": config.StringVariable(startDate),
+				"once_end_date":   config.StringVariable(endDate),
 			},
 			ConfigDirectory: config.StaticDirectory("testdata/resource_check_maintenance/once"),
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "schedule.#", "1"),
-				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "schedule.0.once_start_date", "2024-10-23T13:01:03Z"),
-				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "schedule.0.once_end_date", "2024-10-25T14:59:59Z"),
+				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "schedule.0.once_start_date", startDate),
+				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "schedule.0.once_end_date", endDate),
 			),
 		},
 	}))
@@ -122,6 +127,10 @@ func TestAccCheckMaintenanceResource_Once(t *testing.T) {
 
 func TestAccCheckMaintenanceResource_All(t *testing.T) {
 	name := petname.Generate(3, "-")
+	// Generate future dates to avoid issues with past maintenance windows
+	startDate := time.Now().UTC().Add(24 * time.Hour).Format(time.RFC3339)
+	endDate := time.Now().UTC().Add(72 * time.Hour).Format(time.RFC3339)
+
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
 			ConfigVariables: config.Variables{
@@ -134,8 +143,8 @@ func TestAccCheckMaintenanceResource_All(t *testing.T) {
 				"monthday":          config.IntegerVariable(0),
 				"monthday_from":     config.IntegerVariable(19),
 				"monthday_to":       config.IntegerVariable(23),
-				"once_start_date":   config.StringVariable("2024-10-23T13:01:03Z"),
-				"once_end_date":     config.StringVariable("2024-10-25T14:59:59Z"),
+				"once_start_date":   config.StringVariable(startDate),
+				"once_end_date":     config.StringVariable(endDate),
 			},
 			ConfigDirectory: config.StaticDirectory("testdata/resource_check_maintenance/all"),
 			Check: resource.ComposeAggregateTestCheckFunc(
@@ -152,8 +161,8 @@ func TestAccCheckMaintenanceResource_All(t *testing.T) {
 				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "schedule.1.monthday_from", "19"),
 				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "schedule.1.monthday_to", "23"),
 				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "schedule.2.type", "ONCE"),
-				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "schedule.2.once_start_date", "2024-10-23T13:01:03Z"),
-				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "schedule.2.once_end_date", "2024-10-25T14:59:59Z"),
+				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "schedule.2.once_start_date", startDate),
+				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "schedule.2.once_end_date", endDate),
 			),
 		},
 	}))
