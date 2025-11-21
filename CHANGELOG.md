@@ -1,5 +1,29 @@
 # Uptime.com Terraform provider changelog
 
+## v2.17.0
+
+New Data Sources:
+* uptime_alerts - Query monitoring alerts and incidents
+* uptime_contacts - Query notification recipients
+* uptime_dashboards - Query custom monitoring dashboards
+* uptime_outages - Query historical downtime events
+* uptime_push_notification_profiles - Query mobile device registrations
+* uptime_scheduled_reports - Query automated SLA report delivery
+* uptime_sla_reports - Query service level agreement tracking
+* uptime_statuspage_current_status - Query current status page state
+* uptime_statuspage_status_history - Query status page historical data
+* uptime_users - Query account team members
+
+New Resource:
+* uptime_subaccount - Manage subaccounts
+
+Resource Enhancements:
+* uptime_check_sslcert: Added 3 new fields (resolve, ignore_authority_warnings, ignore_sct)
+
+Dependency Updates:
+* uptime-client-go/v2: v2.2.1 → v2.4.1
+* Various golang.org/x dependencies updated
+
 ## v2.16.0
 
 * Add `uptime_user` resource
