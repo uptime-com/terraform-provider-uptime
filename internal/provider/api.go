@@ -31,6 +31,12 @@ type APIModeler[M APIModel, A, R any] interface {
 	FromAPIResult(R) (*M, error)
 }
 
+// PlanValuePreserver is an optional interface that APIModelers can implement
+// to preserve plan values for fields that the API does not return.
+type PlanValuePreserver[M APIModel] interface {
+	PreservePlanValues(result *M, plan *M) *M
+}
+
 type APIResourceMetadata struct {
 	schema.Schema
 	TypeNameSuffix   string
@@ -79,15 +85,15 @@ func (r APIResource[M, A, R]) apiConversionError(op string, src, dst any, err er
 }
 
 func (r APIResource[M, A, R]) Create(ctx context.Context, rq resource.CreateRequest, rs *resource.CreateResponse) {
-	model, diags := r.mod.Get(ctx, rq.Plan)
+	planModel, diags := r.mod.Get(ctx, rq.Plan)
 	rs.Diagnostics.Append(diags...)
 	if rs.Diagnostics.HasError() {
 		return
 	}
 
-	arg, err := r.mod.ToAPIArgument(*model)
+	arg, err := r.mod.ToAPIArgument(*planModel)
 	if err != nil {
-		rs.Diagnostics.Append(r.apiConversionError(toAPIArgumentError, model, arg, err))
+		rs.Diagnostics.Append(r.apiConversionError(toAPIArgumentError, planModel, arg, err))
 		return
 	}
 
@@ -97,13 +103,19 @@ func (r APIResource[M, A, R]) Create(ctx context.Context, rq resource.CreateRequ
 		return
 	}
 
-	model, err = r.mod.FromAPIResult(*res)
+	resultModel, err := r.mod.FromAPIResult(*res)
 	if err != nil {
-		rs.Diagnostics.Append(r.apiConversionError(fromAPIResultError, res, model, err))
+		rs.Diagnostics.Append(r.apiConversionError(fromAPIResultError, res, resultModel, err))
 		return
 	}
 
-	diags = rs.State.Set(ctx, model)
+	// If the modeler implements PlanValuePreserver, use it to preserve plan values
+	// for fields that the API doesn't return (like sensitive fields)
+	if preserver, ok := any(r.mod).(PlanValuePreserver[M]); ok {
+		resultModel = preserver.PreservePlanValues(resultModel, planModel)
+	}
+
+	diags = rs.State.Set(ctx, resultModel)
 	rs.Diagnostics.Append(diags...)
 	if rs.Diagnostics.HasError() {
 		return
@@ -112,25 +124,30 @@ func (r APIResource[M, A, R]) Create(ctx context.Context, rq resource.CreateRequ
 }
 
 func (r APIResource[M, A, R]) Read(ctx context.Context, rq resource.ReadRequest, rs *resource.ReadResponse) {
-	model, diags := r.mod.Get(ctx, rq.State)
+	stateModel, diags := r.mod.Get(ctx, rq.State)
 	rs.Diagnostics.Append(diags...)
 	if rs.Diagnostics.HasError() {
 		return
 	}
 
-	res, err := r.api.Read(ctx, *model)
+	res, err := r.api.Read(ctx, *stateModel)
 	if err != nil {
 		rs.Diagnostics.Append(r.apiOperationError(apiOperationRead, err))
 		return
 	}
 
-	model, err = r.mod.FromAPIResult(*res)
+	resultModel, err := r.mod.FromAPIResult(*res)
 	if err != nil {
-		rs.Diagnostics.Append(r.apiConversionError(fromAPIResultError, res, model, err))
+		rs.Diagnostics.Append(r.apiConversionError(fromAPIResultError, res, resultModel, err))
 		return
 	}
 
-	diags = rs.State.Set(ctx, model)
+	// Preserve state values for fields that the API doesn't return
+	if preserver, ok := any(r.mod).(PlanValuePreserver[M]); ok {
+		resultModel = preserver.PreservePlanValues(resultModel, stateModel)
+	}
+
+	diags = rs.State.Set(ctx, resultModel)
 	if rs.Diagnostics.HasError() {
 		return
 	}
@@ -144,15 +161,15 @@ func (r APIResource[M, A, R]) Update(ctx context.Context, rq resource.UpdateRequ
 		return
 	}
 
-	plan, diags := r.mod.Get(ctx, rq.Plan)
+	planModel, diags := r.mod.Get(ctx, rq.Plan)
 	rs.Diagnostics.Append(diags...)
 	if rs.Diagnostics.HasError() {
 		return
 	}
 
-	arg, err := r.mod.ToAPIArgument(*plan)
+	arg, err := r.mod.ToAPIArgument(*planModel)
 	if err != nil {
-		rs.Diagnostics.Append(r.apiConversionError(toAPIArgumentError, plan, arg, err))
+		rs.Diagnostics.Append(r.apiConversionError(toAPIArgumentError, planModel, arg, err))
 		return
 	}
 
@@ -162,13 +179,18 @@ func (r APIResource[M, A, R]) Update(ctx context.Context, rq resource.UpdateRequ
 		return
 	}
 
-	state, err = r.mod.FromAPIResult(*res)
+	resultModel, err := r.mod.FromAPIResult(*res)
 	if err != nil {
-		rs.Diagnostics.Append(r.apiConversionError(fromAPIResultError, res, state, err))
+		rs.Diagnostics.Append(r.apiConversionError(fromAPIResultError, res, resultModel, err))
 		return
 	}
 
-	diags = rs.State.Set(ctx, state)
+	// Preserve plan values for fields that the API doesn't return
+	if preserver, ok := any(r.mod).(PlanValuePreserver[M]); ok {
+		resultModel = preserver.PreservePlanValues(resultModel, planModel)
+	}
+
+	diags = rs.State.Set(ctx, resultModel)
 	rs.Diagnostics.Append(diags...)
 	if rs.Diagnostics.HasError() {
 		return
