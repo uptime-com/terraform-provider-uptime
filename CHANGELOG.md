@@ -1,5 +1,26 @@
 # Uptime.com Terraform provider changelog
 
+## v2.18.0
+
+New Resources:
+* uptime_integration_cachet - Cachet status page integration
+* uptime_integration_datadog - Datadog monitoring integration
+* uptime_integration_geckoboard - Geckoboard dashboard integration
+* uptime_integration_jira_servicedesk - JIRA Service Desk integration
+* uptime_integration_klipfolio - Klipfolio dashboard integration
+* uptime_integration_librato - Librato metrics integration
+* uptime_integration_microsoft_teams - Microsoft Teams notification integration
+* uptime_integration_pagerduty - PagerDuty incident management integration
+* uptime_integration_pushbullet - Pushbullet notification integration
+* uptime_integration_pushover - Pushover notification integration
+* uptime_integration_slack - Slack notification integration
+* uptime_integration_status - Status.io integration
+* uptime_integration_statuspage - Statuspage.io integration
+* uptime_integration_victorops - VictorOps integration
+* uptime_integration_wavefront - Wavefront integration
+* uptime_integration_webhook - Custom webhook integration
+* uptime_integration_zapier - Zapier automation integration
+
 ## v2.17.0
 
 New Data Sources:
