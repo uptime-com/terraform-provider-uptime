@@ -71,6 +71,14 @@ func (a IntegrationWebhookResourceModelAdapter) PreservePlanValues(result *Integ
 	if result.PostbackURL.IsNull() {
 		result.PostbackURL = plan.PostbackURL
 	}
+	// Preserve headers from plan if API didn't return it
+	if result.Headers.IsNull() {
+		result.Headers = plan.Headers
+	}
+	// Preserve use_legacy_payload from plan if API didn't return it
+	if result.UseLegacyPayload.IsNull() {
+		result.UseLegacyPayload = plan.UseLegacyPayload
+	}
 	return result
 }
 
@@ -100,8 +108,8 @@ func (a IntegrationWebhookResourceModelAdapter) FromAPIResult(api upapi.Integrat
 		Name:             types.StringValue(api.Name),
 		ContactGroups:    a.ContactGroupsValue(api.ContactGroups),
 		PostbackURL:      types.StringNull(),
-		Headers:          types.StringValue(""),
-		UseLegacyPayload: types.BoolValue(false),
+		Headers:          types.StringNull(),
+		UseLegacyPayload: types.BoolNull(),
 	}, nil
 }
 
