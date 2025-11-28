@@ -40,11 +40,18 @@ func NewCheckGroupResource(_ context.Context, p *providerImpl) resource.Resource
 								Optional: true,
 								Computed: true,
 								Default:  stringdefault.StaticString("ANY"),
+								Description: "Condition that determines when the group check is considered DOWN. " +
+									"Valid values: `ANY`, `TWO`, `THREE`, `FOUR`, `FIVE`, `TEN`, " +
+									"`ONE_PCT`, `THREE_PCT`, `FIVE_PCT`, `TEN_PCT`, `TWENTYFIVE_PCT`, `FIFTY_PCT`, `ALL`. " +
+									"Numeric values (TWO-TEN) mean the group is DOWN when that many checks are down. " +
+									"Percentage values (ONE_PCT-FIFTY_PCT) mean the group is DOWN when that percentage of checks are down. " +
+									"Defaults to `ANY`.",
 							},
 							"uptime_percent_calculation": schema.StringAttribute{
-								Optional: true,
-								Computed: true,
-								Default:  stringdefault.StaticString("UP_DOWN_STATES"),
+								Optional:    true,
+								Computed:    true,
+								Default:     stringdefault.StaticString("UP_DOWN_STATES"),
+								Description: "Method used to calculate the group's uptime percentage. Valid values: `UP_DOWN_STATES` (calculates based on up/down state transitions), `AVERAGE` (calculates as the average uptime of all included checks). Defaults to `UP_DOWN_STATES`.",
 							},
 							"response_time": schema.SingleNestedAttribute{
 								Optional: true,
