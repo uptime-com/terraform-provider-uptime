@@ -69,7 +69,7 @@ func (a IntegrationPushbulletResourceModelAdapter) Get(ctx context.Context, sg S
 func (a IntegrationPushbulletResourceModelAdapter) ToAPIArgument(model IntegrationPushbulletResourceModel) (*upapi.IntegrationPushbullet, error) {
 	return &upapi.IntegrationPushbullet{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		Email:         model.Email.ValueString(),
 	}, nil
 }
@@ -79,7 +79,7 @@ func (a IntegrationPushbulletResourceModelAdapter) FromAPIResult(api upapi.Integ
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		Email:         types.StringNull(),
 	}, nil
 }

@@ -80,7 +80,7 @@ func (a IntegrationSlackResourceModelAdapter) Get(ctx context.Context, sg StateG
 func (a IntegrationSlackResourceModelAdapter) ToAPIArgument(model IntegrationSlackResourceModel) (*upapi.IntegrationSlack, error) {
 	return &upapi.IntegrationSlack{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		WebhookURL:    model.WebhookURL.ValueString(),
 		Channel:       model.Channel.ValueString(),
 	}, nil
@@ -91,7 +91,7 @@ func (a IntegrationSlackResourceModelAdapter) FromAPIResult(api upapi.Integratio
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		WebhookURL:    types.StringNull(),
 		Channel:       types.StringNull(),
 	}, nil

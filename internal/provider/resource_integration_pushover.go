@@ -77,7 +77,7 @@ func (a IntegrationPushoverResourceModelAdapter) Get(ctx context.Context, sg Sta
 func (a IntegrationPushoverResourceModelAdapter) ToAPIArgument(model IntegrationPushoverResourceModel) (*upapi.IntegrationPushover, error) {
 	return &upapi.IntegrationPushover{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		User:          model.User.ValueString(),
 		Priority:      model.Priority.ValueInt64(),
 	}, nil
@@ -88,7 +88,7 @@ func (a IntegrationPushoverResourceModelAdapter) FromAPIResult(api upapi.Integra
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		User:          types.StringNull(),
 		Priority:      types.Int64Null(),
 	}, nil

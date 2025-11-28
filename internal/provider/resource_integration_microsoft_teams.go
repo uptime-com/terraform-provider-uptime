@@ -69,7 +69,7 @@ func (a IntegrationMicrosoftTeamsResourceModelAdapter) Get(ctx context.Context, 
 func (a IntegrationMicrosoftTeamsResourceModelAdapter) ToAPIArgument(model IntegrationMicrosoftTeamsResourceModel) (*upapi.IntegrationMicrosoftTeams, error) {
 	return &upapi.IntegrationMicrosoftTeams{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		WebhookUrl:    model.WebhookURL.ValueString(),
 	}, nil
 }
@@ -79,7 +79,7 @@ func (a IntegrationMicrosoftTeamsResourceModelAdapter) FromAPIResult(api upapi.I
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		WebhookURL:    types.StringNull(),
 	}, nil
 }
