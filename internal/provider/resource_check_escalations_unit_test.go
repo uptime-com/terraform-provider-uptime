@@ -34,7 +34,7 @@ func TestEscalationsToAPI(t *testing.T) {
 				{
 					WaitTime:      300,
 					NumRepeats:    3,
-					ContactGroups: []string{"Default"},
+					ContactGroups: &[]string{"Default"},
 				},
 			},
 		},
@@ -58,12 +58,12 @@ func TestEscalationsToAPI(t *testing.T) {
 				{
 					WaitTime:      300,
 					NumRepeats:    3,
-					ContactGroups: []string{"Default"},
+					ContactGroups: &[]string{"Default"},
 				},
 				{
 					WaitTime:      600,
 					NumRepeats:    0,
-					ContactGroups: []string{"Default", "DevOps"},
+					ContactGroups: &[]string{"Default", "DevOps"},
 				},
 			},
 		},
@@ -97,8 +97,16 @@ func TestEscalationsToAPI(t *testing.T) {
 				if got[i].NumRepeats != tc.expect[i].NumRepeats {
 					t.Errorf("escalation[%d].NumRepeats: expected %d, got %d", i, tc.expect[i].NumRepeats, got[i].NumRepeats)
 				}
-				if len(got[i].ContactGroups) != len(tc.expect[i].ContactGroups) {
-					t.Errorf("escalation[%d].ContactGroups: expected %d groups, got %d", i, len(tc.expect[i].ContactGroups), len(got[i].ContactGroups))
+				gotLen := 0
+				expectLen := 0
+				if got[i].ContactGroups != nil {
+					gotLen = len(*got[i].ContactGroups)
+				}
+				if tc.expect[i].ContactGroups != nil {
+					expectLen = len(*tc.expect[i].ContactGroups)
+				}
+				if gotLen != expectLen {
+					t.Errorf("escalation[%d].ContactGroups: expected %d groups, got %d", i, expectLen, gotLen)
 				}
 			}
 		})
@@ -123,7 +131,7 @@ func TestEscalationsFromAPI(t *testing.T) {
 				{
 					WaitTime:      300,
 					NumRepeats:    3,
-					ContactGroups: []string{"Default"},
+					ContactGroups: &[]string{"Default"},
 				},
 			},
 			expect: &escalationsAttribute{
@@ -139,12 +147,12 @@ func TestEscalationsFromAPI(t *testing.T) {
 				{
 					WaitTime:      300,
 					NumRepeats:    3,
-					ContactGroups: []string{"Default"},
+					ContactGroups: &[]string{"Default"},
 				},
 				{
 					WaitTime:      600,
 					NumRepeats:    0,
-					ContactGroups: []string{"Default", "DevOps"},
+					ContactGroups: &[]string{"Default", "DevOps"},
 				},
 			},
 			expect: &escalationsAttribute{

@@ -98,7 +98,7 @@ func (a IntegrationCachetResourceModelAdapter) Get(ctx context.Context, sg State
 func (a IntegrationCachetResourceModelAdapter) ToAPIArgument(model IntegrationCachetResourceModel) (*upapi.IntegrationCachet, error) {
 	return &upapi.IntegrationCachet{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		CachetURL:     model.CachetURL.ValueString(),
 		Token:         model.Token.ValueString(),
 		Component:     model.Component.ValueString(),
@@ -111,7 +111,7 @@ func (a IntegrationCachetResourceModelAdapter) FromAPIResult(api upapi.Integrati
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		CachetURL:     types.StringNull(),
 		Token:         types.StringNull(),
 		Component:     types.StringNull(),

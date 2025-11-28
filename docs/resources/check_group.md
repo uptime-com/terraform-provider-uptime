@@ -44,7 +44,7 @@ or purpose ('api', 'customer-facing'). Defaults to an empty list if not specifie
 
 Optional:
 
-- `down_condition` (String)
+- `down_condition` (String) Condition that determines when the group check is considered DOWN. Valid values: `ANY`, `TWO`, `THREE`, `FOUR`, `FIVE`, `TEN`, `ONE_PCT`, `THREE_PCT`, `FIVE_PCT`, `TEN_PCT`, `TWENTYFIVE_PCT`, `FIFTY_PCT`, `ALL`. Numeric values (TWO-TEN) mean the group is DOWN when that many checks are down. Percentage values (ONE_PCT-FIFTY_PCT) mean the group is DOWN when that percentage of checks are down. Defaults to `ANY`.
 - `response_time` (Attributes) (see [below for nested schema](#nestedatt--config--response_time))
 - `services` (Set of String) List of check IDs to be included in the group. 
 A group can contain up to 200 individual checks of any type (except other group checks). 
@@ -54,7 +54,7 @@ Each account can have up to 3,000 unique tags, with a 100-character limit per ta
 Tags help categorize resources for filtering in Dashboards, Public Status Pages, and SLA Reports. 
 Common use cases include tagging by team ('dev-team', 'ops'), environment ('production', 'staging'), 
 or purpose ('api', 'customer-facing'). Defaults to an empty list if not specified.
-- `uptime_percent_calculation` (String)
+- `uptime_percent_calculation` (String) Method used to calculate the group's uptime percentage. Valid values: `UP_DOWN_STATES` (calculates based on up/down state transitions), `AVERAGE` (calculates as the average uptime of all included checks). Defaults to `UP_DOWN_STATES`.
 
 <a id="nestedatt--config--response_time"></a>
 ### Nested Schema for `config.response_time`

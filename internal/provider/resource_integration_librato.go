@@ -85,7 +85,7 @@ func (a IntegrationLibratoResourceModelAdapter) Get(ctx context.Context, sg Stat
 func (a IntegrationLibratoResourceModelAdapter) ToAPIArgument(model IntegrationLibratoResourceModel) (*upapi.IntegrationLibrato, error) {
 	return &upapi.IntegrationLibrato{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		Email:         model.Email.ValueString(),
 		APIToken:      model.APIToken.ValueString(),
 		MetricName:    model.MetricName.ValueString(),
@@ -97,7 +97,7 @@ func (a IntegrationLibratoResourceModelAdapter) FromAPIResult(api upapi.Integrat
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		Email:         types.StringNull(),
 		APIToken:      types.StringNull(),
 		MetricName:    types.StringNull(),

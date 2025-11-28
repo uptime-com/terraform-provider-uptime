@@ -77,7 +77,7 @@ func (a IntegrationPagerdutyResourceModelAdapter) Get(ctx context.Context, sg St
 func (a IntegrationPagerdutyResourceModelAdapter) ToAPIArgument(model IntegrationPagerdutyResourceModel) (*upapi.IntegrationPagerduty, error) {
 	return &upapi.IntegrationPagerduty{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		ServiceKey:    model.ServiceKey.ValueString(),
 		Autoresolve:   model.AutoResolve.ValueBool(),
 	}, nil
@@ -88,7 +88,7 @@ func (a IntegrationPagerdutyResourceModelAdapter) FromAPIResult(api upapi.Integr
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		ServiceKey:    types.StringNull(),
 		AutoResolve:   types.BoolValue(api.Autoresolve),
 	}, nil

@@ -89,7 +89,7 @@ func (a IntegrationDatadogResourceModelAdapter) Get(ctx context.Context, sg Stat
 func (a IntegrationDatadogResourceModelAdapter) ToAPIArgument(model IntegrationDatadogResourceModel) (*upapi.IntegrationDatadog, error) {
 	return &upapi.IntegrationDatadog{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		APIKey:        model.APIKey.ValueString(),
 		APPKey:        model.APPKey.ValueString(),
 		Region:        model.Region.ValueString(),
@@ -101,7 +101,7 @@ func (a IntegrationDatadogResourceModelAdapter) FromAPIResult(api upapi.Integrat
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		APIKey:        types.StringNull(),
 		APPKey:        types.StringNull(),
 		Region:        types.StringNull(),

@@ -1,5 +1,16 @@
 # Uptime.com Terraform provider changelog
 
+## v2.19.0
+
+Enhancements:
+* Allow checks to have empty `contact_groups` (`contact_groups = []`) so alerting can be handled by check groups instead of individual checks
+
+Bug Fixes:
+* Fix inverted error check in `UPTIME_RATE_LIMIT` environment variable parsing that caused the parsed value to be ignored
+
+Documentation:
+* Add documentation for `check_group` `down_condition` and `uptime_percent_calculation` fields with all valid enum values
+
 ## v2.18.0
 
 New Resources:

@@ -78,7 +78,7 @@ func (a IntegrationWavefrontResourceModelAdapter) Get(ctx context.Context, sg St
 func (a IntegrationWavefrontResourceModelAdapter) ToAPIArgument(model IntegrationWavefrontResourceModel) (*upapi.IntegrationWavefront, error) {
 	return &upapi.IntegrationWavefront{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		WavefrontUrl:  model.WavefrontURL.ValueString(),
 		APIToken:      model.APIToken.ValueString(),
 	}, nil
@@ -89,7 +89,7 @@ func (a IntegrationWavefrontResourceModelAdapter) FromAPIResult(api upapi.Integr
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		WavefrontURL:  types.StringNull(),
 		APIToken:      types.StringNull(),
 	}, nil

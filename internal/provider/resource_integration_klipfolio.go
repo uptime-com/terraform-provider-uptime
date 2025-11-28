@@ -77,7 +77,7 @@ func (a IntegrationKlipfolioResourceModelAdapter) Get(ctx context.Context, sg St
 func (a IntegrationKlipfolioResourceModelAdapter) ToAPIArgument(model IntegrationKlipfolioResourceModel) (*upapi.IntegrationKlipfolio, error) {
 	return &upapi.IntegrationKlipfolio{
 		Name:           model.Name.ValueString(),
-		ContactGroups:  a.ContactGroups(model.ContactGroups),
+		ContactGroups:  a.ContactGroupsSlice(model.ContactGroups),
 		APIKey:         model.APIKey.ValueString(),
 		DataSourceName: model.DataSourceName.ValueString(),
 	}, nil
@@ -88,7 +88,7 @@ func (a IntegrationKlipfolioResourceModelAdapter) FromAPIResult(api upapi.Integr
 		ID:             types.Int64Value(api.PK),
 		URL:            types.StringValue(api.URL),
 		Name:           types.StringValue(api.Name),
-		ContactGroups:  a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups:  a.ContactGroupsSliceValue(api.ContactGroups),
 		APIKey:         types.StringNull(),
 		DataSourceName: types.StringNull(),
 	}, nil
