@@ -69,7 +69,7 @@ func (a IntegrationZapierResourceModelAdapter) Get(ctx context.Context, sg State
 func (a IntegrationZapierResourceModelAdapter) ToAPIArgument(model IntegrationZapierResourceModel) (*upapi.IntegrationZapier, error) {
 	return &upapi.IntegrationZapier{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		WebhookUrl:    model.WebhookURL.ValueString(),
 	}, nil
 }
@@ -79,7 +79,7 @@ func (a IntegrationZapierResourceModelAdapter) FromAPIResult(api upapi.Integrati
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		WebhookURL:    types.StringNull(),
 	}, nil
 }

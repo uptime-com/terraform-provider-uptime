@@ -232,3 +232,21 @@ func TestAccCheckHTTPResource_PortValidation(t *testing.T) {
 		},
 	}))
 }
+
+func TestAccCheckHTTPResource_EmptyContactGroups(t *testing.T) {
+	name := petname.Generate(3, "-")
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/empty_contact_groups"),
+			ConfigVariables: config.Variables{
+				"name":       config.StringVariable(name),
+				"address":    config.StringVariable("https://example.com"),
+				"group_name": config.StringVariable(name + "-group"),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_http.test", "contact_groups.#", "0"),
+				resource.TestCheckResourceAttr("uptime_check_group.test_group", "contact_groups.#", "1"),
+			),
+		},
+	}))
+}

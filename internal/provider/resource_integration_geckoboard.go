@@ -77,7 +77,7 @@ func (a IntegrationGeckoboardResourceModelAdapter) Get(ctx context.Context, sg S
 func (a IntegrationGeckoboardResourceModelAdapter) ToAPIArgument(model IntegrationGeckoboardResourceModel) (*upapi.IntegrationGeckoboard, error) {
 	return &upapi.IntegrationGeckoboard{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		APIKey:        model.APIKey.ValueString(),
 		DatasetName:   model.DatasetName.ValueString(),
 	}, nil
@@ -88,7 +88,7 @@ func (a IntegrationGeckoboardResourceModelAdapter) FromAPIResult(api upapi.Integ
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		APIKey:        types.StringNull(),
 		DatasetName:   types.StringNull(),
 	}, nil

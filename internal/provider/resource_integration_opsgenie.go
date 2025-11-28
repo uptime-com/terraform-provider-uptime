@@ -89,7 +89,7 @@ func (a IntegrationOpsgenieResourceModelAdapter) Get(ctx context.Context, sg Sta
 func (a IntegrationOpsgenieResourceModelAdapter) ToAPIArgument(model IntegrationOpsgenieResourceModel) (*upapi.IntegrationOpsgenie, error) {
 	return &upapi.IntegrationOpsgenie{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		APIEndpoint:   model.APIEndpoint.ValueString(),
 		APIKey:        model.APIKey.ValueString(),
 		Teams:         model.Teams.ValueString(),
@@ -103,7 +103,7 @@ func (a IntegrationOpsgenieResourceModelAdapter) FromAPIResult(api upapi.Integra
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		APIEndpoint:   types.StringValue(api.APIEndpoint),
 		APIKey:        types.StringValue(api.APIKey),
 		Teams:         types.StringValue(api.Teams),

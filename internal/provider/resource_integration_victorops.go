@@ -80,7 +80,7 @@ func (a IntegrationVictoropsResourceModelAdapter) Get(ctx context.Context, sg St
 func (a IntegrationVictoropsResourceModelAdapter) ToAPIArgument(model IntegrationVictoropsResourceModel) (*upapi.IntegrationVictorops, error) {
 	return &upapi.IntegrationVictorops{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		ServiceKey:    model.ServiceKey.ValueString(),
 		RoutingKey:    model.RoutingKey.ValueString(),
 	}, nil
@@ -91,7 +91,7 @@ func (a IntegrationVictoropsResourceModelAdapter) FromAPIResult(api upapi.Integr
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		ServiceKey:    types.StringNull(),
 		RoutingKey:    types.StringNull(),
 	}, nil

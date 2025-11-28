@@ -94,7 +94,7 @@ func (a IntegrationWebhookResourceModelAdapter) Get(ctx context.Context, sg Stat
 func (a IntegrationWebhookResourceModelAdapter) ToAPIArgument(model IntegrationWebhookResourceModel) (*upapi.IntegrationWebhook, error) {
 	return &upapi.IntegrationWebhook{
 		Name:             model.Name.ValueString(),
-		ContactGroups:    a.ContactGroups(model.ContactGroups),
+		ContactGroups:    a.ContactGroupsSlice(model.ContactGroups),
 		PostbackUrl:      model.PostbackURL.ValueString(),
 		Headers:          model.Headers.ValueString(),
 		UseLegacyPayload: model.UseLegacyPayload.ValueBool(),
@@ -106,7 +106,7 @@ func (a IntegrationWebhookResourceModelAdapter) FromAPIResult(api upapi.Integrat
 		ID:               types.Int64Value(api.PK),
 		URL:              types.StringValue(api.URL),
 		Name:             types.StringValue(api.Name),
-		ContactGroups:    a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups:    a.ContactGroupsSliceValue(api.ContactGroups),
 		PostbackURL:      types.StringNull(),
 		Headers:          types.StringNull(),
 		UseLegacyPayload: types.BoolNull(),

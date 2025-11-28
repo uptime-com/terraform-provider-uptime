@@ -89,3 +89,20 @@ func TestAccCheckGroupResource_PercentCalculation(t *testing.T) {
 		},
 	}))
 }
+
+func TestAccCheckGroupResource_DownCondition(t *testing.T) {
+	name := petname.Generate(3, "-")
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigVariables: config.Variables{
+				"name":           config.StringVariable(name),
+				"down_condition": config.StringVariable("TEN_PCT"),
+			},
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_group/down_condition"),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_group.test", "name", name),
+				resource.TestCheckResourceAttr("uptime_check_group.test", "config.down_condition", "TEN_PCT"),
+			),
+		},
+	}))
+}

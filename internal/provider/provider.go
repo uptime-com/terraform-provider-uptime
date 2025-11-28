@@ -95,7 +95,7 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 	if cfg.RateLimit.IsNull() {
 		rateLimit := 0.5
 		if val := os.Getenv("UPTIME_RATE_LIMIT"); val != "" {
-			if parsedVal, err := strconv.ParseFloat(val, 64); err != nil {
+			if parsedVal, err := strconv.ParseFloat(val, 64); err == nil {
 				rateLimit = parsedVal
 			}
 		}

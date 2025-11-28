@@ -145,7 +145,7 @@ func (a IntegrationJiraServicedeskResourceModelAdapter) Get(ctx context.Context,
 func (a IntegrationJiraServicedeskResourceModelAdapter) ToAPIArgument(model IntegrationJiraServicedeskResourceModel) (*upapi.IntegrationJiraServicedesk, error) {
 	return &upapi.IntegrationJiraServicedesk{
 		Name:                     model.Name.ValueString(),
-		ContactGroups:            a.ContactGroups(model.ContactGroups),
+		ContactGroups:            a.ContactGroupsSlice(model.ContactGroups),
 		APIEmail:                 model.APIEmail.ValueString(),
 		APIToken:                 model.APIToken.ValueString(),
 		JiraSubdomain:            model.JiraSubdomain.ValueString(),
@@ -163,7 +163,7 @@ func (a IntegrationJiraServicedeskResourceModelAdapter) FromAPIResult(api upapi.
 		ID:                       types.Int64Value(api.PK),
 		URL:                      types.StringValue(api.URL),
 		Name:                     types.StringValue(api.Name),
-		ContactGroups:            a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups:            a.ContactGroupsSliceValue(api.ContactGroups),
 		APIEmail:                 types.StringNull(),
 		APIToken:                 types.StringNull(),
 		JiraSubdomain:            types.StringNull(),

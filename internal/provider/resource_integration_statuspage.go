@@ -98,7 +98,7 @@ func (a IntegrationStatuspageResourceModelAdapter) Get(ctx context.Context, sg S
 func (a IntegrationStatuspageResourceModelAdapter) ToAPIArgument(model IntegrationStatuspageResourceModel) (*upapi.IntegrationStatuspage, error) {
 	return &upapi.IntegrationStatuspage{
 		Name:          model.Name.ValueString(),
-		ContactGroups: a.ContactGroups(model.ContactGroups),
+		ContactGroups: a.ContactGroupsSlice(model.ContactGroups),
 		APIKey:        model.APIKey.ValueString(),
 		Page:          model.Page.ValueString(),
 		Component:     model.Component.ValueString(),
@@ -111,7 +111,7 @@ func (a IntegrationStatuspageResourceModelAdapter) FromAPIResult(api upapi.Integ
 		ID:            types.Int64Value(api.PK),
 		URL:           types.StringValue(api.URL),
 		Name:          types.StringValue(api.Name),
-		ContactGroups: a.ContactGroupsValue(api.ContactGroups),
+		ContactGroups: a.ContactGroupsSliceValue(api.ContactGroups),
 		APIKey:        types.StringNull(),
 		Page:          types.StringNull(),
 		Component:     types.StringNull(),

@@ -24,16 +24,33 @@ that will be notified when alerts are triggered. Defaults to ['Default'] if not 
 	}
 }
 
-type ContactGroupsAttribute []string
-
 type ContactGroupsAttributeAdapter struct {
 	SetAttributeAdapter[string]
 }
 
-func (a ContactGroupsAttributeAdapter) ContactGroups(v types.Set) ContactGroupsAttribute {
+func (a ContactGroupsAttributeAdapter) ContactGroups(v types.Set) *[]string {
+	slice := a.Slice(v)
+	if slice == nil {
+		return nil // null/unknown set - omit field in API call
+	}
+	return &slice // return pointer (works for empty and non-empty)
+}
+
+func (a ContactGroupsAttributeAdapter) ContactGroupsValue(v *[]string) types.Set {
+	if v == nil {
+		return types.SetNull(types.StringType)
+	}
+	return a.SliceValue(*v)
+}
+
+// ContactGroupsSlice returns []string for API structs that don't use pointer type (integrations).
+// Use ContactGroups() for check resources that use *[]string.
+func (a ContactGroupsAttributeAdapter) ContactGroupsSlice(v types.Set) []string {
 	return a.Slice(v)
 }
 
-func (a ContactGroupsAttributeAdapter) ContactGroupsValue(v ContactGroupsAttribute) types.Set {
+// ContactGroupsSliceValue accepts []string for API structs that don't use pointer type (integrations).
+// Use ContactGroupsValue() for check resources that use *[]string.
+func (a ContactGroupsAttributeAdapter) ContactGroupsSliceValue(v []string) types.Set {
 	return a.SliceValue(v)
 }
