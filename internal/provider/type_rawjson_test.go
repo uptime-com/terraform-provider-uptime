@@ -122,6 +122,47 @@ func TestJsonType_ValueFromTerraform(t *testing.T) {
 	}
 }
 
+func TestRawJson_ToTerraformValue(t *testing.T) {
+	ctx := context.Background()
+
+	testCases := map[string]struct {
+		in       provider.RawJson
+		expected tftypes.Value
+	}{
+		"known value": {
+			in:       provider.RawJsonValue(`{"key": "value"}`),
+			expected: tftypes.NewValue(tftypes.String, `{"key": "value"}`),
+		},
+		"unknown value": {
+			in:       provider.RawJsonUnknown(),
+			expected: tftypes.NewValue(tftypes.String, tftypes.UnknownValue),
+		},
+		"null value": {
+			in:       provider.RawJsonNull(),
+			expected: tftypes.NewValue(tftypes.String, nil),
+		},
+	}
+
+	for name, testCase := range testCases {
+		name, testCase := name, testCase
+		t.Run(name, func(t *testing.T) {
+			got, err := testCase.in.ToTerraformValue(ctx)
+			if err != nil {
+				t.Fatalf("Unexpected error: %s", err)
+			}
+			if !got.Equal(testCase.expected) {
+				t.Errorf("Expected %v, got %v", testCase.expected, got)
+			}
+			if got.IsKnown() != testCase.expected.IsKnown() {
+				t.Errorf("Expected IsKnown=%t, got IsKnown=%t", testCase.expected.IsKnown(), got.IsKnown())
+			}
+			if got.IsNull() != testCase.expected.IsNull() {
+				t.Errorf("Expected IsNull=%t, got IsNull=%t", testCase.expected.IsNull(), got.IsNull())
+			}
+		})
+	}
+}
+
 func TestRawJson_StringSemanticEquals(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
