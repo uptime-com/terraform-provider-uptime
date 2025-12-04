@@ -291,6 +291,31 @@ func (a CheckGroupResourceModelAdapter) FromAPIResult(api upapi.Check) (_ *Check
 	return &model, nil
 }
 
+// PreservePlanValues preserves the planned services values since the API
+// returns check names instead of the numeric IDs that were sent.
+// This implements the PlanValuePreserver interface.
+func (a CheckGroupResourceModelAdapter) PreservePlanValues(result *CheckGroupResourceModel, plan *CheckGroupResourceModel) *CheckGroupResourceModel {
+	if plan == nil || result == nil {
+		return result
+	}
+
+	// If plan has config with services, preserve them in the result
+	// because the API returns check names but we need to maintain the user's input (IDs)
+	if !plan.Config.IsNull() && !plan.Config.IsUnknown() && !result.Config.IsNull() {
+		var planConfig, resultConfig CheckGroupConfigAttribute
+		plan.Config.As(context.Background(), &planConfig, basetypes.ObjectAsOptions{})
+		result.Config.As(context.Background(), &resultConfig, basetypes.ObjectAsOptions{})
+
+		// Preserve planned services if they exist
+		if !planConfig.Services.IsNull() && !planConfig.Services.IsUnknown() {
+			resultConfig.Services = planConfig.Services
+			result.Config = a.CheckGroupConfigAttributeValue(resultConfig)
+		}
+	}
+
+	return result
+}
+
 type CheckGroupResourceAPI struct {
 	provider *providerImpl
 }
