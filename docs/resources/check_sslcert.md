@@ -25,9 +25,10 @@ and must have at least one dot separator between valid DNS labels.
 ### Optional
 
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
-- `contact_groups` (Set of String) List of contact group names to receive notifications. 
-Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations) 
+- `contact_groups` (Set of String) List of contact group names to receive notifications.
+Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations)
 that will be notified when alerts are triggered. Defaults to ['Default'] if not specified.
+Set to an empty list to disable notifications at this level and rely on parent check group notifications instead.
 - `is_paused` (Boolean)
 - `notes` (String)
 - `num_retries` (Number) How many times the check should be retried before a location is considered down

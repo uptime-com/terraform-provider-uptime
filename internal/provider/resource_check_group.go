@@ -303,8 +303,12 @@ func (a CheckGroupResourceModelAdapter) PreservePlanValues(result *CheckGroupRes
 	// because the API returns check names but we need to maintain the user's input (IDs)
 	if !plan.Config.IsNull() && !plan.Config.IsUnknown() && !result.Config.IsNull() {
 		var planConfig, resultConfig CheckGroupConfigAttribute
-		plan.Config.As(context.Background(), &planConfig, basetypes.ObjectAsOptions{})
-		result.Config.As(context.Background(), &resultConfig, basetypes.ObjectAsOptions{})
+		if diags := plan.Config.As(context.Background(), &planConfig, basetypes.ObjectAsOptions{}); diags.HasError() {
+			return result
+		}
+		if diags := result.Config.As(context.Background(), &resultConfig, basetypes.ObjectAsOptions{}); diags.HasError() {
+			return result
+		}
 
 		// Preserve planned services if they exist
 		if !planConfig.Services.IsNull() && !planConfig.Services.IsUnknown() {

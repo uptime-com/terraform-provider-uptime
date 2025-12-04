@@ -35,7 +35,7 @@ func TestAccCheckGroupResource_Config(t *testing.T) {
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_group.test", "name", name),
 				resource.TestCheckResourceAttr("uptime_check_group.test", "config.services.#", "1"),
-				// Services are stored by ID (as returned by API), verify it's a numeric string
+				// Services preserve the user's input format (name in this case)
 				resource.TestCheckResourceAttrSet("uptime_check_group.test", "config.services.0"),
 			),
 		},
