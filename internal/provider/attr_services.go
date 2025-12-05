@@ -10,8 +10,8 @@ import (
 func ServicesSchemaAttribute() schema.SetAttribute {
 	return schema.SetAttribute{
 		ElementType: types.StringType,
-		Description: `List of check IDs to be included in the group. 
-A group can contain up to 200 individual checks of any type (except other group checks). 
+		Description: `List of check IDs to be included in the group (specified as strings, e.g., ["5581024"]).
+A group can contain up to 200 individual checks of any type (except other group checks).
 Checks can be part of multiple groups simultaneously. Defaults to an empty list if not specified.`,
 		Optional: true,
 		Computed: true,

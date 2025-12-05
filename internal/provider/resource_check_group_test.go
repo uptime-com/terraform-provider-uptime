@@ -35,7 +35,27 @@ func TestAccCheckGroupResource_Config(t *testing.T) {
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_group.test", "name", name),
 				resource.TestCheckResourceAttr("uptime_check_group.test", "config.services.#", "1"),
-				resource.TestCheckResourceAttr("uptime_check_group.test", "config.services.0", name),
+				// Services preserve the user's input format (name in this case)
+				resource.TestCheckResourceAttrSet("uptime_check_group.test", "config.services.0"),
+			),
+		},
+	}))
+}
+
+func TestAccCheckGroupResource_ConfigByID(t *testing.T) {
+	name := petname.Generate(3, "-")
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigVariables: config.Variables{
+				"name":       config.StringVariable(name),
+				"check_name": config.StringVariable(name),
+			},
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_group/config_by_id"),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_group.test", "name", name),
+				resource.TestCheckResourceAttr("uptime_check_group.test", "config.services.#", "1"),
+				// When specifying by ID, the state should maintain the ID format
+				resource.TestCheckResourceAttrSet("uptime_check_group.test", "config.services.0"),
 			),
 		},
 	}))

@@ -32,9 +32,10 @@ resource "uptime_integration_datadog" "example" {
 
 ### Optional
 
-- `contact_groups` (Set of String) List of contact group names to receive notifications. 
-Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations) 
+- `contact_groups` (Set of String) List of contact group names to receive notifications.
+Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations)
 that will be notified when alerts are triggered. Defaults to ['Default'] if not specified.
+Set to an empty list to disable notifications at this level and rely on parent check group notifications instead.
 - `region` (String) Datadog region (e.g., 'us', 'eu')
 
 ### Read-Only
