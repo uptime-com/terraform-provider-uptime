@@ -41,6 +41,11 @@ func NewCheckMaintenanceResource(_ context.Context, p *providerImpl) resource.Re
 							OneOfStringValidator([]string{"SUPPRESSED", "ACTIVE", "SCHEDULED"}),
 						},
 					},
+					"pause_on_scheduled_maintenance": schema.BoolAttribute{
+						Optional:    true,
+						Computed:    true,
+						Description: "Whether to pause the check during scheduled maintenance windows",
+					},
 					"schedule": schema.SetNestedAttribute{
 						Optional: true,
 						Computed: true,
@@ -136,9 +141,10 @@ func (w CheckMaintenanceWrapper) PrimaryKey() upapi.PrimaryKey {
 }
 
 type CheckMaintenanceResourceModel struct {
-	CheckID  types.Int64  `tfsdk:"check_id"`
-	State    types.String `tfsdk:"state"`
-	Schedule types.Set    `tfsdk:"schedule"`
+	CheckID                     types.Int64  `tfsdk:"check_id"`
+	State                       types.String `tfsdk:"state"`
+	PauseOnScheduledMaintenance types.Bool   `tfsdk:"pause_on_scheduled_maintenance"`
+	Schedule                    types.Set    `tfsdk:"schedule"`
 
 	schedule []CheckMaintenanceScheduleAttribute `tfsdk:"-"`
 }
@@ -241,6 +247,10 @@ func (a CheckMaintenanceResourceModelAdapter) ToAPIArgument(
 	api := upapi.CheckMaintenance{
 		State: model.State.ValueString(),
 	}
+	if !model.PauseOnScheduledMaintenance.IsNull() && !model.PauseOnScheduledMaintenance.IsUnknown() {
+		v := model.PauseOnScheduledMaintenance.ValueBool()
+		api.PauseOnScheduledMaintenance = &v
+	}
 	if len(model.schedule) > 0 {
 		for _, v := range model.schedule {
 			s := upapi.CheckMaintenanceSchedule{
@@ -277,6 +287,11 @@ func (a CheckMaintenanceResourceModelAdapter) FromAPIResult(
 	model := CheckMaintenanceResourceModel{
 		CheckID: types.Int64Value(api.CheckID),
 		State:   types.StringValue(api.State),
+	}
+	if api.PauseOnScheduledMaintenance != nil {
+		model.PauseOnScheduledMaintenance = types.BoolValue(*api.PauseOnScheduledMaintenance)
+	} else {
+		model.PauseOnScheduledMaintenance = types.BoolNull()
 	}
 
 	schedule := []CheckMaintenanceScheduleAttribute{}

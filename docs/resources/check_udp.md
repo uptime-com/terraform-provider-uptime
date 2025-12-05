@@ -27,9 +27,10 @@ and must have at least one dot separator between valid DNS labels.
 
 ### Optional
 
-- `contact_groups` (Set of String) List of contact group names to receive notifications. 
-Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations) 
+- `contact_groups` (Set of String) List of contact group names to receive notifications.
+Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations)
 that will be notified when alerts are triggered. Defaults to ['Default'] if not specified.
+Set to an empty list to disable notifications at this level and rely on parent check group notifications instead.
 - `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
 - `interval` (Number) The interval between checks in minutes
 - `is_paused` (Boolean)

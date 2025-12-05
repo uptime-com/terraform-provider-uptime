@@ -21,6 +21,7 @@ Set maintenance windows for a check
 
 ### Optional
 
+- `pause_on_scheduled_maintenance` (Boolean) Whether to pause the check during scheduled maintenance windows
 - `schedule` (Attributes Set) (see [below for nested schema](#nestedatt--schedule))
 - `state` (String)
 
