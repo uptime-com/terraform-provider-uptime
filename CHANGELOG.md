@@ -1,6 +1,28 @@
 # Uptime.com Terraform provider changelog
 
-## v2.19.0
+## v2.20.0
+
+New Data Sources:
+* uptime_check_groups - Retrieve a list of all check groups
+
+Enhancements:
+* `check_group` resource now accepts check IDs (in addition to names) in `config.services`
+* `check_maintenance` resource now supports `pause_on_scheduled_maintenance` field
+
+Bug Fixes:
+* Fix "Provider produced inconsistent result after apply" error when specifying `check_group` services by numeric ID
+
+Breaking Changes:
+* `tag` resource `color_hex` attribute is now required (was optional with computed default)
+
+Documentation:
+* Clarify `contact_groups` behavior: defaults to `['Default']` if not specified, set to empty list `[]` to disable notifications
+
+## 2.19.0
+
+This release skipped.
+
+## v2.18.1
 
 Enhancements:
 * Allow checks to have empty `contact_groups` (`contact_groups = []`) so alerting can be handled by check groups instead of individual checks
