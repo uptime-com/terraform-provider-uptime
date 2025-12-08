@@ -1,11 +1,13 @@
 package provider
 
 import (
+	"fmt"
 	"testing"
 
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 )
 
 func TestAccStatusPageMetricResource(t *testing.T) {
@@ -43,6 +45,25 @@ func TestAccStatusPageMetricResource(t *testing.T) {
 					resource.TestCheckResourceAttr("uptime_statuspage_metric.test", "name", metricName[1]),
 					resource.TestCheckResourceAttr("uptime_statuspage_metric.test", "is_visible", "true"),
 				),
+			},
+			{
+				ConfigDirectory: config.StaticDirectory("testdata/resource_statuspage_metric/_basic"),
+				ConfigVariables: config.Variables{
+					"name":        config.StringVariable(name),
+					"metric_name": config.StringVariable(metricName[1]),
+					"is_visible":  config.BoolVariable(true),
+				},
+				ResourceName:      "uptime_statuspage_metric.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateIdFunc: func(s *terraform.State) (string, error) {
+					statusPageRS := s.RootModule().Resources["uptime_statuspage.test"]
+					metricRS := s.RootModule().Resources["uptime_statuspage_metric.test"]
+					if statusPageRS == nil || metricRS == nil {
+						return "", fmt.Errorf("resources not found in state")
+					}
+					return fmt.Sprintf("%s:%s", statusPageRS.Primary.Attributes["id"], metricRS.Primary.Attributes["id"]), nil
+				},
 			},
 		},
 	})

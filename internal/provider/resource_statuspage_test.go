@@ -36,6 +36,16 @@ func TestAccStatusPageResource(t *testing.T) {
 					resource.TestCheckResourceAttr("uptime_statuspage.basic", "name", names[1]),
 				),
 			},
+			{
+				ConfigDirectory: config.StaticDirectory("testdata/resource_statuspage/_basic"),
+				ConfigVariables: config.Variables{
+					"name": config.StringVariable(names[1]),
+				},
+				ResourceName:            "uptime_statuspage.basic",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"auth_password"},
+			},
 		},
 	})
 }
