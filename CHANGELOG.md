@@ -1,5 +1,22 @@
 # Uptime.com Terraform provider changelog
 
+## v2.21.0
+
+Enhancements:
+* Add Terraform import support for all status page resources:
+  * `uptime_statuspage` (simple ID import)
+  * `uptime_statuspage_component` (composite ID: `statuspage_id:component_id`)
+  * `uptime_statuspage_incident` (composite ID: `statuspage_id:incident_id`)
+  * `uptime_statuspage_metric` (composite ID: `statuspage_id:metric_id`)
+  * `uptime_statuspage_subscriber` (composite ID: `statuspage_id:subscriber_id`)
+  * `uptime_statuspage_user` (composite ID: `statuspage_id:user_id`)
+  * `uptime_statuspage_subscription_domain_allow` (composite ID: `statuspage_id:domain_id`)
+  * `uptime_statuspage_subscription_domain_block` (composite ID: `statuspage_id:domain_id`)
+
+Dependency Updates:
+* Bump github.com/hashicorp/terraform-plugin-framework
+* Bump github.com/hashicorp/terraform-plugin-testing
+
 ## v2.20.0
 
 New Data Sources:

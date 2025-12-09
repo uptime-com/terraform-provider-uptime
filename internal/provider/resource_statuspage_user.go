@@ -13,13 +13,13 @@ import (
 )
 
 func NewStatusPageUserResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[StatusPageUserResourceModel, StatusPageUserWrapper, StatusPageUserWrapper]{
-		api: &StatusPageUserResourceAPI{provider: p},
-		mod: StatusPageUserResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[StatusPageUserResourceModel, StatusPageUserWrapper, StatusPageUserWrapper](
+		&StatusPageUserResourceAPI{provider: p},
+		StatusPageUserResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "statuspage_user",
 			Schema: schema.Schema{
-				Description: "Status page user resource",
+				Description: "Status page user resource. Import using composite ID: `terraform import uptime_statuspage_user.example statuspage_id:user_id`",
 				Attributes: map[string]schema.Attribute{
 					"statuspage_id": schema.Int64Attribute{
 						Required: true,
@@ -40,7 +40,8 @@ func NewStatusPageUserResource(_ context.Context, p *providerImpl) resource.Reso
 				},
 			},
 		},
-	}
+		ImportStateCompositeID,
+	)
 }
 
 type StatusPageUserWrapper struct {

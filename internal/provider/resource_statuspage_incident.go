@@ -18,13 +18,13 @@ import (
 )
 
 func NewStatusPageIncidentResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[StatusPageIncidentResourceModel, StatusPageIncidentWrapper, StatusPageIncidentWrapper]{
-		api: &StatusPageIncidentResourceAPI{provider: p},
-		mod: StatusPageIncidentResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[StatusPageIncidentResourceModel, StatusPageIncidentWrapper, StatusPageIncidentWrapper](
+		&StatusPageIncidentResourceAPI{provider: p},
+		StatusPageIncidentResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "statuspage_incident",
 			Schema: schema.Schema{
-				Description: "Status page incident or maintenance window resource",
+				Description: "Status page incident or maintenance window resource. Import using composite ID: `terraform import uptime_statuspage_incident.example statuspage_id:incident_id`",
 				Attributes: map[string]schema.Attribute{
 					"statuspage_id": schema.Int64Attribute{
 						Required: true,
@@ -116,7 +116,8 @@ func NewStatusPageIncidentResource(_ context.Context, p *providerImpl) resource.
 				},
 			},
 		},
-	}
+		ImportStateCompositeID,
+	)
 }
 
 type StatusPageIncidentWrapper struct {

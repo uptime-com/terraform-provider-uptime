@@ -15,12 +15,13 @@ import (
 )
 
 func NewStatusPageResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[StatusPageResourceModel, upapi.StatusPage, upapi.StatusPage]{
-		api: &StatusPageResourceAPI{provider: p},
-		mod: StatusPageResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[StatusPageResourceModel, upapi.StatusPage, upapi.StatusPage](
+		&StatusPageResourceAPI{provider: p},
+		StatusPageResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "statuspage",
 			Schema: schema.Schema{
+				Description: "Status page resource. Import using the status page ID: `terraform import uptime_statuspage.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":   IDSchemaAttribute(),
 					"url":  URLSchemaAttribute(),
@@ -241,7 +242,8 @@ func NewStatusPageResource(_ context.Context, p *providerImpl) resource.Resource
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type StatusPageResourceModel struct {

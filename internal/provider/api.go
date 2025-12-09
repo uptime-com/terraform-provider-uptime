@@ -212,3 +212,32 @@ func (r APIResource[M, A, R]) Delete(ctx context.Context, rq resource.DeleteRequ
 
 	return
 }
+
+// ImportableAPIResource wraps APIResource and adds import support.
+// Use this for resources that need import functionality.
+type ImportableAPIResource[M APIModel, A, R any] struct {
+	APIResource[M, A, R]
+	importHandler func(context.Context, resource.ImportStateRequest, *resource.ImportStateResponse)
+}
+
+// NewImportableAPIResource creates a new ImportableAPIResource with the given import handler.
+func NewImportableAPIResource[M APIModel, A, R any](
+	api API[A, R],
+	mod APIModeler[M, A, R],
+	meta APIResourceMetadata,
+	importHandler func(context.Context, resource.ImportStateRequest, *resource.ImportStateResponse),
+) ImportableAPIResource[M, A, R] {
+	return ImportableAPIResource[M, A, R]{
+		APIResource: APIResource[M, A, R]{
+			api:  api,
+			mod:  mod,
+			meta: meta,
+		},
+		importHandler: importHandler,
+	}
+}
+
+// ImportState implements resource.ResourceWithImportState
+func (r ImportableAPIResource[M, A, R]) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	r.importHandler(ctx, req, resp)
+}

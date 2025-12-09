@@ -1,11 +1,13 @@
 package provider
 
 import (
+	"fmt"
 	"testing"
 
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 )
 
 func TestAccStatusPageIncidentBasicResource(t *testing.T) {
@@ -49,6 +51,29 @@ func TestAccStatusPageIncidentBasicResource(t *testing.T) {
 					resource.TestCheckResourceAttr("uptime_statuspage_incident.test", "updates.0.updated_at", "2025-01-28T20:10:00Z"),
 					resource.TestCheckResourceAttr("uptime_statuspage_incident.test", "starts_at", "2025-01-28T10:10:00Z"),
 				),
+			},
+			{
+				ConfigDirectory: config.StaticDirectory("testdata/resource_statuspage_incident/_basic"),
+				ConfigVariables: config.Variables{
+					"name":           config.StringVariable(name),
+					"incident_name":  config.StringVariable(incidentName),
+					"incident_state": config.StringVariable("monitoring"),
+					"starts_at":      config.StringVariable("2025-01-28T10:10:00Z"),
+					"updated_at":     config.StringVariable("2025-01-28T20:10:00Z"),
+				},
+				ResourceName:      "uptime_statuspage_incident.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+				// Ignore time fields due to format differences (Z vs +00:00)
+				ImportStateVerifyIgnore: []string{"starts_at", "updates.0.updated_at"},
+				ImportStateIdFunc: func(s *terraform.State) (string, error) {
+					statusPageRS := s.RootModule().Resources["uptime_statuspage.test"]
+					incidentRS := s.RootModule().Resources["uptime_statuspage_incident.test"]
+					if statusPageRS == nil || incidentRS == nil {
+						return "", fmt.Errorf("resources not found in state")
+					}
+					return fmt.Sprintf("%s:%s", statusPageRS.Primary.Attributes["id"], incidentRS.Primary.Attributes["id"]), nil
+				},
 			},
 		},
 	})

@@ -13,13 +13,13 @@ import (
 )
 
 func NewStatusPageSubsDomainAllowResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[StatusPageSubsDomainAllowResourceModel, StatusPageSubsDomainAllowWrapper, StatusPageSubsDomainAllowWrapper]{
-		api: &StatusPageSubsDomainAllowResourceAPI{provider: p},
-		mod: StatusPageSubsDomainAllowResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[StatusPageSubsDomainAllowResourceModel, StatusPageSubsDomainAllowWrapper, StatusPageSubsDomainAllowWrapper](
+		&StatusPageSubsDomainAllowResourceAPI{provider: p},
+		StatusPageSubsDomainAllowResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "statuspage_subscription_domain_allow",
 			Schema: schema.Schema{
-				Description: "Status page subscription domain allow resource",
+				Description: "Status page subscription domain allow resource. Import using composite ID: `terraform import uptime_statuspage_subscription_domain_allow.example statuspage_id:domain_id`",
 				Attributes: map[string]schema.Attribute{
 					"statuspage_id": schema.Int64Attribute{
 						Required: true,
@@ -29,7 +29,8 @@ func NewStatusPageSubsDomainAllowResource(_ context.Context, p *providerImpl) re
 				},
 			},
 		},
-	}
+		ImportStateCompositeID,
+	)
 }
 
 type StatusPageSubsDomainAllowWrapper struct {
