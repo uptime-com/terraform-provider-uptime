@@ -1,11 +1,13 @@
 package provider
 
 import (
+	"fmt"
 	"testing"
 
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 )
 
 func TestAccStatusPageSubscriptionDomainBlockResource(t *testing.T) {
@@ -40,6 +42,24 @@ func TestAccStatusPageSubscriptionDomainBlockResource(t *testing.T) {
 					resource.TestCheckResourceAttr("uptime_statuspage.test", "name", name),
 					resource.TestCheckResourceAttr("uptime_statuspage_subscription_domain_block.test", "domain", domains[0]),
 				),
+			},
+			{
+				ConfigDirectory: config.StaticDirectory("testdata/resource_statuspage_subscription_domain_block/_basic"),
+				ConfigVariables: config.Variables{
+					"name":   config.StringVariable(name),
+					"domain": config.StringVariable(domains[0]),
+				},
+				ResourceName:      "uptime_statuspage_subscription_domain_block.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateIdFunc: func(s *terraform.State) (string, error) {
+					statusPageRS := s.RootModule().Resources["uptime_statuspage.test"]
+					domainRS := s.RootModule().Resources["uptime_statuspage_subscription_domain_block.test"]
+					if statusPageRS == nil || domainRS == nil {
+						return "", fmt.Errorf("resources not found in state")
+					}
+					return fmt.Sprintf("%s:%s", statusPageRS.Primary.Attributes["id"], domainRS.Primary.Attributes["id"]), nil
+				},
 			},
 		},
 	})

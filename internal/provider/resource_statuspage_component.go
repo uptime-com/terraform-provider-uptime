@@ -16,13 +16,13 @@ import (
 )
 
 func NewStatusPageComponentResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[StatusPageComponentResourceModel, StatusPageComponentWrapper, StatusPageComponentWrapper]{
-		api: &StatusPageComponentResourceAPI{provider: p},
-		mod: StatusPageComponentResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[StatusPageComponentResourceModel, StatusPageComponentWrapper, StatusPageComponentWrapper](
+		&StatusPageComponentResourceAPI{provider: p},
+		StatusPageComponentResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "statuspage_component",
 			Schema: schema.Schema{
-				Description: "Status page component resource",
+				Description: "Status page component resource. Import using composite ID: `terraform import uptime_statuspage_component.example statuspage_id:component_id`",
 				Attributes: map[string]schema.Attribute{
 					"statuspage_id": schema.Int64Attribute{
 						Required: true,
@@ -72,7 +72,8 @@ func NewStatusPageComponentResource(_ context.Context, p *providerImpl) resource
 				},
 			},
 		},
-	}
+		ImportStateCompositeID,
+	)
 }
 
 type StatusPageComponentWrapper struct {

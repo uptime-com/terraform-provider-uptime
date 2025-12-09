@@ -14,13 +14,13 @@ import (
 )
 
 func NewStatusPageMetricResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[StatusPageMetricResourceModel, StatusPageMetricWrapper, StatusPageMetricWrapper]{
-		api: &StatusPageMetricResourceAPI{provider: p},
-		mod: StatusPageMetricResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[StatusPageMetricResourceModel, StatusPageMetricWrapper, StatusPageMetricWrapper](
+		&StatusPageMetricResourceAPI{provider: p},
+		StatusPageMetricResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "statuspage_metric",
 			Schema: schema.Schema{
-				Description: "Status page metric resource",
+				Description: "Status page metric resource. Import using composite ID: `terraform import uptime_statuspage_metric.example statuspage_id:metric_id`",
 				Attributes: map[string]schema.Attribute{
 					"statuspage_id": schema.Int64Attribute{
 						Required: true,
@@ -39,7 +39,8 @@ func NewStatusPageMetricResource(_ context.Context, p *providerImpl) resource.Re
 				},
 			},
 		},
-	}
+		ImportStateCompositeID,
+	)
 }
 
 type StatusPageMetricWrapper struct {

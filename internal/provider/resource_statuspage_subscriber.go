@@ -15,13 +15,13 @@ import (
 )
 
 func NewStatusPageSubscriberResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[StatusPageSubscriberResourceModel, StatusPageSubscriberWrapper, StatusPageSubscriberWrapper]{
-		api: &StatusPageSubscriberResourceAPI{provider: p},
-		mod: StatusPageSubscriberResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[StatusPageSubscriberResourceModel, StatusPageSubscriberWrapper, StatusPageSubscriberWrapper](
+		&StatusPageSubscriberResourceAPI{provider: p},
+		StatusPageSubscriberResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "statuspage_subscriber",
 			Schema: schema.Schema{
-				Description: "Status page subscriber resource",
+				Description: "Status page subscriber resource. Import using composite ID: `terraform import uptime_statuspage_subscriber.example statuspage_id:subscriber_id`",
 				Attributes: map[string]schema.Attribute{
 					"statuspage_id": schema.Int64Attribute{
 						Required: true,
@@ -45,7 +45,8 @@ func NewStatusPageSubscriberResource(_ context.Context, p *providerImpl) resourc
 				},
 			},
 		},
-	}
+		ImportStateCompositeID,
+	)
 }
 
 type StatusPageSubscriberWrapper struct {

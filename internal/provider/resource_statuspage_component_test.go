@@ -1,11 +1,13 @@
 package provider
 
 import (
+	"fmt"
 	"testing"
 
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 )
 
 func TestAccStatusPageComponentResource(t *testing.T) {
@@ -39,6 +41,24 @@ func TestAccStatusPageComponentResource(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("uptime_statuspage_component.test", "name", componentNames[1]),
 				),
+			},
+			{
+				ConfigDirectory: config.StaticDirectory("testdata/resource_statuspage_component/_basic"),
+				ConfigVariables: config.Variables{
+					"name":           config.StringVariable(name),
+					"component_name": config.StringVariable(componentNames[1]),
+				},
+				ResourceName:      "uptime_statuspage_component.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateIdFunc: func(s *terraform.State) (string, error) {
+					statusPageRS := s.RootModule().Resources["uptime_statuspage.test"]
+					componentRS := s.RootModule().Resources["uptime_statuspage_component.test"]
+					if statusPageRS == nil || componentRS == nil {
+						return "", fmt.Errorf("resources not found in state")
+					}
+					return fmt.Sprintf("%s:%s", statusPageRS.Primary.Attributes["id"], componentRS.Primary.Attributes["id"]), nil
+				},
 			},
 		},
 	})
