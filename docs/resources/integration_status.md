@@ -3,12 +3,12 @@
 page_title: "uptime_integration_status Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Status.io integration resource
+  Status.io integration resource. Import using the integration ID: terraform import uptime_integration_status.example 123
 ---
 
 # uptime_integration_status (Resource)
 
-Status.io integration resource
+Status.io integration resource. Import using the integration ID: `terraform import uptime_integration_status.example 123`
 
 ## Example Usage
 

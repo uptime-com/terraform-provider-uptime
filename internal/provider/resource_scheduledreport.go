@@ -18,12 +18,13 @@ import (
 )
 
 func NewScheduledReportResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[ScheduledReportResourceModel, upapi.ScheduledReport, upapi.ScheduledReport]{
-		api: &ScheduledReportResourceAPI{provider: p},
-		mod: ScheduledReportResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[ScheduledReportResourceModel, upapi.ScheduledReport, upapi.ScheduledReport](
+		&ScheduledReportResourceAPI{provider: p},
+		ScheduledReportResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "scheduled_report",
 			Schema: schema.Schema{
+				Description: "Scheduled report resource. Import using the scheduled report ID: `terraform import uptime_scheduled_report.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":   IDSchemaAttribute(),
 					"url":  URLSchemaAttribute(),
@@ -88,7 +89,8 @@ func NewScheduledReportResource(_ context.Context, p *providerImpl) resource.Res
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type ScheduledReportResourceModel struct {

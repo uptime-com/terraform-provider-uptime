@@ -11,13 +11,13 @@ import (
 )
 
 func NewCheckRDAPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckRDAPResourceModel, upapi.CheckRDAP, upapi.Check]{
-		api: CheckRDAPResourceAPI{provider: p},
-		mod: CheckRDAPResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[CheckRDAPResourceModel, upapi.CheckRDAP, upapi.Check](
+		CheckRDAPResourceAPI{provider: p},
+		CheckRDAPResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "check_rdap",
 			Schema: schema.Schema{
-				Description: "Monitor domain's expiry date and registration details using RDAP (Registration Data Access Protocol)",
+				Description: "Monitor domain's expiry date and registration details using RDAP (Registration Data Access Protocol). Import using the check ID: `terraform import uptime_check_rdap.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -39,7 +39,8 @@ func NewCheckRDAPResource(_ context.Context, p *providerImpl) resource.Resource 
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckRDAPResourceModel struct {

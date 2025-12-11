@@ -3,12 +3,12 @@
 page_title: "uptime_check_imap Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Monitor IMAP server availability
+  Monitor IMAP server availability. Import using the check ID: terraform import uptime_check_imap.example 123
 ---
 
 # uptime_check_imap (Resource)
 
-Monitor IMAP server availability
+Monitor IMAP server availability. Import using the check ID: `terraform import uptime_check_imap.example 123`
 
 
 

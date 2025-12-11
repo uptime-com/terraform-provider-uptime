@@ -3,12 +3,12 @@
 page_title: "uptime_dashboard Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Custom dashboard resource
+  Custom dashboard resource. Import using the dashboard ID: terraform import uptime_dashboard.example 123
 ---
 
 # uptime_dashboard (Resource)
 
-Custom dashboard resource
+Custom dashboard resource. Import using the dashboard ID: `terraform import uptime_dashboard.example 123`
 
 
 

@@ -3,12 +3,12 @@
 page_title: "uptime_user Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  
+  Account user resource. Import using the user ID: terraform import uptime_user.example 123
 ---
 
 # uptime_user (Resource)
 
-
+Account user resource. Import using the user ID: `terraform import uptime_user.example 123`
 
 ## Example Usage
 

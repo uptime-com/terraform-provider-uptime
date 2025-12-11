@@ -12,13 +12,13 @@ import (
 )
 
 func NewIntegrationSlackResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationSlackResourceModel, upapi.IntegrationSlack, upapi.Integration]{
-		api: IntegrationSlackResourceAPI{provider: p},
-		mod: IntegrationSlackResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationSlackResourceModel, upapi.IntegrationSlack, upapi.Integration](
+		IntegrationSlackResourceAPI{provider: p},
+		IntegrationSlackResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_slack",
 			Schema: schema.Schema{
-				Description: "Slack integration resource",
+				Description: "Slack integration resource. Import using the integration ID: `terraform import uptime_integration_slack.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -38,7 +38,8 @@ func NewIntegrationSlackResource(_ context.Context, p *providerImpl) resource.Re
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationSlackResourceModel struct {

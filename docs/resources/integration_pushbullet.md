@@ -3,12 +3,12 @@
 page_title: "uptime_integration_pushbullet Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Pushbullet integration resource
+  Pushbullet integration resource. Import using the integration ID: terraform import uptime_integration_pushbullet.example 123
 ---
 
 # uptime_integration_pushbullet (Resource)
 
-Pushbullet integration resource
+Pushbullet integration resource. Import using the integration ID: `terraform import uptime_integration_pushbullet.example 123`
 
 ## Example Usage
 

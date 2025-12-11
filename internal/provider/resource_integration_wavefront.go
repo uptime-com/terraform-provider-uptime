@@ -11,13 +11,13 @@ import (
 )
 
 func NewIntegrationWavefrontResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationWavefrontResourceModel, upapi.IntegrationWavefront, upapi.Integration]{
-		api: IntegrationWavefrontResourceAPI{provider: p},
-		mod: IntegrationWavefrontResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationWavefrontResourceModel, upapi.IntegrationWavefront, upapi.Integration](
+		IntegrationWavefrontResourceAPI{provider: p},
+		IntegrationWavefrontResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_wavefront",
 			Schema: schema.Schema{
-				Description: "Wavefront integration resource",
+				Description: "Wavefront integration resource. Import using the integration ID: `terraform import uptime_integration_wavefront.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -36,7 +36,8 @@ func NewIntegrationWavefrontResource(_ context.Context, p *providerImpl) resourc
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationWavefrontResourceModel struct {

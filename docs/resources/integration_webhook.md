@@ -3,12 +3,12 @@
 page_title: "uptime_integration_webhook Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Webhook integration resource
+  Webhook integration resource. Import using the integration ID: terraform import uptime_integration_webhook.example 123
 ---
 
 # uptime_integration_webhook (Resource)
 
-Webhook integration resource
+Webhook integration resource. Import using the integration ID: `terraform import uptime_integration_webhook.example 123`
 
 ## Example Usage
 

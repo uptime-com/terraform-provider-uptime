@@ -3,12 +3,12 @@
 page_title: "uptime_check_icmp Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Monitor network activity for a specific domain or IP address
+  Monitor network activity for a specific domain or IP address. Import using the check ID: terraform import uptime_check_icmp.example 123
 ---
 
 # uptime_check_icmp (Resource)
 
-Monitor network activity for a specific domain or IP address
+Monitor network activity for a specific domain or IP address. Import using the check ID: `terraform import uptime_check_icmp.example 123`
 
 
 

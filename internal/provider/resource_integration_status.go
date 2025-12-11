@@ -12,13 +12,13 @@ import (
 )
 
 func NewIntegrationStatusResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationStatusResourceModel, upapi.IntegrationStatus, upapi.Integration]{
-		api: IntegrationStatusResourceAPI{provider: p},
-		mod: IntegrationStatusResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationStatusResourceModel, upapi.IntegrationStatus, upapi.Integration](
+		IntegrationStatusResourceAPI{provider: p},
+		IntegrationStatusResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_status",
 			Schema: schema.Schema{
-				Description: "Status.io integration resource",
+				Description: "Status.io integration resource. Import using the integration ID: `terraform import uptime_integration_status.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -58,7 +58,8 @@ func NewIntegrationStatusResource(_ context.Context, p *providerImpl) resource.R
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationStatusResourceModel struct {

@@ -13,13 +13,13 @@ import (
 )
 
 func NewIntegrationJiraServicedeskResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationJiraServicedeskResourceModel, upapi.IntegrationJiraServicedesk, upapi.Integration]{
-		api: IntegrationJiraServicedeskResourceAPI{provider: p},
-		mod: IntegrationJiraServicedeskResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationJiraServicedeskResourceModel, upapi.IntegrationJiraServicedesk, upapi.Integration](
+		IntegrationJiraServicedeskResourceAPI{provider: p},
+		IntegrationJiraServicedeskResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_jira_servicedesk",
 			Schema: schema.Schema{
-				Description: "JIRA Service Desk integration resource",
+				Description: "JIRA Service Desk integration resource. Import using the integration ID: `terraform import uptime_integration_jira_servicedesk.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -75,7 +75,8 @@ func NewIntegrationJiraServicedeskResource(_ context.Context, p *providerImpl) r
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationJiraServicedeskResourceModel struct {

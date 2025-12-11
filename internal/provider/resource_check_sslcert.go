@@ -19,13 +19,13 @@ import (
 )
 
 func NewCheckSSLCertResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckSSLCertResourceModel, upapi.CheckSSLCert, upapi.Check]{
-		api: CheckSSLCertResourceAPI{provider: p},
-		mod: CheckSSLCertResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[CheckSSLCertResourceModel, upapi.CheckSSLCert, upapi.Check](
+		CheckSSLCertResourceAPI{provider: p},
+		CheckSSLCertResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "check_sslcert",
 			Schema: schema.Schema{
-				Description: "Verify SSL certificate validity",
+				Description: "Verify SSL certificate validity. Import using the check ID: `terraform import uptime_check_sslcert.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -130,7 +130,8 @@ func NewCheckSSLCertResource(_ context.Context, p *providerImpl) resource.Resour
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckSSLCertResourceModel struct {

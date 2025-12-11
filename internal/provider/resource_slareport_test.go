@@ -25,6 +25,16 @@ func TestAccSLAReportResource_Basic(t *testing.T) {
 				resource.TestCheckResourceAttr("uptime_sla_report.test", "services_selected.0.name", check_name),
 			),
 		},
+		{
+			ConfigVariables: config.Variables{
+				"name":       config.StringVariable(name),
+				"check_name": config.StringVariable(check_name),
+			},
+			ConfigDirectory:   config.StaticDirectory("testdata/resource_slareport/_basic"),
+			ResourceName:      "uptime_sla_report.test",
+			ImportState:       true,
+			ImportStateVerify: true,
+		},
 	}))
 }
 

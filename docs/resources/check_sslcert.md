@@ -3,12 +3,12 @@
 page_title: "uptime_check_sslcert Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Verify SSL certificate validity
+  Verify SSL certificate validity. Import using the check ID: terraform import uptime_check_sslcert.example 123
 ---
 
 # uptime_check_sslcert (Resource)
 
-Verify SSL certificate validity
+Verify SSL certificate validity. Import using the check ID: `terraform import uptime_check_sslcert.example 123`
 
 
 

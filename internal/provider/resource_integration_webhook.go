@@ -13,13 +13,13 @@ import (
 )
 
 func NewIntegrationWebhookResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationWebhookResourceModel, upapi.IntegrationWebhook, upapi.Integration]{
-		api: IntegrationWebhookResourceAPI{provider: p},
-		mod: IntegrationWebhookResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationWebhookResourceModel, upapi.IntegrationWebhook, upapi.Integration](
+		IntegrationWebhookResourceAPI{provider: p},
+		IntegrationWebhookResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_webhook",
 			Schema: schema.Schema{
-				Description: "Webhook integration resource",
+				Description: "Webhook integration resource. Import using the integration ID: `terraform import uptime_integration_webhook.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -45,7 +45,8 @@ func NewIntegrationWebhookResource(_ context.Context, p *providerImpl) resource.
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationWebhookResourceModel struct {

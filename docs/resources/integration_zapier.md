@@ -3,12 +3,12 @@
 page_title: "uptime_integration_zapier Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Zapier integration resource
+  Zapier integration resource. Import using the integration ID: terraform import uptime_integration_zapier.example 123
 ---
 
 # uptime_integration_zapier (Resource)
 
-Zapier integration resource
+Zapier integration resource. Import using the integration ID: `terraform import uptime_integration_zapier.example 123`
 
 ## Example Usage
 

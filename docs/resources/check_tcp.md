@@ -3,12 +3,12 @@
 page_title: "uptime_check_tcp Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Monitor a TCP port for a response
+  Monitor a TCP port for a response. Import using the check ID: terraform import uptime_check_tcp.example 123
 ---
 
 # uptime_check_tcp (Resource)
 
-Monitor a TCP port for a response
+Monitor a TCP port for a response. Import using the check ID: `terraform import uptime_check_tcp.example 123`
 
 
 

@@ -13,13 +13,13 @@ import (
 )
 
 func NewCheckICMPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckICMPResourceModel, upapi.CheckICMP, upapi.Check]{
+	return NewImportableAPIResource[CheckICMPResourceModel, upapi.CheckICMP, upapi.Check](
 		CheckICMPResourceAPI{provider: p},
 		CheckICMPResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_icmp",
 			Schema: schema.Schema{
-				Description: "Monitor network activity for a specific domain or IP address",
+				Description: "Monitor network activity for a specific domain or IP address. Import using the check ID: `terraform import uptime_check_icmp.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":                        IDSchemaAttribute(),
 					"url":                       URLSchemaAttribute(),
@@ -39,7 +39,8 @@ func NewCheckICMPResource(_ context.Context, p *providerImpl) resource.Resource 
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckICMPResourceModel struct {

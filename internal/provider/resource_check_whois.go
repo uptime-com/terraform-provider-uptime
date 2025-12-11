@@ -11,13 +11,13 @@ import (
 )
 
 func NewCheckWHOISResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckWHOISResourceModel, upapi.CheckWHOIS, upapi.Check]{
-		api: CheckWHOISResourceAPI{provider: p},
-		mod: CheckWHOISResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[CheckWHOISResourceModel, upapi.CheckWHOIS, upapi.Check](
+		CheckWHOISResourceAPI{provider: p},
+		CheckWHOISResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "check_whois",
 			Schema: schema.Schema{
-				Description: "Monitor domain's expiry date and registration details",
+				Description: "Monitor domain's expiry date and registration details. Import using the check ID: `terraform import uptime_check_whois.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -41,7 +41,8 @@ func NewCheckWHOISResource(_ context.Context, p *providerImpl) resource.Resource
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckWHOISResourceModel struct {

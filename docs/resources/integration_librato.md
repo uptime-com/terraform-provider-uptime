@@ -3,12 +3,12 @@
 page_title: "uptime_integration_librato Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Librato integration resource
+  Librato integration resource. Import using the integration ID: terraform import uptime_integration_librato.example 123
 ---
 
 # uptime_integration_librato (Resource)
 
-Librato integration resource
+Librato integration resource. Import using the integration ID: `terraform import uptime_integration_librato.example 123`
 
 ## Example Usage
 

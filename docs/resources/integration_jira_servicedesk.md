@@ -3,12 +3,12 @@
 page_title: "uptime_integration_jira_servicedesk Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  JIRA Service Desk integration resource
+  JIRA Service Desk integration resource. Import using the integration ID: terraform import uptime_integration_jira_servicedesk.example 123
 ---
 
 # uptime_integration_jira_servicedesk (Resource)
 
-JIRA Service Desk integration resource
+JIRA Service Desk integration resource. Import using the integration ID: `terraform import uptime_integration_jira_servicedesk.example 123`
 
 ## Example Usage
 

@@ -3,12 +3,12 @@
 page_title: "uptime_check_dns Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Monitor for DNS failures or changes
+  Monitor for DNS failures or changes. Import using the check ID: terraform import uptime_check_dns.example 123
 ---
 
 # uptime_check_dns (Resource)
 
-Monitor for DNS failures or changes
+Monitor for DNS failures or changes. Import using the check ID: `terraform import uptime_check_dns.example 123`
 
 
 
