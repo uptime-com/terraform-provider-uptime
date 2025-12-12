@@ -3,12 +3,12 @@
 page_title: "uptime_integration_pushover Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Pushover integration resource
+  Pushover integration resource. Import using the integration ID: terraform import uptime_integration_pushover.example 123
 ---
 
 # uptime_integration_pushover (Resource)
 
-Pushover integration resource
+Pushover integration resource. Import using the integration ID: `terraform import uptime_integration_pushover.example 123`
 
 ## Example Usage
 

@@ -12,13 +12,13 @@ import (
 )
 
 func NewIntegrationDatadogResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationDatadogResourceModel, upapi.IntegrationDatadog, upapi.Integration]{
-		api: IntegrationDatadogResourceAPI{provider: p},
-		mod: IntegrationDatadogResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationDatadogResourceModel, upapi.IntegrationDatadog, upapi.Integration](
+		IntegrationDatadogResourceAPI{provider: p},
+		IntegrationDatadogResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_datadog",
 			Schema: schema.Schema{
-				Description: "Datadog integration resource",
+				Description: "Datadog integration resource. Import using the integration ID: `terraform import uptime_integration_datadog.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -43,7 +43,8 @@ func NewIntegrationDatadogResource(_ context.Context, p *providerImpl) resource.
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationDatadogResourceModel struct {

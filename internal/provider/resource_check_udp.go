@@ -13,13 +13,13 @@ import (
 )
 
 func NewCheckUDPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckUDPResourceModel, upapi.CheckUDP, upapi.Check]{
+	return NewImportableAPIResource[CheckUDPResourceModel, upapi.CheckUDP, upapi.Check](
 		CheckUDPResourceAPI{provider: p},
 		CheckUDPResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_udp",
 			Schema: schema.Schema{
-				Description: "Monitor a UDP port for a response",
+				Description: "Monitor a UDP port for a response. Import using the check ID: `terraform import uptime_check_udp.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":      IDSchemaAttribute(),
 					"url":     URLSchemaAttribute(),
@@ -48,7 +48,8 @@ func NewCheckUDPResource(_ context.Context, p *providerImpl) resource.Resource {
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckUDPResourceModel struct {

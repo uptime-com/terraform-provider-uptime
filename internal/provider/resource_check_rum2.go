@@ -12,13 +12,13 @@ import (
 )
 
 func NewCheckRUM2Resource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckRUM2ResourceModel, upapi.CheckRUM2, upapi.Check]{
-		api: CheckRUM2ResourceAPI{provider: p},
-		mod: CheckRUM2ResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[CheckRUM2ResourceModel, upapi.CheckRUM2, upapi.Check](
+		CheckRUM2ResourceAPI{provider: p},
+		CheckRUM2ResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "check_rum2",
 			Schema: schema.Schema{
-				Description: "Create a new Real User Monitoring check",
+				Description: "Create a new Real User Monitoring check. Import using the check ID: `terraform import uptime_check_rum2.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":                        IDSchemaAttribute(),
 					"url":                       URLSchemaAttribute(),
@@ -33,7 +33,8 @@ func NewCheckRUM2Resource(_ context.Context, p *providerImpl) resource.Resource 
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckRUM2ResourceModel struct {

@@ -13,13 +13,13 @@ import (
 )
 
 func NewCheckSSHResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckSSHResourceModel, upapi.CheckSSH, upapi.Check]{
+	return NewImportableAPIResource[CheckSSHResourceModel, upapi.CheckSSH, upapi.Check](
 		CheckSSHResourceAPI{provider: p},
 		CheckSSHResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_ssh",
 			Schema: schema.Schema{
-				Description: "Monitor SSH access for a domain or IP address",
+				Description: "Monitor SSH access for a domain or IP address. Import using the check ID: `terraform import uptime_check_ssh.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":                        IDSchemaAttribute(),
 					"url":                       URLSchemaAttribute(),
@@ -40,7 +40,8 @@ func NewCheckSSHResource(_ context.Context, p *providerImpl) resource.Resource {
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckSSHResourceModel struct {

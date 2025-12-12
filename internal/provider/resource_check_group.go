@@ -15,13 +15,13 @@ import (
 )
 
 func NewCheckGroupResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckGroupResourceModel, upapi.CheckGroup, upapi.Check]{
+	return NewImportableAPIResource[CheckGroupResourceModel, upapi.CheckGroup, upapi.Check](
 		CheckGroupResourceAPI{provider: p},
 		CheckGroupResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_group",
 			Schema: schema.Schema{
-				Description: "Combine multiple checks",
+				Description: "Combine multiple checks. Import using the check ID: `terraform import uptime_check_group.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":                        IDSchemaAttribute(),
 					"name":                      NameSchemaAttribute(),
@@ -78,7 +78,8 @@ func NewCheckGroupResource(_ context.Context, p *providerImpl) resource.Resource
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckGroupConfigTimeAttribute struct {

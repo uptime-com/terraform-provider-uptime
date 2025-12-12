@@ -11,13 +11,13 @@ import (
 )
 
 func NewIntegrationPushbulletResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationPushbulletResourceModel, upapi.IntegrationPushbullet, upapi.Integration]{
-		api: IntegrationPushbulletResourceAPI{provider: p},
-		mod: IntegrationPushbulletResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationPushbulletResourceModel, upapi.IntegrationPushbullet, upapi.Integration](
+		IntegrationPushbulletResourceAPI{provider: p},
+		IntegrationPushbulletResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_pushbullet",
 			Schema: schema.Schema{
-				Description: "Pushbullet integration resource",
+				Description: "Pushbullet integration resource. Import using the integration ID: `terraform import uptime_integration_pushbullet.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -31,7 +31,8 @@ func NewIntegrationPushbulletResource(_ context.Context, p *providerImpl) resour
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationPushbulletResourceModel struct {

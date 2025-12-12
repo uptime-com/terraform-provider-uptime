@@ -3,12 +3,12 @@
 page_title: "uptime_integration_slack Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Slack integration resource
+  Slack integration resource. Import using the integration ID: terraform import uptime_integration_slack.example 123
 ---
 
 # uptime_integration_slack (Resource)
 
-Slack integration resource
+Slack integration resource. Import using the integration ID: `terraform import uptime_integration_slack.example 123`
 
 ## Example Usage
 

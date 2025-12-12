@@ -13,12 +13,13 @@ import (
 )
 
 func NewContactResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[ContactResourceModel, upapi.Contact, upapi.Contact]{
-		api: ContactResourceAPI{provider: p},
-		mod: ContactResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[ContactResourceModel, upapi.Contact, upapi.Contact](
+		&ContactResourceAPI{provider: p},
+		ContactResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "contact",
 			Schema: schema.Schema{
+				Description: "Contact resource. Import using the contact ID: `terraform import uptime_contact.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":   IDSchemaAttribute(),
 					"url":  URLSchemaAttribute(),
@@ -56,7 +57,8 @@ func NewContactResource(_ context.Context, p *providerImpl) resource.Resource {
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type ContactResourceModel struct {

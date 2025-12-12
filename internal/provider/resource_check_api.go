@@ -12,13 +12,13 @@ import (
 )
 
 func NewCheckAPIResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckAPIResourceModel, upapi.CheckAPI, upapi.Check]{
+	return NewImportableAPIResource[CheckAPIResourceModel, upapi.CheckAPI, upapi.Check](
 		CheckAPIResourceAPI{provider: p},
 		CheckAPIResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_api",
 			Schema: schema.Schema{
-				Description: "Multi-step advanced check type that is intended to monitor API such as REST or SOAP",
+				Description: "Multi-step advanced check type that is intended to monitor API such as REST or SOAP. Import using the check ID: `terraform import uptime_check_api.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":                        IDSchemaAttribute(),
 					"url":                       URLSchemaAttribute(),
@@ -38,7 +38,8 @@ func NewCheckAPIResource(_ context.Context, p *providerImpl) resource.Resource {
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckAPIResource struct {

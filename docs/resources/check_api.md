@@ -3,12 +3,12 @@
 page_title: "uptime_check_api Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Multi-step advanced check type that is intended to monitor API such as REST or SOAP
+  Multi-step advanced check type that is intended to monitor API such as REST or SOAP. Import using the check ID: terraform import uptime_check_api.example 123
 ---
 
 # uptime_check_api (Resource)
 
-Multi-step advanced check type that is intended to monitor API such as REST or SOAP
+Multi-step advanced check type that is intended to monitor API such as REST or SOAP. Import using the check ID: `terraform import uptime_check_api.example 123`
 
 
 

@@ -3,12 +3,12 @@
 page_title: "uptime_check_webhook Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Receive alerts based on periodic jobs or processes using an automated HTTP callback
+  Receive alerts based on periodic jobs or processes using an automated HTTP callback. Import using the check ID: terraform import uptime_check_webhook.example 123
 ---
 
 # uptime_check_webhook (Resource)
 
-Receive alerts based on periodic jobs or processes using an automated HTTP callback
+Receive alerts based on periodic jobs or processes using an automated HTTP callback. Import using the check ID: `terraform import uptime_check_webhook.example 123`
 
 
 

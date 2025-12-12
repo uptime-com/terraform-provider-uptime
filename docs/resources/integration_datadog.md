@@ -3,12 +3,12 @@
 page_title: "uptime_integration_datadog Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Datadog integration resource
+  Datadog integration resource. Import using the integration ID: terraform import uptime_integration_datadog.example 123
 ---
 
 # uptime_integration_datadog (Resource)
 
-Datadog integration resource
+Datadog integration resource. Import using the integration ID: `terraform import uptime_integration_datadog.example 123`
 
 ## Example Usage
 

@@ -12,13 +12,13 @@ import (
 )
 
 func NewCheckWebhookResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckWebhookResourceModel, upapi.CheckWebhook, upapi.Check]{
-		api: CheckWebookResourceAPI{provider: p},
-		mod: CheckWebhookResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[CheckWebhookResourceModel, upapi.CheckWebhook, upapi.Check](
+		CheckWebookResourceAPI{provider: p},
+		CheckWebhookResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "check_webhook",
 			Schema: schema.Schema{
-				Description: "Receive alerts based on periodic jobs or processes using an automated HTTP callback",
+				Description: "Receive alerts based on periodic jobs or processes using an automated HTTP callback. Import using the check ID: `terraform import uptime_check_webhook.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":                        IDSchemaAttribute(),
 					"url":                       URLSchemaAttribute(),
@@ -36,7 +36,8 @@ func NewCheckWebhookResource(_ context.Context, p *providerImpl) resource.Resour
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckWebhookResourceModel struct {

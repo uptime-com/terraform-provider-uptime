@@ -3,12 +3,12 @@
 page_title: "uptime_sla_report Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  
+  SLA report resource. Import using the SLA report ID: terraform import uptime_sla_report.example 123
 ---
 
 # uptime_sla_report (Resource)
 
-
+SLA report resource. Import using the SLA report ID: `terraform import uptime_sla_report.example 123`
 
 
 

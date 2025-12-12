@@ -13,13 +13,13 @@ import (
 )
 
 func NewCheckNTPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckNTPResourceModel, upapi.CheckNTP, upapi.Check]{
-		api: CheckNTPResourceAPI{provider: p},
-		mod: CheckNTPResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[CheckNTPResourceModel, upapi.CheckNTP, upapi.Check](
+		CheckNTPResourceAPI{provider: p},
+		CheckNTPResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "check_ntp",
 			Schema: schema.Schema{
-				Description: "Monitor a Network Time Protocol server",
+				Description: "Monitor a Network Time Protocol server. Import using the check ID: `terraform import uptime_check_ntp.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":                        IDSchemaAttribute(),
 					"url":                       URLSchemaAttribute(),
@@ -41,7 +41,8 @@ func NewCheckNTPResource(_ context.Context, p *providerImpl) resource.Resource {
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 // var checkNTPResourceSchema =

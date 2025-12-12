@@ -1,5 +1,16 @@
 # Uptime.com Terraform provider changelog
 
+## v2.22.0
+
+Enhancements:
+* Add Terraform import support for remaining resources:
+  * `uptime_contact` (simple ID import)
+  * `uptime_scheduled_report` (simple ID import)
+  * `uptime_sla_report` (simple ID import)
+  * `uptime_dashboard` (simple ID import)
+  * All check resources (simple ID import)
+  * All 18 integration resources (simple ID import)
+
 ## v2.21.0
 
 Enhancements:

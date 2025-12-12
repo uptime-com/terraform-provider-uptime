@@ -40,6 +40,19 @@ func TestAccUserResource(t *testing.T) {
 				),
 			},
 			{
+				ConfigDirectory: config.StaticDirectory("testdata/resource_user/basic"),
+				ConfigVariables: config.Variables{
+					"email":      config.StringVariable(email),
+					"first_name": config.StringVariable(firstName),
+					"last_name":  config.StringVariable(lastName),
+					"password":   config.StringVariable(password),
+				},
+				ResourceName:            "uptime_user.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"password"},
+			},
+			{
 				ConfigDirectory: config.StaticDirectory("testdata/resource_user/update"),
 				ConfigVariables: config.Variables{
 					"email":                config.StringVariable(email),

@@ -13,13 +13,13 @@ import (
 )
 
 func NewCheckIMAPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckIMAPResourceModel, upapi.CheckIMAP, upapi.Check]{
+	return NewImportableAPIResource[CheckIMAPResourceModel, upapi.CheckIMAP, upapi.Check](
 		CheckIMAPResourceAPI{provider: p},
 		CheckIMAPResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_imap",
 			Schema: schema.Schema{
-				Description: "Monitor IMAP server availability",
+				Description: "Monitor IMAP server availability. Import using the check ID: `terraform import uptime_check_imap.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -45,7 +45,8 @@ func NewCheckIMAPResource(_ context.Context, p *providerImpl) resource.Resource 
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckIMAPResourceModel struct {

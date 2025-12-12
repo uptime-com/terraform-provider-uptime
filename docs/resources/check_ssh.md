@@ -3,12 +3,12 @@
 page_title: "uptime_check_ssh Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Monitor SSH access for a domain or IP address
+  Monitor SSH access for a domain or IP address. Import using the check ID: terraform import uptime_check_ssh.example 123
 ---
 
 # uptime_check_ssh (Resource)
 
-Monitor SSH access for a domain or IP address
+Monitor SSH access for a domain or IP address. Import using the check ID: `terraform import uptime_check_ssh.example 123`
 
 
 

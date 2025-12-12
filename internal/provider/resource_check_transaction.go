@@ -12,13 +12,13 @@ import (
 )
 
 func NewCheckTransactionResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckTransactionResourceModel, upapi.CheckTransaction, upapi.Check]{
+	return NewImportableAPIResource[CheckTransactionResourceModel, upapi.CheckTransaction, upapi.Check](
 		CheckTransactionResourceAPI{provider: p},
 		CheckTransactionResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_transaction",
 			Schema: schema.Schema{
-				Description: "Transaction check to monitor your entire site by scanning for suitable checks to add",
+				Description: "Transaction check to monitor your entire site by scanning for suitable checks to add. Import using the check ID: `terraform import uptime_check_transaction.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":                        IDSchemaAttribute(),
 					"url":                       URLSchemaAttribute(),
@@ -38,7 +38,8 @@ func NewCheckTransactionResource(_ context.Context, p *providerImpl) resource.Re
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckTransactionResource struct {

@@ -3,12 +3,12 @@
 page_title: "uptime_check_rdap Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Monitor domain's expiry date and registration details using RDAP (Registration Data Access Protocol)
+  Monitor domain's expiry date and registration details using RDAP (Registration Data Access Protocol). Import using the check ID: terraform import uptime_check_rdap.example 123
 ---
 
 # uptime_check_rdap (Resource)
 
-Monitor domain's expiry date and registration details using RDAP (Registration Data Access Protocol)
+Monitor domain's expiry date and registration details using RDAP (Registration Data Access Protocol). Import using the check ID: `terraform import uptime_check_rdap.example 123`
 
 
 

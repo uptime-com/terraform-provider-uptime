@@ -3,12 +3,12 @@
 page_title: "uptime_check_rum2 Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Create a new Real User Monitoring check
+  Create a new Real User Monitoring check. Import using the check ID: terraform import uptime_check_rum2.example 123
 ---
 
 # uptime_check_rum2 (Resource)
 
-Create a new Real User Monitoring check
+Create a new Real User Monitoring check. Import using the check ID: `terraform import uptime_check_rum2.example 123`
 
 
 

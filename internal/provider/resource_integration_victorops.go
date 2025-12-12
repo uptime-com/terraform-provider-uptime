@@ -12,13 +12,13 @@ import (
 )
 
 func NewIntegrationVictoropsResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationVictoropsResourceModel, upapi.IntegrationVictorops, upapi.Integration]{
-		api: IntegrationVictoropsResourceAPI{provider: p},
-		mod: IntegrationVictoropsResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationVictoropsResourceModel, upapi.IntegrationVictorops, upapi.Integration](
+		IntegrationVictoropsResourceAPI{provider: p},
+		IntegrationVictoropsResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_victorops",
 			Schema: schema.Schema{
-				Description: "VictorOps integration resource",
+				Description: "VictorOps integration resource. Import using the integration ID: `terraform import uptime_integration_victorops.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -38,7 +38,8 @@ func NewIntegrationVictoropsResource(_ context.Context, p *providerImpl) resourc
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationVictoropsResourceModel struct {

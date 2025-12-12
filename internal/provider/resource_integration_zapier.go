@@ -11,13 +11,13 @@ import (
 )
 
 func NewIntegrationZapierResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationZapierResourceModel, upapi.IntegrationZapier, upapi.Integration]{
-		api: IntegrationZapierResourceAPI{provider: p},
-		mod: IntegrationZapierResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationZapierResourceModel, upapi.IntegrationZapier, upapi.Integration](
+		IntegrationZapierResourceAPI{provider: p},
+		IntegrationZapierResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_zapier",
 			Schema: schema.Schema{
-				Description: "Zapier integration resource",
+				Description: "Zapier integration resource. Import using the integration ID: `terraform import uptime_integration_zapier.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -31,7 +31,8 @@ func NewIntegrationZapierResource(_ context.Context, p *providerImpl) resource.R
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationZapierResourceModel struct {

@@ -3,12 +3,12 @@
 page_title: "uptime_integration_wavefront Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Wavefront integration resource
+  Wavefront integration resource. Import using the integration ID: terraform import uptime_integration_wavefront.example 123
 ---
 
 # uptime_integration_wavefront (Resource)
 
-Wavefront integration resource
+Wavefront integration resource. Import using the integration ID: `terraform import uptime_integration_wavefront.example 123`
 
 ## Example Usage
 

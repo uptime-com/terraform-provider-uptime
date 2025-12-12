@@ -13,13 +13,13 @@ import (
 )
 
 func NewCheckPOPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckPOPResourceModel, upapi.CheckPOP, upapi.Check]{
+	return NewImportableAPIResource[CheckPOPResourceModel, upapi.CheckPOP, upapi.Check](
 		CheckPOPResourceAPI{provider: p},
 		CheckPOPResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_pop",
 			Schema: schema.Schema{
-				Description: "Monitor POP server availability",
+				Description: "Monitor POP server availability. Import using the check ID: `terraform import uptime_check_pop.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -45,7 +45,8 @@ func NewCheckPOPResource(_ context.Context, p *providerImpl) resource.Resource {
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckPOPResourceModel struct {

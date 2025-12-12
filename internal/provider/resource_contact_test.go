@@ -39,12 +39,9 @@ func TestAccContactResource_EmailList(t *testing.T) {
 					config.StringVariable("nobody@uptime.com"),
 				),
 			},
-			Check: resource.ComposeAggregateTestCheckFunc(
-				resource.TestCheckResourceAttr("uptime_contact.test", "name", names[1]),
-
-				resource.TestCheckResourceAttr("uptime_contact.test", "email_list.#", "1"),
-				resource.TestCheckResourceAttr("uptime_contact.test", "email_list.0", "nobody@uptime.com"),
-			),
+			ResourceName:      "uptime_contact.test",
+			ImportState:       true,
+			ImportStateVerify: true,
 		},
 	}))
 }

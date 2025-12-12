@@ -3,12 +3,12 @@
 page_title: "uptime_integration_pagerduty Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  PagerDuty integration resource
+  PagerDuty integration resource. Import using the integration ID: terraform import uptime_integration_pagerduty.example 123
 ---
 
 # uptime_integration_pagerduty (Resource)
 
-PagerDuty integration resource
+PagerDuty integration resource. Import using the integration ID: `terraform import uptime_integration_pagerduty.example 123`
 
 ## Example Usage
 

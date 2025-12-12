@@ -17,13 +17,13 @@ import (
 )
 
 func NewDashboardResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[DashboardResourceModel, upapi.Dashboard, upapi.Dashboard]{
-		api: DashboardResourceAPI{provider: p},
-		mod: DashboardResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[DashboardResourceModel, upapi.Dashboard, upapi.Dashboard](
+		&DashboardResourceAPI{provider: p},
+		DashboardResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "dashboard",
 			Schema: schema.Schema{
-				Description: "Custom dashboard resource",
+				Description: "Custom dashboard resource. Import using the dashboard ID: `terraform import uptime_dashboard.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":   IDSchemaAttribute(),
 					"name": NameSchemaAttribute(),
@@ -161,7 +161,8 @@ func NewDashboardResource(_ context.Context, p *providerImpl) resource.Resource 
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type DashboardResourceModel struct {

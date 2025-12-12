@@ -3,12 +3,12 @@
 page_title: "uptime_check_whois Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Monitor domain's expiry date and registration details
+  Monitor domain's expiry date and registration details. Import using the check ID: terraform import uptime_check_whois.example 123
 ---
 
 # uptime_check_whois (Resource)
 
-Monitor domain's expiry date and registration details
+Monitor domain's expiry date and registration details. Import using the check ID: `terraform import uptime_check_whois.example 123`
 
 
 
