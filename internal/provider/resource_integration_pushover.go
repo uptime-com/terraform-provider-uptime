@@ -11,13 +11,13 @@ import (
 )
 
 func NewIntegrationPushoverResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationPushoverResourceModel, upapi.IntegrationPushover, upapi.Integration]{
-		api: IntegrationPushoverResourceAPI{provider: p},
-		mod: IntegrationPushoverResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationPushoverResourceModel, upapi.IntegrationPushover, upapi.Integration](
+		IntegrationPushoverResourceAPI{provider: p},
+		IntegrationPushoverResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_pushover",
 			Schema: schema.Schema{
-				Description: "Pushover integration resource",
+				Description: "Pushover integration resource. Import using the integration ID: `terraform import uptime_integration_pushover.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -35,7 +35,8 @@ func NewIntegrationPushoverResource(_ context.Context, p *providerImpl) resource
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationPushoverResourceModel struct {

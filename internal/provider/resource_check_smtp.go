@@ -13,13 +13,13 @@ import (
 )
 
 func NewCheckSMTPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckSMTPResourceModel, upapi.CheckSMTP, upapi.Check]{
+	return NewImportableAPIResource[CheckSMTPResourceModel, upapi.CheckSMTP, upapi.Check](
 		CheckSMTPResourceAPI{provider: p},
 		CheckSMTPResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_smtp",
 			Schema: schema.Schema{
-				Description: "Monitor SMTP server availability",
+				Description: "Monitor SMTP server availability. Import using the check ID: `terraform import uptime_check_smtp.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -45,7 +45,8 @@ func NewCheckSMTPResource(_ context.Context, p *providerImpl) resource.Resource 
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckSMTPResourceModel struct {

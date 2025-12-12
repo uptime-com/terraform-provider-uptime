@@ -3,12 +3,12 @@
 page_title: "uptime_integration_geckoboard Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Geckoboard integration resource
+  Geckoboard integration resource. Import using the integration ID: terraform import uptime_integration_geckoboard.example 123
 ---
 
 # uptime_integration_geckoboard (Resource)
 
-Geckoboard integration resource
+Geckoboard integration resource. Import using the integration ID: `terraform import uptime_integration_geckoboard.example 123`
 
 ## Example Usage
 

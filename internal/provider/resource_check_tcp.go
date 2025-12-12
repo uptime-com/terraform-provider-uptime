@@ -13,13 +13,13 @@ import (
 )
 
 func NewCheckTCPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckTCPResourceModel, upapi.CheckTCP, upapi.Check]{
+	return NewImportableAPIResource[CheckTCPResourceModel, upapi.CheckTCP, upapi.Check](
 		CheckTCPResourceAPI{provider: p},
 		CheckTCPResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_tcp",
 			Schema: schema.Schema{
-				Description: "Monitor a TCP port for a response",
+				Description: "Monitor a TCP port for a response. Import using the check ID: `terraform import uptime_check_tcp.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":                        IDSchemaAttribute(),
 					"url":                       URLSchemaAttribute(),
@@ -46,7 +46,8 @@ func NewCheckTCPResource(_ context.Context, p *providerImpl) resource.Resource {
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckTCPResourceModel struct {

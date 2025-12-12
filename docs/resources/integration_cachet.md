@@ -3,12 +3,12 @@
 page_title: "uptime_integration_cachet Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Cachet integration resource
+  Cachet integration resource. Import using the integration ID: terraform import uptime_integration_cachet.example 123
 ---
 
 # uptime_integration_cachet (Resource)
 
-Cachet integration resource
+Cachet integration resource. Import using the integration ID: `terraform import uptime_integration_cachet.example 123`
 
 ## Example Usage
 

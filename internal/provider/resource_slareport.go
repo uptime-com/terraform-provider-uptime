@@ -16,12 +16,13 @@ import (
 )
 
 func NewSLAReportResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[SLAReportResourceModel, upapi.SLAReport, upapi.SLAReport]{
-		api: &SLAReportResourceAPI{provider: p},
-		mod: SLAReportResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[SLAReportResourceModel, upapi.SLAReport, upapi.SLAReport](
+		&SLAReportResourceAPI{provider: p},
+		SLAReportResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "sla_report",
 			Schema: schema.Schema{
+				Description: "SLA report resource. Import using the SLA report ID: `terraform import uptime_sla_report.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":            IDSchemaAttribute(),
 					"url":           URLSchemaAttribute(),
@@ -130,7 +131,8 @@ func NewSLAReportResource(_ context.Context, p *providerImpl) resource.Resource 
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type SLAReportResourceModel struct {

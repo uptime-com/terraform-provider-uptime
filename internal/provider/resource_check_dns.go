@@ -14,13 +14,13 @@ import (
 )
 
 func NewCheckDNSResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckDNSResourceModel, upapi.CheckDNS, upapi.Check]{
+	return NewImportableAPIResource[CheckDNSResourceModel, upapi.CheckDNS, upapi.Check](
 		CheckDNSResourceAPI{provider: p},
 		CheckDNSResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_dns",
 			Schema: schema.Schema{
-				Description: "Monitor for DNS failures or changes",
+				Description: "Monitor for DNS failures or changes. Import using the check ID: `terraform import uptime_check_dns.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -60,7 +60,8 @@ func NewCheckDNSResource(_ context.Context, p *providerImpl) resource.Resource {
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckDNSResourceModel struct {

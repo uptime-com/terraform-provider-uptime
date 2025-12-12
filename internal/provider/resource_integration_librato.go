@@ -11,13 +11,13 @@ import (
 )
 
 func NewIntegrationLibratoResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationLibratoResourceModel, upapi.IntegrationLibrato, upapi.Integration]{
-		api: IntegrationLibratoResourceAPI{provider: p},
-		mod: IntegrationLibratoResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationLibratoResourceModel, upapi.IntegrationLibrato, upapi.Integration](
+		IntegrationLibratoResourceAPI{provider: p},
+		IntegrationLibratoResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_librato",
 			Schema: schema.Schema{
-				Description: "Librato integration resource",
+				Description: "Librato integration resource. Import using the integration ID: `terraform import uptime_integration_librato.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -39,7 +39,8 @@ func NewIntegrationLibratoResource(_ context.Context, p *providerImpl) resource.
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationLibratoResourceModel struct {

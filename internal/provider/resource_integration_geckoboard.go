@@ -11,13 +11,13 @@ import (
 )
 
 func NewIntegrationGeckoboardResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationGeckoboardResourceModel, upapi.IntegrationGeckoboard, upapi.Integration]{
-		api: IntegrationGeckoboardResourceAPI{provider: p},
-		mod: IntegrationGeckoboardResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationGeckoboardResourceModel, upapi.IntegrationGeckoboard, upapi.Integration](
+		IntegrationGeckoboardResourceAPI{provider: p},
+		IntegrationGeckoboardResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_geckoboard",
 			Schema: schema.Schema{
-				Description: "Geckoboard integration resource",
+				Description: "Geckoboard integration resource. Import using the integration ID: `terraform import uptime_integration_geckoboard.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -35,7 +35,8 @@ func NewIntegrationGeckoboardResource(_ context.Context, p *providerImpl) resour
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationGeckoboardResourceModel struct {

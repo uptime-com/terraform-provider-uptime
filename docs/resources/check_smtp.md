@@ -3,12 +3,12 @@
 page_title: "uptime_check_smtp Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Monitor SMTP server availability
+  Monitor SMTP server availability. Import using the check ID: terraform import uptime_check_smtp.example 123
 ---
 
 # uptime_check_smtp (Resource)
 
-Monitor SMTP server availability
+Monitor SMTP server availability. Import using the check ID: `terraform import uptime_check_smtp.example 123`
 
 
 

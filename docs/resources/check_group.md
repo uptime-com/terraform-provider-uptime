@@ -3,12 +3,12 @@
 page_title: "uptime_check_group Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Combine multiple checks
+  Combine multiple checks. Import using the check ID: terraform import uptime_check_group.example 123
 ---
 
 # uptime_check_group (Resource)
 
-Combine multiple checks
+Combine multiple checks. Import using the check ID: `terraform import uptime_check_group.example 123`
 
 
 

@@ -3,12 +3,12 @@
 page_title: "uptime_check_transaction Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Transaction check to monitor your entire site by scanning for suitable checks to add
+  Transaction check to monitor your entire site by scanning for suitable checks to add. Import using the check ID: terraform import uptime_check_transaction.example 123
 ---
 
 # uptime_check_transaction (Resource)
 
-Transaction check to monitor your entire site by scanning for suitable checks to add
+Transaction check to monitor your entire site by scanning for suitable checks to add. Import using the check ID: `terraform import uptime_check_transaction.example 123`
 
 
 

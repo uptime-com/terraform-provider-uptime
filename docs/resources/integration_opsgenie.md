@@ -3,12 +3,12 @@
 page_title: "uptime_integration_opsgenie Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Opsgenie integration resource
+  Opsgenie integration resource. Import using the integration ID: terraform import uptime_integration_opsgenie.example 123
 ---
 
 # uptime_integration_opsgenie (Resource)
 
-Opsgenie integration resource
+Opsgenie integration resource. Import using the integration ID: `terraform import uptime_integration_opsgenie.example 123`
 
 ## Example Usage
 

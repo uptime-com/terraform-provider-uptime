@@ -17,13 +17,13 @@ import (
 )
 
 func NewCheckHTTPResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckHTTPResourceModel, upapi.CheckHTTP, upapi.Check]{
-		api: CheckHTTPResourceAPI{provider: p},
-		mod: CheckHTTPResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[CheckHTTPResourceModel, upapi.CheckHTTP, upapi.Check](
+		CheckHTTPResourceAPI{provider: p},
+		CheckHTTPResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "check_http",
 			Schema: schema.Schema{
-				Description: "Monitor a URL for specific status code(s)",
+				Description: "Monitor a URL for specific status code(s). Import using the check ID: `terraform import uptime_check_http.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":                        IDSchemaAttribute(),
 					"url":                       URLSchemaAttribute(),
@@ -110,7 +110,8 @@ func NewCheckHTTPResource(_ context.Context, p *providerImpl) resource.Resource 
 					path.Root("address"), path.Root("port"))}
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckHTTPResourceModel struct {

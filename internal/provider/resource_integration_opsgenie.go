@@ -13,13 +13,13 @@ import (
 )
 
 func NewIntegrationOpsgenieResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationOpsgenieResourceModel, upapi.IntegrationOpsgenie, upapi.Integration]{
-		api: IntegrationOpsgenieResourceAPI{provider: p},
-		mod: IntegrationOpsgenieResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationOpsgenieResourceModel, upapi.IntegrationOpsgenie, upapi.Integration](
+		IntegrationOpsgenieResourceAPI{provider: p},
+		IntegrationOpsgenieResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_opsgenie",
 			Schema: schema.Schema{
-				Description: "Opsgenie integration resource",
+				Description: "Opsgenie integration resource. Import using the integration ID: `terraform import uptime_integration_opsgenie.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -54,7 +54,8 @@ func NewIntegrationOpsgenieResource(_ context.Context, p *providerImpl) resource
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationOpsgenieResourceModel struct {

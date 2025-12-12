@@ -12,13 +12,13 @@ import (
 )
 
 func NewIntegrationPagerdutyResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationPagerdutyResourceModel, upapi.IntegrationPagerduty, upapi.Integration]{
-		api: IntegrationPagerdutyResourceAPI{provider: p},
-		mod: IntegrationPagerdutyResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationPagerdutyResourceModel, upapi.IntegrationPagerduty, upapi.Integration](
+		IntegrationPagerdutyResourceAPI{provider: p},
+		IntegrationPagerdutyResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_pagerduty",
 			Schema: schema.Schema{
-				Description: "PagerDuty integration resource",
+				Description: "PagerDuty integration resource. Import using the integration ID: `terraform import uptime_integration_pagerduty.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -38,7 +38,8 @@ func NewIntegrationPagerdutyResource(_ context.Context, p *providerImpl) resourc
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationPagerdutyResourceModel struct {

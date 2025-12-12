@@ -3,12 +3,12 @@
 page_title: "uptime_check_ntp Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Monitor a Network Time Protocol server
+  Monitor a Network Time Protocol server. Import using the check ID: terraform import uptime_check_ntp.example 123
 ---
 
 # uptime_check_ntp (Resource)
 
-Monitor a Network Time Protocol server
+Monitor a Network Time Protocol server. Import using the check ID: `terraform import uptime_check_ntp.example 123`
 
 
 

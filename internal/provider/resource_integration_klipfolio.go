@@ -11,13 +11,13 @@ import (
 )
 
 func NewIntegrationKlipfolioResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationKlipfolioResourceModel, upapi.IntegrationKlipfolio, upapi.Integration]{
-		api: IntegrationKlipfolioResourceAPI{provider: p},
-		mod: IntegrationKlipfolioResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationKlipfolioResourceModel, upapi.IntegrationKlipfolio, upapi.Integration](
+		IntegrationKlipfolioResourceAPI{provider: p},
+		IntegrationKlipfolioResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_klipfolio",
 			Schema: schema.Schema{
-				Description: "Klipfolio integration resource",
+				Description: "Klipfolio integration resource. Import using the integration ID: `terraform import uptime_integration_klipfolio.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -35,7 +35,8 @@ func NewIntegrationKlipfolioResource(_ context.Context, p *providerImpl) resourc
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationKlipfolioResourceModel struct {

@@ -3,12 +3,12 @@
 page_title: "uptime_check_pop Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Monitor POP server availability
+  Monitor POP server availability. Import using the check ID: terraform import uptime_check_pop.example 123
 ---
 
 # uptime_check_pop (Resource)
 
-Monitor POP server availability
+Monitor POP server availability. Import using the check ID: `terraform import uptime_check_pop.example 123`
 
 
 

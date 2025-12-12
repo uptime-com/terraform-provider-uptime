@@ -3,12 +3,12 @@
 page_title: "uptime_check_udp Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Monitor a UDP port for a response
+  Monitor a UDP port for a response. Import using the check ID: terraform import uptime_check_udp.example 123
 ---
 
 # uptime_check_udp (Resource)
 
-Monitor a UDP port for a response
+Monitor a UDP port for a response. Import using the check ID: `terraform import uptime_check_udp.example 123`
 
 
 

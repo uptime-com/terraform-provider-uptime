@@ -11,13 +11,13 @@ import (
 )
 
 func NewIntegrationMicrosoftTeamsResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationMicrosoftTeamsResourceModel, upapi.IntegrationMicrosoftTeams, upapi.Integration]{
-		api: IntegrationMicrosoftTeamsResourceAPI{provider: p},
-		mod: IntegrationMicrosoftTeamsResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationMicrosoftTeamsResourceModel, upapi.IntegrationMicrosoftTeams, upapi.Integration](
+		IntegrationMicrosoftTeamsResourceAPI{provider: p},
+		IntegrationMicrosoftTeamsResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_microsoft_teams",
 			Schema: schema.Schema{
-				Description: "Microsoft Teams integration resource",
+				Description: "Microsoft Teams integration resource. Import using the integration ID: `terraform import uptime_integration_microsoft_teams.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -31,7 +31,8 @@ func NewIntegrationMicrosoftTeamsResource(_ context.Context, p *providerImpl) re
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationMicrosoftTeamsResourceModel struct {

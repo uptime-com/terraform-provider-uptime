@@ -12,13 +12,13 @@ import (
 )
 
 func NewIntegrationCachetResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[IntegrationCachetResourceModel, upapi.IntegrationCachet, upapi.Integration]{
-		api: IntegrationCachetResourceAPI{provider: p},
-		mod: IntegrationCachetResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[IntegrationCachetResourceModel, upapi.IntegrationCachet, upapi.Integration](
+		IntegrationCachetResourceAPI{provider: p},
+		IntegrationCachetResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "integration_cachet",
 			Schema: schema.Schema{
-				Description: "Cachet integration resource",
+				Description: "Cachet integration resource. Import using the integration ID: `terraform import uptime_integration_cachet.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -48,7 +48,8 @@ func NewIntegrationCachetResource(_ context.Context, p *providerImpl) resource.R
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type IntegrationCachetResourceModel struct {

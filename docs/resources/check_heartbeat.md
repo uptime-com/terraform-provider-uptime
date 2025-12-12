@@ -3,12 +3,12 @@
 page_title: "uptime_check_heartbeat Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Monitor a periodic process, such as Cron, and issue alerts if the expected interval is exceeded
+  Monitor a periodic process, such as Cron, and issue alerts if the expected interval is exceeded. Import using the check ID: terraform import uptime_check_heartbeat.example 123
 ---
 
 # uptime_check_heartbeat (Resource)
 
-Monitor a periodic process, such as Cron, and issue alerts if the expected interval is exceeded
+Monitor a periodic process, such as Cron, and issue alerts if the expected interval is exceeded. Import using the check ID: `terraform import uptime_check_heartbeat.example 123`
 
 
 

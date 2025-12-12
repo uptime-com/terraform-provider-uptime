@@ -3,12 +3,12 @@
 page_title: "uptime_integration_klipfolio Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Klipfolio integration resource
+  Klipfolio integration resource. Import using the integration ID: terraform import uptime_integration_klipfolio.example 123
 ---
 
 # uptime_integration_klipfolio (Resource)
 
-Klipfolio integration resource
+Klipfolio integration resource. Import using the integration ID: `terraform import uptime_integration_klipfolio.example 123`
 
 ## Example Usage
 

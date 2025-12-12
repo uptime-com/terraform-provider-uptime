@@ -3,12 +3,12 @@
 page_title: "uptime_integration_victorops Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  VictorOps integration resource
+  VictorOps integration resource. Import using the integration ID: terraform import uptime_integration_victorops.example 123
 ---
 
 # uptime_integration_victorops (Resource)
 
-VictorOps integration resource
+VictorOps integration resource. Import using the integration ID: `terraform import uptime_integration_victorops.example 123`
 
 ## Example Usage
 

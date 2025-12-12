@@ -27,6 +27,16 @@ func TestAccDashboardResource(t *testing.T) {
 					resource.TestCheckResourceAttr("uptime_dashboard.basic", "selected.services.0", name),
 				),
 			},
+			{
+				ConfigDirectory: config.StaticDirectory("testdata/resource_dashboard/_basic"),
+				ConfigVariables: config.Variables{
+					"name":       config.StringVariable(name),
+					"check_name": config.StringVariable(name),
+				},
+				ResourceName:      "uptime_dashboard.basic",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }

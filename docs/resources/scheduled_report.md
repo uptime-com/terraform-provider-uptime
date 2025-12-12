@@ -3,12 +3,12 @@
 page_title: "uptime_scheduled_report Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  
+  Scheduled report resource. Import using the scheduled report ID: terraform import uptime_scheduled_report.example 123
 ---
 
 # uptime_scheduled_report (Resource)
 
-
+Scheduled report resource. Import using the scheduled report ID: `terraform import uptime_scheduled_report.example 123`
 
 
 

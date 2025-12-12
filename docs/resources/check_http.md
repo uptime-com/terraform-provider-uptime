@@ -3,12 +3,12 @@
 page_title: "uptime_check_http Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Monitor a URL for specific status code(s)
+  Monitor a URL for specific status code(s). Import using the check ID: terraform import uptime_check_http.example 123
 ---
 
 # uptime_check_http (Resource)
 
-Monitor a URL for specific status code(s)
+Monitor a URL for specific status code(s). Import using the check ID: `terraform import uptime_check_http.example 123`
 
 
 

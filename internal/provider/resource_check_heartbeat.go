@@ -13,13 +13,13 @@ import (
 )
 
 func NewCheckHeartbeatResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckHeartbeatResourceModel, upapi.CheckHeartbeat, upapi.Check]{
-		api: CheckHeartbeatResourceAPI{provider: p},
-		mod: CheckHeartbeatResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[CheckHeartbeatResourceModel, upapi.CheckHeartbeat, upapi.Check](
+		CheckHeartbeatResourceAPI{provider: p},
+		CheckHeartbeatResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "check_heartbeat",
 			Schema: schema.Schema{
-				Description: "Monitor a periodic process, such as Cron, and issue alerts if the expected interval is exceeded",
+				Description: "Monitor a periodic process, such as Cron, and issue alerts if the expected interval is exceeded. Import using the check ID: `terraform import uptime_check_heartbeat.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":                        IDSchemaAttribute(),
 					"url":                       URLSchemaAttribute(),
@@ -38,7 +38,8 @@ func NewCheckHeartbeatResource(_ context.Context, p *providerImpl) resource.Reso
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckHeartbeatResourceModel struct {

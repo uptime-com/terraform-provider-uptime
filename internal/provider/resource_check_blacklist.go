@@ -12,13 +12,13 @@ import (
 )
 
 func NewCheckBlacklistResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckBlacklistResourceModel, upapi.CheckBlacklist, upapi.Check]{
+	return NewImportableAPIResource[CheckBlacklistResourceModel, upapi.CheckBlacklist, upapi.Check](
 		CheckBlacklistResourceAPI{provider: p},
 		CheckBlacklistResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "check_blacklist",
 			Schema: schema.Schema{
-				Description: "Checks your domain against approximately 100 of the most well-known spam blacklists once per day to see if it’s included on those lists",
+				Description: "Checks your domain against approximately 100 of the most well-known spam blacklists once per day to see if it's included on those lists. Import using the check ID: `terraform import uptime_check_blacklist.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"url":            URLSchemaAttribute(),
@@ -33,7 +33,8 @@ func NewCheckBlacklistResource(_ context.Context, p *providerImpl) resource.Reso
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckBlacklistResourceModelAdapter struct {

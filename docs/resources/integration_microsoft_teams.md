@@ -3,12 +3,12 @@
 page_title: "uptime_integration_microsoft_teams Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Microsoft Teams integration resource
+  Microsoft Teams integration resource. Import using the integration ID: terraform import uptime_integration_microsoft_teams.example 123
 ---
 
 # uptime_integration_microsoft_teams (Resource)
 
-Microsoft Teams integration resource
+Microsoft Teams integration resource. Import using the integration ID: `terraform import uptime_integration_microsoft_teams.example 123`
 
 ## Example Usage
 
