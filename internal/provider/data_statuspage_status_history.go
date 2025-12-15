@@ -145,21 +145,21 @@ func (d StatusPageStatusHistoryDataSource) Read(ctx context.Context, rq datasour
 		ComponentID:  config.ComponentID,
 		DateFrom:     config.DateFrom,
 		DateTo:       config.DateTo,
-		History:      make([]StatusPageStatusHistoryDataSourceItemModel, len(api)),
+		History:      make([]StatusPageStatusHistoryDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		componentID := types.Int64Null()
-		if api[i].ComponentPK != nil {
-			componentID = types.Int64Value(*api[i].ComponentPK)
+		if api.Items[i].ComponentPK != nil {
+			componentID = types.Int64Value(*api.Items[i].ComponentPK)
 		}
 
 		model.History[i] = StatusPageStatusHistoryDataSourceItemModel{
-			ID:          types.Int64Value(api[i].PK),
-			Status:      types.StringValue(api[i].Status),
-			Description: types.StringValue(api[i].Description),
-			CreatedAt:   types.StringValue(api[i].CreatedAt),
-			UpdatedAt:   types.StringValue(api[i].UpdatedAt),
+			ID:          types.Int64Value(api.Items[i].PK),
+			Status:      types.StringValue(api.Items[i].Status),
+			Description: types.StringValue(api.Items[i].Description),
+			CreatedAt:   types.StringValue(api.Items[i].CreatedAt),
+			UpdatedAt:   types.StringValue(api.Items[i].UpdatedAt),
 			ComponentID: componentID,
 		}
 	}

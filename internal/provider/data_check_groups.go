@@ -159,7 +159,7 @@ func (d CheckGroupsDataSource) Read(ctx context.Context, _ datasource.ReadReques
 
 	// Filter to only include check groups (checks with GroupConfig)
 	var checkGroups []upapi.Check
-	for _, check := range api {
+	for _, check := range api.Items {
 		if check.GroupConfig != nil {
 			checkGroups = append(checkGroups, check)
 		}

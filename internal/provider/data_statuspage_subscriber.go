@@ -96,15 +96,15 @@ func (d StatusPageSubscriberDataSource) Read(ctx context.Context, rq datasource.
 	model := StatusPageSubscriberDataSourceModel{
 		ID:           types.StringValue(""),
 		StatusPageID: config.StatusPageID,
-		Subscribers:  make([]StatusPageSubscriberDataSourceItemModel, len(api)),
+		Subscribers:  make([]StatusPageSubscriberDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		model.Subscribers[i] = StatusPageSubscriberDataSourceItemModel{
-			ID:                 types.Int64Value(api[i].PK),
-			Target:             types.StringValue(api[i].Target),
-			Type:               types.StringValue(api[i].Type),
-			ForceValidationSMS: types.BoolValue(api[i].ForceValidationSMS),
+			ID:                 types.Int64Value(api.Items[i].PK),
+			Target:             types.StringValue(api.Items[i].Target),
+			Type:               types.StringValue(api.Items[i].Type),
+			ForceValidationSMS: types.BoolValue(api.Items[i].ForceValidationSMS),
 		}
 	}
 

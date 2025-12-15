@@ -88,34 +88,34 @@ func (d LocationsDataSource) Read(ctx context.Context, _ datasource.ReadRequest,
 	}
 	model := LocationsDataSourceModel{
 		ID:        types.StringValue(""),
-		Locations: make([]LocationsDataSourceLocationModel, len(api)),
+		Locations: make([]LocationsDataSourceLocationModel, len(api.Items)),
 	}
-	for i := range api {
+	for i := range api.Items {
 		var primaryIP string
 		var primaryIPv6 string
 
 		// Get primary IPs (first in each list)
-		if len(api[i].IPv4Addresses) > 0 {
-			primaryIP = api[i].IPv4Addresses[0]
+		if len(api.Items[i].IPv4Addresses) > 0 {
+			primaryIP = api.Items[i].IPv4Addresses[0]
 		}
-		if len(api[i].IPv6Addresses) > 0 {
-			primaryIPv6 = api[i].IPv6Addresses[0]
+		if len(api.Items[i].IPv6Addresses) > 0 {
+			primaryIPv6 = api.Items[i].IPv6Addresses[0]
 		}
 
 		// Convert to Terraform types
-		ipv4StringList := make([]types.String, len(api[i].IPv4Addresses))
-		for j, ip := range api[i].IPv4Addresses {
+		ipv4StringList := make([]types.String, len(api.Items[i].IPv4Addresses))
+		for j, ip := range api.Items[i].IPv4Addresses {
 			ipv4StringList[j] = types.StringValue(ip)
 		}
 
-		ipv6StringList := make([]types.String, len(api[i].IPv6Addresses))
-		for j, ip := range api[i].IPv6Addresses {
+		ipv6StringList := make([]types.String, len(api.Items[i].IPv6Addresses))
+		for j, ip := range api.Items[i].IPv6Addresses {
 			ipv6StringList[j] = types.StringValue(ip)
 		}
 
 		model.Locations[i] = LocationsDataSourceLocationModel{
-			Name:          types.StringValue(api[i].ProbeName),
-			Location:      types.StringValue(api[i].Location),
+			Name:          types.StringValue(api.Items[i].ProbeName),
+			Location:      types.StringValue(api.Items[i].Location),
 			IP:            types.StringValue(primaryIP),
 			IPv6:          types.StringValue(primaryIPv6),
 			IPv4Addresses: types.ListValueMust(types.StringType, convertToAttrValues(ipv4StringList)),

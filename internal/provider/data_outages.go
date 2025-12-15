@@ -133,35 +133,35 @@ func (d OutagesDataSource) Read(ctx context.Context, _ datasource.ReadRequest, r
 
 	model := OutagesDataSourceModel{
 		ID:      types.StringValue(""),
-		Outages: make([]OutagesDataSourceItemModel, len(api)),
+		Outages: make([]OutagesDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		createdAt := ""
-		if !api[i].CreatedAt.IsZero() {
-			createdAt = api[i].CreatedAt.Format("2006-01-02T15:04:05Z07:00")
+		if !api.Items[i].CreatedAt.IsZero() {
+			createdAt = api.Items[i].CreatedAt.Format("2006-01-02T15:04:05Z07:00")
 		}
 
 		resolvedAt := ""
-		if !api[i].ResolvedAt.IsZero() {
-			resolvedAt = api[i].ResolvedAt.Format("2006-01-02T15:04:05Z07:00")
+		if !api.Items[i].ResolvedAt.IsZero() {
+			resolvedAt = api.Items[i].ResolvedAt.Format("2006-01-02T15:04:05Z07:00")
 		}
 
 		model.Outages[i] = OutagesDataSourceItemModel{
-			ID:                         types.Int64Value(api[i].PK),
-			URL:                        types.StringValue(api[i].URL),
+			ID:                         types.Int64Value(api.Items[i].PK),
+			URL:                        types.StringValue(api.Items[i].URL),
 			CreatedAt:                  types.StringValue(createdAt),
 			ResolvedAt:                 types.StringValue(resolvedAt),
-			DurationSecs:               types.Int64Value(api[i].DurationSecs),
-			IgnoreAlertURL:             types.StringValue(api[i].IgnoreAlertURL),
-			CheckPK:                    types.Int64Value(api[i].CheckPK),
-			CheckURL:                   types.StringValue(api[i].CheckURL),
-			CheckAddress:               types.StringValue(api[i].CheckAddress),
-			CheckName:                  types.StringValue(api[i].CheckName),
-			CheckMonitoringServiceType: types.StringValue(api[i].CheckMonitoringServiceType),
-			StateIsUp:                  types.BoolValue(api[i].StateIsUp),
-			Ignored:                    types.BoolValue(api[i].Ignored),
-			NumLocationsDown:           types.Int64Value(api[i].NumLocationsDown),
+			DurationSecs:               types.Int64Value(api.Items[i].DurationSecs),
+			IgnoreAlertURL:             types.StringValue(api.Items[i].IgnoreAlertURL),
+			CheckPK:                    types.Int64Value(api.Items[i].CheckPK),
+			CheckURL:                   types.StringValue(api.Items[i].CheckURL),
+			CheckAddress:               types.StringValue(api.Items[i].CheckAddress),
+			CheckName:                  types.StringValue(api.Items[i].CheckName),
+			CheckMonitoringServiceType: types.StringValue(api.Items[i].CheckMonitoringServiceType),
+			StateIsUp:                  types.BoolValue(api.Items[i].StateIsUp),
+			Ignored:                    types.BoolValue(api.Items[i].Ignored),
+			NumLocationsDown:           types.Int64Value(api.Items[i].NumLocationsDown),
 		}
 	}
 

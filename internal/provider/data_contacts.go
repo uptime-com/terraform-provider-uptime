@@ -109,13 +109,13 @@ func (d ContactsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, 
 
 	model := ContactsDataSourceModel{
 		ID:       types.StringValue(""),
-		Contacts: make([]ContactsDataSourceItemModel, len(api)),
+		Contacts: make([]ContactsDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		// Convert string slices to types.List
-		smsListValues := make([]attr.Value, len(api[i].SmsList))
-		for j, v := range api[i].SmsList {
+		smsListValues := make([]attr.Value, len(api.Items[i].SmsList))
+		for j, v := range api.Items[i].SmsList {
 			smsListValues[j] = types.StringValue(v)
 		}
 		smsList := types.ListNull(types.StringType)
@@ -123,8 +123,8 @@ func (d ContactsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, 
 			smsList = types.ListValueMust(types.StringType, smsListValues)
 		}
 
-		emailListValues := make([]attr.Value, len(api[i].EmailList))
-		for j, v := range api[i].EmailList {
+		emailListValues := make([]attr.Value, len(api.Items[i].EmailList))
+		for j, v := range api.Items[i].EmailList {
 			emailListValues[j] = types.StringValue(v)
 		}
 		emailList := types.ListNull(types.StringType)
@@ -132,8 +132,8 @@ func (d ContactsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, 
 			emailList = types.ListValueMust(types.StringType, emailListValues)
 		}
 
-		phonecallListValues := make([]attr.Value, len(api[i].PhonecallList))
-		for j, v := range api[i].PhonecallList {
+		phonecallListValues := make([]attr.Value, len(api.Items[i].PhonecallList))
+		for j, v := range api.Items[i].PhonecallList {
 			phonecallListValues[j] = types.StringValue(v)
 		}
 		phonecallList := types.ListNull(types.StringType)
@@ -141,8 +141,8 @@ func (d ContactsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, 
 			phonecallList = types.ListValueMust(types.StringType, phonecallListValues)
 		}
 
-		integrationsValues := make([]attr.Value, len(api[i].Integrations))
-		for j, v := range api[i].Integrations {
+		integrationsValues := make([]attr.Value, len(api.Items[i].Integrations))
+		for j, v := range api.Items[i].Integrations {
 			integrationsValues[j] = types.StringValue(v)
 		}
 		integrations := types.ListNull(types.StringType)
@@ -150,8 +150,8 @@ func (d ContactsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, 
 			integrations = types.ListValueMust(types.StringType, integrationsValues)
 		}
 
-		pushProfilesValues := make([]attr.Value, len(api[i].PushNotificationProfiles))
-		for j, v := range api[i].PushNotificationProfiles {
+		pushProfilesValues := make([]attr.Value, len(api.Items[i].PushNotificationProfiles))
+		for j, v := range api.Items[i].PushNotificationProfiles {
 			pushProfilesValues[j] = types.StringValue(v)
 		}
 		pushProfiles := types.ListNull(types.StringType)
@@ -160,9 +160,9 @@ func (d ContactsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, 
 		}
 
 		model.Contacts[i] = ContactsDataSourceItemModel{
-			ID:                       types.Int64Value(api[i].PK),
-			URL:                      types.StringValue(api[i].URL),
-			Name:                     types.StringValue(api[i].Name),
+			ID:                       types.Int64Value(api.Items[i].PK),
+			URL:                      types.StringValue(api.Items[i].URL),
+			Name:                     types.StringValue(api.Items[i].Name),
 			SMSList:                  smsList,
 			EmailList:                emailList,
 			PhonecallList:            phonecallList,
