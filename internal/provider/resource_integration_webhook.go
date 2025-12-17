@@ -34,7 +34,7 @@ func NewIntegrationWebhookResource(_ context.Context, p *providerImpl) resource.
 						Optional:    true,
 						Computed:    true,
 						Default:     stringdefault.StaticString(""),
-						Description: "Custom headers to send with the webhook request (JSON format)",
+						Description: "Custom headers to send with the webhook request (newline-delimited key: value format, e.g. 'Authorization: Bearer token')",
 					},
 					"use_legacy_payload": schema.BoolAttribute{
 						Optional:    true,

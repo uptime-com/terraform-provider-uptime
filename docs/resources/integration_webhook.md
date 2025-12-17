@@ -13,11 +13,20 @@ Webhook integration resource. Import using the integration ID: `terraform import
 ## Example Usage
 
 ```terraform
+# Basic webhook integration
 resource "uptime_integration_webhook" "example" {
-  name                = "My Webhook Integration"
-  postback_url        = "https://example.com/webhook"
-  headers             = jsonencode({ "Authorization" = "Bearer token" })
-  use_legacy_payload  = false
+  name               = "My Webhook Integration"
+  postback_url       = "https://example.com/webhook"
+  use_legacy_payload = false
+}
+
+# Webhook with custom headers
+# Note: headers use newline-delimited "key: value" format, NOT JSON
+resource "uptime_integration_webhook" "with_headers" {
+  name               = "Authenticated Webhook"
+  postback_url       = "https://api.example.com/alerts"
+  headers            = "Authorization: Bearer your-token-here"
+  use_legacy_payload = false
 }
 ```
 
@@ -35,7 +44,7 @@ resource "uptime_integration_webhook" "example" {
 Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations)
 that will be notified when alerts are triggered. Defaults to ['Default'] if not specified.
 Set to an empty list to disable notifications at this level and rely on parent check group notifications instead.
-- `headers` (String) Custom headers to send with the webhook request (JSON format)
+- `headers` (String) Custom headers to send with the webhook request (newline-delimited key: value format, e.g. 'Authorization: Bearer token')
 - `use_legacy_payload` (Boolean) Use legacy payload format
 
 ### Read-Only
