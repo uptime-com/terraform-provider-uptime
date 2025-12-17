@@ -117,20 +117,21 @@ func TestAccCheckHTTPResource_Interval(t *testing.T) {
 
 func TestAccCheckHTTPResource_Locations(t *testing.T) {
 	name := petname.Generate(3, "-")
+	locs := testAccLocations(t)
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
 			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/locations"),
 			ConfigVariables: config.Variables{
 				"name": config.StringVariable(name),
 				"locations": config.ListVariable(
-					config.StringVariable("US-CA-Los Angeles"),
-					config.StringVariable("US-NY-New York"),
+					config.StringVariable(locs[0]),
+					config.StringVariable(locs[1]),
 				),
 			},
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_http.test", "locations.#", "2"),
-				resource.TestCheckResourceAttr("uptime_check_http.test", "locations.0", "US-CA-Los Angeles"),
-				resource.TestCheckResourceAttr("uptime_check_http.test", "locations.1", "US-NY-New York"),
+				resource.TestCheckTypeSetElemAttr("uptime_check_http.test", "locations.*", locs[0]),
+				resource.TestCheckTypeSetElemAttr("uptime_check_http.test", "locations.*", locs[1]),
 			),
 		},
 		{
@@ -138,14 +139,14 @@ func TestAccCheckHTTPResource_Locations(t *testing.T) {
 			ConfigVariables: config.Variables{
 				"name": config.StringVariable(name),
 				"locations": config.ListVariable(
-					config.StringVariable("Israel-Tel Aviv"),
-					config.StringVariable("Serbia-Belgrade"),
+					config.StringVariable(locs[2]),
+					config.StringVariable(locs[3]),
 				),
 			},
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_http.test", "locations.#", "2"),
-				resource.TestCheckResourceAttr("uptime_check_http.test", "locations.0", "Israel-Tel Aviv"),
-				resource.TestCheckResourceAttr("uptime_check_http.test", "locations.1", "Serbia-Belgrade"),
+				resource.TestCheckTypeSetElemAttr("uptime_check_http.test", "locations.*", locs[2]),
+				resource.TestCheckTypeSetElemAttr("uptime_check_http.test", "locations.*", locs[3]),
 			),
 		},
 	}))

@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"os"
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
@@ -52,10 +53,55 @@ func testAccAPIClient(t testing.TB) upapi.API {
 	token := os.Getenv("UPTIME_TOKEN")
 	require.NotEmpty(t, token, "UPTIME_TOKEN must be set for acceptance tests")
 
-	api, err := upapi.New(upapi.WithToken(token), upapi.WithRateLimit(0.15))
+	rateLimit := 0.15
+	if val := os.Getenv("UPTIME_RATE_LIMIT"); val != "" {
+		if parsedVal, err := strconv.ParseFloat(val, 64); err == nil {
+			rateLimit = parsedVal
+		}
+	}
+
+	opts := []upapi.Option{
+		upapi.WithToken(token),
+		upapi.WithRateLimit(rateLimit),
+	}
+	if endpoint := os.Getenv("UPTIME_ENDPOINT"); endpoint != "" {
+		opts = append(opts, upapi.WithBaseURL(endpoint))
+	}
+
+	api, err := upapi.New(opts...)
 	require.NoError(t, err, "failed to initialize uptime.com api client")
 
 	return api
+}
+
+// testAccLocations fetches available probe server locations from the API.
+// It returns a slice of location strings (excluding "AUTO" and "TEST").
+// Skips the test if TF_ACC is not set.
+func testAccLocations(t testing.TB) []string {
+	t.Helper()
+
+	if os.Getenv("TF_ACC") == "" {
+		t.Skip("Acceptance tests skipped unless env 'TF_ACC' set")
+	}
+
+	api := testAccAPIClient(t)
+	servers, err := api.ProbeServers().List(context.Background())
+	require.NoError(t, err, "failed to fetch probe servers")
+
+	locations := make([]string, 0, len(servers.Items))
+	seen := make(map[string]struct{})
+	for _, s := range servers.Items {
+		if s.Location == "AUTO" || s.Location == "TEST" {
+			continue
+		}
+		if _, ok := seen[s.Location]; ok {
+			continue
+		}
+		seen[s.Location] = struct{}{}
+		locations = append(locations, s.Location)
+	}
+	require.GreaterOrEqual(t, len(locations), 4, "expected at least 4 locations")
+	return locations
 }
 
 func testCaseFromSteps(t testing.TB, steps []resource.TestStep) resource.TestCase {

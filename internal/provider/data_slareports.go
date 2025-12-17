@@ -130,13 +130,13 @@ func (d SLAReportsDataSource) Read(ctx context.Context, _ datasource.ReadRequest
 
 	model := SLAReportsDataSourceModel{
 		ID:         types.StringValue(""),
-		SLAReports: make([]SLAReportsDataSourceItemModel, len(api)),
+		SLAReports: make([]SLAReportsDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		// Convert ServicesTags slice to types.List
-		servicesTagsValues := make([]attr.Value, len(api[i].ServicesTags))
-		for j, v := range api[i].ServicesTags {
+		servicesTagsValues := make([]attr.Value, len(api.Items[i].ServicesTags))
+		for j, v := range api.Items[i].ServicesTags {
 			servicesTagsValues[j] = types.StringValue(v)
 		}
 		servicesTags := types.ListNull(types.StringType)
@@ -145,19 +145,19 @@ func (d SLAReportsDataSource) Read(ctx context.Context, _ datasource.ReadRequest
 		}
 
 		model.SLAReports[i] = SLAReportsDataSourceItemModel{
-			ID:                              types.Int64Value(api[i].PK),
-			URL:                             types.StringValue(api[i].URL),
-			StatsURL:                        types.StringValue(api[i].StatsURL),
-			Name:                            types.StringValue(api[i].Name),
+			ID:                              types.Int64Value(api.Items[i].PK),
+			URL:                             types.StringValue(api.Items[i].URL),
+			StatsURL:                        types.StringValue(api.Items[i].StatsURL),
+			Name:                            types.StringValue(api.Items[i].Name),
 			ServicesTags:                    servicesTags,
-			DefaultDateRange:                types.StringValue(api[i].DefaultDateRange),
-			FilterWithDowntime:              types.BoolValue(api[i].FilterWithDowntime),
-			FilterUptimeSLAViolations:       types.BoolValue(api[i].FilterUptimeSLAViolations),
-			FilterSlowest:                   types.BoolValue(api[i].FilterSlowest),
-			FilterResponseTimeSLAViolations: types.BoolValue(api[i].FilterResponseTimeSLAViolations),
-			ShowUptimeSection:               types.BoolValue(api[i].ShowUptimeSection),
-			ShowUptimeSLA:                   types.BoolValue(api[i].ShowUptimeSLA),
-			ShowResponseTimeSection:         types.BoolValue(api[i].ShowResponseTimeSection),
+			DefaultDateRange:                types.StringValue(api.Items[i].DefaultDateRange),
+			FilterWithDowntime:              types.BoolValue(api.Items[i].FilterWithDowntime),
+			FilterUptimeSLAViolations:       types.BoolValue(api.Items[i].FilterUptimeSLAViolations),
+			FilterSlowest:                   types.BoolValue(api.Items[i].FilterSlowest),
+			FilterResponseTimeSLAViolations: types.BoolValue(api.Items[i].FilterResponseTimeSLAViolations),
+			ShowUptimeSection:               types.BoolValue(api.Items[i].ShowUptimeSection),
+			ShowUptimeSLA:                   types.BoolValue(api.Items[i].ShowUptimeSLA),
+			ShowResponseTimeSection:         types.BoolValue(api.Items[i].ShowResponseTimeSection),
 		}
 	}
 

@@ -110,15 +110,15 @@ func (d CredentialsDataSource) Read(ctx context.Context, _ datasource.ReadReques
 
 	model := CredentialsDataSourceModel{
 		ID:          types.StringValue(""),
-		Credentials: make([]CredentialsDataSourceItemModel, len(api)),
+		Credentials: make([]CredentialsDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		// Convert UsedSecretProperties to types.List
 		var usedSecretPropsList types.List
-		if len(api[i].UsedSecretProperties) > 0 {
-			elements := make([]attr.Value, len(api[i].UsedSecretProperties))
-			for j, prop := range api[i].UsedSecretProperties {
+		if len(api.Items[i].UsedSecretProperties) > 0 {
+			elements := make([]attr.Value, len(api.Items[i].UsedSecretProperties))
+			for j, prop := range api.Items[i].UsedSecretProperties {
 				elements[j] = types.StringValue(prop)
 			}
 			usedSecretPropsList = types.ListValueMust(types.StringType, elements)
@@ -127,15 +127,15 @@ func (d CredentialsDataSource) Read(ctx context.Context, _ datasource.ReadReques
 		}
 
 		model.Credentials[i] = CredentialsDataSourceItemModel{
-			ID:                   types.Int64Value(api[i].PK),
-			DisplayName:          types.StringValue(api[i].DisplayName),
-			Description:          types.StringValue(api[i].Description),
-			CredentialType:       types.StringValue(api[i].CredentialType),
-			Hint:                 types.StringValue(api[i].Hint),
-			Username:             types.StringValue(api[i].Username),
-			Version:              types.StringValue(api[i].Version),
+			ID:                   types.Int64Value(api.Items[i].PK),
+			DisplayName:          types.StringValue(api.Items[i].DisplayName),
+			Description:          types.StringValue(api.Items[i].Description),
+			CredentialType:       types.StringValue(api.Items[i].CredentialType),
+			Hint:                 types.StringValue(api.Items[i].Hint),
+			Username:             types.StringValue(api.Items[i].Username),
+			Version:              types.StringValue(api.Items[i].Version),
 			UsedSecretProperties: usedSecretPropsList,
-			CreatedBy:            types.Int64Value(api[i].CreatedBy),
+			CreatedBy:            types.Int64Value(api.Items[i].CreatedBy),
 		}
 	}
 

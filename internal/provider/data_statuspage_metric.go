@@ -101,16 +101,16 @@ func (d StatusPageMetricDataSource) Read(ctx context.Context, rq datasource.Read
 	model := StatusPageMetricDataSourceModel{
 		ID:           types.StringValue(""),
 		StatusPageID: config.StatusPageID,
-		Metrics:      make([]StatusPageMetricDataSourceItemModel, len(api)),
+		Metrics:      make([]StatusPageMetricDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		model.Metrics[i] = StatusPageMetricDataSourceItemModel{
-			ID:        types.Int64Value(api[i].PK),
-			URL:       types.StringValue(api[i].URL),
-			Name:      types.StringValue(api[i].Name),
-			ServiceID: types.Int64Value(api[i].ServiceID),
-			IsVisible: types.BoolValue(api[i].IsVisible),
+			ID:        types.Int64Value(api.Items[i].PK),
+			URL:       types.StringValue(api.Items[i].URL),
+			Name:      types.StringValue(api.Items[i].Name),
+			ServiceID: types.Int64Value(api.Items[i].ServiceID),
+			IsVisible: types.BoolValue(api.Items[i].IsVisible),
 		}
 	}
 

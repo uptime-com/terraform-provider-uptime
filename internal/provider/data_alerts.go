@@ -133,35 +133,35 @@ func (d AlertsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, rs
 
 	model := AlertsDataSourceModel{
 		ID:     types.StringValue(""),
-		Alerts: make([]AlertsDataSourceItemModel, len(api)),
+		Alerts: make([]AlertsDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		createdAt := ""
-		if api[i].CreatedAt != nil {
-			createdAt = api[i].CreatedAt.Format("2006-01-02T15:04:05Z07:00")
+		if api.Items[i].CreatedAt != nil {
+			createdAt = api.Items[i].CreatedAt.Format("2006-01-02T15:04:05Z07:00")
 		}
 
 		resolvedAt := ""
-		if api[i].ResolvedAt != nil {
-			resolvedAt = api[i].ResolvedAt.Format("2006-01-02T15:04:05Z07:00")
+		if api.Items[i].ResolvedAt != nil {
+			resolvedAt = api.Items[i].ResolvedAt.Format("2006-01-02T15:04:05Z07:00")
 		}
 
 		model.Alerts[i] = AlertsDataSourceItemModel{
-			ID:                         types.Int64Value(api[i].PK),
-			URL:                        types.StringValue(api[i].URL),
+			ID:                         types.Int64Value(api.Items[i].PK),
+			URL:                        types.StringValue(api.Items[i].URL),
 			CreatedAt:                  types.StringValue(createdAt),
 			ResolvedAt:                 types.StringValue(resolvedAt),
-			MonitoringServerName:       types.StringValue(api[i].MonitoringServerName),
-			Location:                   types.StringValue(api[i].Location),
-			Output:                     types.StringValue(api[i].Output),
-			StateIsUp:                  types.BoolValue(api[i].StateIsUp),
-			Ignored:                    types.BoolValue(api[i].Ignored),
-			CheckPK:                    types.Int64Value(api[i].CheckPK),
-			CheckURL:                   types.StringValue(api[i].CheckURL),
-			CheckAddress:               types.StringValue(api[i].CheckAddress),
-			CheckName:                  types.StringValue(api[i].CheckName),
-			CheckMonitoringServiceType: types.StringValue(api[i].CheckMonitoringServiceType),
+			MonitoringServerName:       types.StringValue(api.Items[i].MonitoringServerName),
+			Location:                   types.StringValue(api.Items[i].Location),
+			Output:                     types.StringValue(api.Items[i].Output),
+			StateIsUp:                  types.BoolValue(api.Items[i].StateIsUp),
+			Ignored:                    types.BoolValue(api.Items[i].Ignored),
+			CheckPK:                    types.Int64Value(api.Items[i].CheckPK),
+			CheckURL:                   types.StringValue(api.Items[i].CheckURL),
+			CheckAddress:               types.StringValue(api.Items[i].CheckAddress),
+			CheckName:                  types.StringValue(api.Items[i].CheckName),
+			CheckMonitoringServiceType: types.StringValue(api.Items[i].CheckMonitoringServiceType),
 		}
 	}
 

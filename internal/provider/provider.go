@@ -216,8 +216,8 @@ func (p *providerImpl) getLocations(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	p.locations = make(map[string]struct{}, len(servers))
-	for _, server := range servers {
+	p.locations = make(map[string]struct{}, len(servers.Items))
+	for _, server := range servers.Items {
 		p.locations[server.Location] = struct{}{}
 	}
 	return nil

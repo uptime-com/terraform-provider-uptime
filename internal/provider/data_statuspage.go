@@ -112,21 +112,21 @@ func (d StatusPageDataSource) Read(ctx context.Context, _ datasource.ReadRequest
 
 	model := StatusPageDataSourceModel{
 		ID:          types.StringValue(""),
-		StatusPages: make([]StatusPageDataSourceItemModel, len(api)),
+		StatusPages: make([]StatusPageDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		model.StatusPages[i] = StatusPageDataSourceItemModel{
-			ID:              types.Int64Value(api[i].PK),
-			URL:             types.StringValue(api[i].URL),
-			Name:            types.StringValue(api[i].Name),
-			VisibilityLevel: types.StringValue(api[i].VisibilityLevel),
-			Description:     types.StringValue(api[i].Description),
-			PageType:        types.StringValue(api[i].PageType),
-			Slug:            types.StringValue(api[i].Slug),
-			CNAME:           types.StringValue(api[i].CNAME),
-			Timezone:        types.StringValue(api[i].Timezone),
-			Theme:           types.StringValue(api[i].Theme),
+			ID:              types.Int64Value(api.Items[i].PK),
+			URL:             types.StringValue(api.Items[i].URL),
+			Name:            types.StringValue(api.Items[i].Name),
+			VisibilityLevel: types.StringValue(api.Items[i].VisibilityLevel),
+			Description:     types.StringValue(api.Items[i].Description),
+			PageType:        types.StringValue(api.Items[i].PageType),
+			Slug:            types.StringValue(api.Items[i].Slug),
+			CNAME:           types.StringValue(api.Items[i].CNAME),
+			Timezone:        types.StringValue(api.Items[i].Timezone),
+			Theme:           types.StringValue(api.Items[i].Theme),
 		}
 	}
 

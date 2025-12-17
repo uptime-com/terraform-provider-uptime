@@ -121,13 +121,13 @@ func (d ScheduledReportsDataSource) Read(ctx context.Context, _ datasource.ReadR
 
 	model := ScheduledReportsDataSourceModel{
 		ID:               types.StringValue(""),
-		ScheduledReports: make([]ScheduledReportsDataSourceItemModel, len(api)),
+		ScheduledReports: make([]ScheduledReportsDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		// Convert RecipientUsers slice to types.List
-		recipientUsersValues := make([]attr.Value, len(api[i].RecipientUsers))
-		for j, v := range api[i].RecipientUsers {
+		recipientUsersValues := make([]attr.Value, len(api.Items[i].RecipientUsers))
+		for j, v := range api.Items[i].RecipientUsers {
 			recipientUsersValues[j] = types.StringValue(v)
 		}
 		recipientUsers := types.ListNull(types.StringType)
@@ -136,8 +136,8 @@ func (d ScheduledReportsDataSource) Read(ctx context.Context, _ datasource.ReadR
 		}
 
 		// Convert RecipientEmails slice to types.List
-		recipientEmailsValues := make([]attr.Value, len(api[i].RecipientEmails))
-		for j, v := range api[i].RecipientEmails {
+		recipientEmailsValues := make([]attr.Value, len(api.Items[i].RecipientEmails))
+		for j, v := range api.Items[i].RecipientEmails {
 			recipientEmailsValues[j] = types.StringValue(v)
 		}
 		recipientEmails := types.ListNull(types.StringType)
@@ -146,17 +146,17 @@ func (d ScheduledReportsDataSource) Read(ctx context.Context, _ datasource.ReadR
 		}
 
 		model.ScheduledReports[i] = ScheduledReportsDataSourceItemModel{
-			ID:              types.Int64Value(api[i].PK),
-			URL:             types.StringValue(api[i].URL),
-			Name:            types.StringValue(api[i].Name),
-			SLAReport:       types.StringValue(api[i].ScheduledReport),
+			ID:              types.Int64Value(api.Items[i].PK),
+			URL:             types.StringValue(api.Items[i].URL),
+			Name:            types.StringValue(api.Items[i].Name),
+			SLAReport:       types.StringValue(api.Items[i].ScheduledReport),
 			RecipientUsers:  recipientUsers,
 			RecipientEmails: recipientEmails,
-			FileType:        types.StringValue(api[i].FileType),
-			Recurrence:      types.StringValue(api[i].Recurrence),
-			OnWeekday:       types.Int64Value(int64(api[i].OnWeekday)),
-			AtTime:          types.Int64Value(int64(api[i].AtTime)),
-			IsEnabled:       types.BoolValue(api[i].IsEnabled),
+			FileType:        types.StringValue(api.Items[i].FileType),
+			Recurrence:      types.StringValue(api.Items[i].Recurrence),
+			OnWeekday:       types.Int64Value(int64(api.Items[i].OnWeekday)),
+			AtTime:          types.Int64Value(int64(api.Items[i].AtTime)),
+			IsEnabled:       types.BoolValue(api.Items[i].IsEnabled),
 		}
 	}
 

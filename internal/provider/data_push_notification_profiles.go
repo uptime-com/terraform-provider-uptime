@@ -110,13 +110,13 @@ func (d PushNotificationProfilesDataSource) Read(ctx context.Context, _ datasour
 
 	model := PushNotificationProfilesDataSourceModel{
 		ID:                       types.StringValue(""),
-		PushNotificationProfiles: make([]PushNotificationProfilesDataSourceItemModel, len(api)),
+		PushNotificationProfiles: make([]PushNotificationProfilesDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		// Convert ContactGroups slice to types.List
-		contactGroupsValues := make([]attr.Value, len(api[i].ContactGroups))
-		for j, v := range api[i].ContactGroups {
+		contactGroupsValues := make([]attr.Value, len(api.Items[i].ContactGroups))
+		for j, v := range api.Items[i].ContactGroups {
 			contactGroupsValues[j] = types.StringValue(v)
 		}
 		contactGroups := types.ListNull(types.StringType)
@@ -125,14 +125,14 @@ func (d PushNotificationProfilesDataSource) Read(ctx context.Context, _ datasour
 		}
 
 		model.PushNotificationProfiles[i] = PushNotificationProfilesDataSourceItemModel{
-			ID:            types.Int64Value(api[i].PK),
-			URL:           types.StringValue(api[i].URL),
-			CreatedAt:     types.StringValue(api[i].CreatedAt),
-			ModifiedAt:    types.StringValue(api[i].ModifiedAt),
-			UUID:          types.StringValue(api[i].UUID),
-			User:          types.StringValue(api[i].User),
-			DeviceName:    types.StringValue(api[i].DeviceName),
-			DisplayName:   types.StringValue(api[i].DisplayName),
+			ID:            types.Int64Value(api.Items[i].PK),
+			URL:           types.StringValue(api.Items[i].URL),
+			CreatedAt:     types.StringValue(api.Items[i].CreatedAt),
+			ModifiedAt:    types.StringValue(api.Items[i].ModifiedAt),
+			UUID:          types.StringValue(api.Items[i].UUID),
+			User:          types.StringValue(api.Items[i].User),
+			DeviceName:    types.StringValue(api.Items[i].DeviceName),
+			DisplayName:   types.StringValue(api.Items[i].DisplayName),
 			ContactGroups: contactGroups,
 		}
 	}
