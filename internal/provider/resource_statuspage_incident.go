@@ -52,7 +52,7 @@ func NewStatusPageIncidentResource(_ context.Context, p *providerImpl) resource.
 						Required: true,
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
-								"id": IDSchemaAttribute(),
+								"id": ComputedIDSchemaAttribute(), // Nested object ID
 								"description": schema.StringAttribute{
 									Optional: true,
 									Computed: true,
@@ -76,7 +76,7 @@ func NewStatusPageIncidentResource(_ context.Context, p *providerImpl) resource.
 						Computed: true,
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
-								"id": IDSchemaAttribute(),
+								"id": ComputedIDSchemaAttribute(), // Nested object ID
 								"status": schema.StringAttribute{
 									Optional: true,
 									Computed: true,

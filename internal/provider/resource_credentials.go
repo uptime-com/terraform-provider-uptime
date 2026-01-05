@@ -23,7 +23,7 @@ func NewCredentialResource(_ context.Context, p *providerImpl) resource.Resource
 			TypeNameSuffix: "credential",
 			Schema: schema.Schema{
 				Attributes: map[string]schema.Attribute{
-					"id": IDSchemaAttribute(),
+					"id": ComputedIDSchemaAttribute(), // Uses delete+create for updates
 					"display_name": schema.StringAttribute{
 						Required: true,
 					},
