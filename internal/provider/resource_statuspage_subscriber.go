@@ -26,7 +26,7 @@ func NewStatusPageSubscriberResource(_ context.Context, p *providerImpl) resourc
 					"statuspage_id": schema.Int64Attribute{
 						Required: true,
 					},
-					"id": IDSchemaAttribute(),
+					"id": ComputedIDSchemaAttribute(), // Uses delete+create for updates
 					"target": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
