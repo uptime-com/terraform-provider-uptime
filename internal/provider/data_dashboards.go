@@ -166,13 +166,13 @@ func (d DashboardsDataSource) Read(ctx context.Context, _ datasource.ReadRequest
 
 	model := DashboardsDataSourceModel{
 		ID:         types.StringValue(""),
-		Dashboards: make([]DashboardsDataSourceItemModel, len(api)),
+		Dashboards: make([]DashboardsDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		// Convert ServicesSelected slice to types.List
-		servicesSelectedValues := make([]attr.Value, len(api[i].ServicesSelected))
-		for j, v := range api[i].ServicesSelected {
+		servicesSelectedValues := make([]attr.Value, len(api.Items[i].ServicesSelected))
+		for j, v := range api.Items[i].ServicesSelected {
 			servicesSelectedValues[j] = types.StringValue(v)
 		}
 		servicesSelected := types.ListNull(types.StringType)
@@ -181,8 +181,8 @@ func (d DashboardsDataSource) Read(ctx context.Context, _ datasource.ReadRequest
 		}
 
 		// Convert ServicesTags slice to types.List
-		servicesTagsValues := make([]attr.Value, len(api[i].ServicesTags))
-		for j, v := range api[i].ServicesTags {
+		servicesTagsValues := make([]attr.Value, len(api.Items[i].ServicesTags))
+		for j, v := range api.Items[i].ServicesTags {
 			servicesTagsValues[j] = types.StringValue(v)
 		}
 		servicesTags := types.ListNull(types.StringType)
@@ -191,26 +191,26 @@ func (d DashboardsDataSource) Read(ctx context.Context, _ datasource.ReadRequest
 		}
 
 		model.Dashboards[i] = DashboardsDataSourceItemModel{
-			ID:                         types.Int64Value(api[i].PK),
-			Name:                       types.StringValue(api[i].Name),
-			Ordering:                   types.Int64Value(api[i].Ordering),
-			IsPinned:                   types.BoolValue(api[i].IsPinned),
+			ID:                         types.Int64Value(api.Items[i].PK),
+			Name:                       types.StringValue(api.Items[i].Name),
+			Ordering:                   types.Int64Value(api.Items[i].Ordering),
+			IsPinned:                   types.BoolValue(api.Items[i].IsPinned),
 			ServicesSelected:           servicesSelected,
 			ServicesTags:               servicesTags,
-			MetricsShowSection:         types.BoolValue(api[i].MetricsShowSection),
-			MetricsForAllChecks:        types.BoolValue(api[i].MetricsForAllChecks),
-			ServicesShowSection:        types.BoolValue(api[i].ServicesShowSection),
-			ServicesNumToShow:          types.Int64Value(api[i].ServicesNumToShow),
-			ServicesIncludeUp:          types.BoolValue(api[i].ServicesIncludeUp),
-			ServicesIncludeDown:        types.BoolValue(api[i].ServicesIncludeDown),
-			ServicesIncludePaused:      types.BoolValue(api[i].ServicesIncludePaused),
-			ServicesIncludeMaintenance: types.BoolValue(api[i].ServicesIncludeMaintenance),
-			ServicesPrimarySort:        types.StringValue(api[i].ServicesPrimarySort),
-			ServicesSecondarySort:      types.StringValue(api[i].ServicesSecondarySort),
-			ServicesShowUptime:         types.BoolValue(api[i].ServicesShowUptime),
-			ServicesShowResponseTime:   types.BoolValue(api[i].ServicesShowResponseTime),
-			AlertsShowSection:          types.BoolValue(api[i].AlertsShowSection),
-			AlertsForAllChecks:         types.BoolValue(api[i].AlertsForAllChecks),
+			MetricsShowSection:         types.BoolValue(api.Items[i].MetricsShowSection),
+			MetricsForAllChecks:        types.BoolValue(api.Items[i].MetricsForAllChecks),
+			ServicesShowSection:        types.BoolValue(api.Items[i].ServicesShowSection),
+			ServicesNumToShow:          types.Int64Value(api.Items[i].ServicesNumToShow),
+			ServicesIncludeUp:          types.BoolValue(api.Items[i].ServicesIncludeUp),
+			ServicesIncludeDown:        types.BoolValue(api.Items[i].ServicesIncludeDown),
+			ServicesIncludePaused:      types.BoolValue(api.Items[i].ServicesIncludePaused),
+			ServicesIncludeMaintenance: types.BoolValue(api.Items[i].ServicesIncludeMaintenance),
+			ServicesPrimarySort:        types.StringValue(api.Items[i].ServicesPrimarySort),
+			ServicesSecondarySort:      types.StringValue(api.Items[i].ServicesSecondarySort),
+			ServicesShowUptime:         types.BoolValue(api.Items[i].ServicesShowUptime),
+			ServicesShowResponseTime:   types.BoolValue(api.Items[i].ServicesShowResponseTime),
+			AlertsShowSection:          types.BoolValue(api.Items[i].AlertsShowSection),
+			AlertsForAllChecks:         types.BoolValue(api.Items[i].AlertsForAllChecks),
 		}
 	}
 

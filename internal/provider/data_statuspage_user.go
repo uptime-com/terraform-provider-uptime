@@ -101,16 +101,16 @@ func (d StatusPageUserDataSource) Read(ctx context.Context, rq datasource.ReadRe
 	model := StatusPageUserDataSourceModel{
 		ID:           types.StringValue(""),
 		StatusPageID: config.StatusPageID,
-		Users:        make([]StatusPageUserDataSourceItemModel, len(api)),
+		Users:        make([]StatusPageUserDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		model.Users[i] = StatusPageUserDataSourceItemModel{
-			ID:        types.Int64Value(api[i].PK),
-			Email:     types.StringValue(api[i].Email),
-			FirstName: types.StringValue(api[i].FirstName),
-			LastName:  types.StringValue(api[i].LastName),
-			IsActive:  types.BoolValue(api[i].IsActive),
+			ID:        types.Int64Value(api.Items[i].PK),
+			Email:     types.StringValue(api.Items[i].Email),
+			FirstName: types.StringValue(api.Items[i].FirstName),
+			LastName:  types.StringValue(api.Items[i].LastName),
+			IsActive:  types.BoolValue(api.Items[i].IsActive),
 		}
 	}
 

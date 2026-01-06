@@ -111,18 +111,18 @@ func (d StatusPageIncidentDataSource) Read(ctx context.Context, rq datasource.Re
 	model := StatusPageIncidentDataSourceModel{
 		ID:           types.StringValue(""),
 		StatusPageID: config.StatusPageID,
-		Incidents:    make([]StatusPageIncidentDataSourceItemModel, len(api)),
+		Incidents:    make([]StatusPageIncidentDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		model.Incidents[i] = StatusPageIncidentDataSourceItemModel{
-			ID:                     types.Int64Value(api[i].PK),
-			URL:                    types.StringValue(api[i].URL),
-			Name:                   types.StringValue(api[i].Name),
-			IncidentType:           types.StringValue(api[i].IncidentType),
-			StartsAt:               types.StringValue(api[i].StartsAt),
-			EndsAt:                 types.StringValue(api[i].EndsAt),
-			IncludeInGlobalMetrics: types.BoolValue(api[i].IncludeInGlobalMetrics),
+			ID:                     types.Int64Value(api.Items[i].PK),
+			URL:                    types.StringValue(api.Items[i].URL),
+			Name:                   types.StringValue(api.Items[i].Name),
+			IncidentType:           types.StringValue(api.Items[i].IncidentType),
+			StartsAt:               types.StringValue(api.Items[i].StartsAt),
+			EndsAt:                 types.StringValue(api.Items[i].EndsAt),
+			IncludeInGlobalMetrics: types.BoolValue(api.Items[i].IncludeInGlobalMetrics),
 		}
 	}
 

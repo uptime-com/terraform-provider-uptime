@@ -1,5 +1,16 @@
 # Uptime.com Terraform provider changelog
 
+## v2.23.0
+
+Bug Fixes:
+* Fix ID attribute showing "(known after apply)" on every plan when resource already exists by adding `UseStateForUnknown` plan modifier
+
+Documentation:
+* Add comprehensive usage examples for all resources and data sources
+
+Dependency Updates:
+* Bump github.com/uptime-com/uptime-client-go to v2.6.0
+
 ## v2.22.0
 
 Enhancements:

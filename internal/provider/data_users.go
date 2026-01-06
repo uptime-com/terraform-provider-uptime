@@ -135,13 +135,13 @@ func (d UsersDataSource) Read(ctx context.Context, _ datasource.ReadRequest, rs 
 
 	model := UsersDataSourceModel{
 		ID:    types.StringValue(""),
-		Users: make([]UsersDataSourceItemModel, len(api)),
+		Users: make([]UsersDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		// Convert AssignedSubaccounts slice to types.List
-		subaccountsValues := make([]attr.Value, len(api[i].AssignedSubaccounts))
-		for j, v := range api[i].AssignedSubaccounts {
+		subaccountsValues := make([]attr.Value, len(api.Items[i].AssignedSubaccounts))
+		for j, v := range api.Items[i].AssignedSubaccounts {
 			subaccountsValues[j] = types.StringValue(v)
 		}
 		subaccounts := types.ListNull(types.StringType)
@@ -150,20 +150,20 @@ func (d UsersDataSource) Read(ctx context.Context, _ datasource.ReadRequest, rs 
 		}
 
 		model.Users[i] = UsersDataSourceItemModel{
-			ID:                  types.Int64Value(api[i].PK),
-			URL:                 types.StringValue(api[i].URL),
-			FirstName:           types.StringValue(api[i].FirstName),
-			LastName:            types.StringValue(api[i].LastName),
-			Email:               types.StringValue(api[i].Email),
-			IsActive:            types.BoolValue(api[i].IsActive),
-			IsPrimary:           types.BoolValue(api[i].IsPrimary),
-			AccessLevel:         types.StringValue(api[i].AccessLevel),
-			IsAPIEnabled:        types.BoolValue(api[i].IsAPIEnabled),
-			NotifyPaidInvoices:  types.BoolValue(api[i].NotifyPaidInvoices),
+			ID:                  types.Int64Value(api.Items[i].PK),
+			URL:                 types.StringValue(api.Items[i].URL),
+			FirstName:           types.StringValue(api.Items[i].FirstName),
+			LastName:            types.StringValue(api.Items[i].LastName),
+			Email:               types.StringValue(api.Items[i].Email),
+			IsActive:            types.BoolValue(api.Items[i].IsActive),
+			IsPrimary:           types.BoolValue(api.Items[i].IsPrimary),
+			AccessLevel:         types.StringValue(api.Items[i].AccessLevel),
+			IsAPIEnabled:        types.BoolValue(api.Items[i].IsAPIEnabled),
+			NotifyPaidInvoices:  types.BoolValue(api.Items[i].NotifyPaidInvoices),
 			AssignedSubaccounts: subaccounts,
-			RequireTwoFactor:    types.StringValue(api[i].RequireTwoFactor),
-			MustTwoFactor:       types.BoolValue(api[i].MustTwoFactor),
-			Timezone:            types.StringValue(api[i].Timezone),
+			RequireTwoFactor:    types.StringValue(api.Items[i].RequireTwoFactor),
+			MustTwoFactor:       types.BoolValue(api.Items[i].MustTwoFactor),
+			Timezone:            types.StringValue(api.Items[i].Timezone),
 		}
 	}
 

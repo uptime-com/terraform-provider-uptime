@@ -126,31 +126,31 @@ func (d StatusPageComponentDataSource) Read(ctx context.Context, rq datasource.R
 	model := StatusPageComponentDataSourceModel{
 		ID:           types.StringValue(""),
 		StatusPageID: config.StatusPageID,
-		Components:   make([]StatusPageComponentDataSourceItemModel, len(api)),
+		Components:   make([]StatusPageComponentDataSourceItemModel, len(api.Items)),
 	}
 
-	for i := range api {
+	for i := range api.Items {
 		groupID := types.Int64Null()
-		if api[i].GroupID != nil {
-			groupID = types.Int64Value(*api[i].GroupID)
+		if api.Items[i].GroupID != nil {
+			groupID = types.Int64Value(*api.Items[i].GroupID)
 		}
 
 		serviceID := types.Int64Null()
-		if api[i].ServiceID != nil {
-			serviceID = types.Int64Value(*api[i].ServiceID)
+		if api.Items[i].ServiceID != nil {
+			serviceID = types.Int64Value(*api.Items[i].ServiceID)
 		}
 
 		model.Components[i] = StatusPageComponentDataSourceItemModel{
-			ID:             types.Int64Value(api[i].PK),
-			URL:            types.StringValue(api[i].URL),
-			Name:           types.StringValue(api[i].Name),
-			Description:    types.StringValue(api[i].Description),
-			IsGroup:        types.BoolValue(api[i].IsGroup),
+			ID:             types.Int64Value(api.Items[i].PK),
+			URL:            types.StringValue(api.Items[i].URL),
+			Name:           types.StringValue(api.Items[i].Name),
+			Description:    types.StringValue(api.Items[i].Description),
+			IsGroup:        types.BoolValue(api.Items[i].IsGroup),
 			GroupID:        groupID,
 			ServiceID:      serviceID,
-			Status:         types.StringValue(api[i].Status),
-			AutoStatusDown: types.StringValue(api[i].AutoStatusDown),
-			AutoStatusUp:   types.StringValue(api[i].AutoStatusUp),
+			Status:         types.StringValue(api.Items[i].Status),
+			AutoStatusDown: types.StringValue(api.Items[i].AutoStatusDown),
+			AutoStatusUp:   types.StringValue(api.Items[i].AutoStatusUp),
 		}
 	}
 

@@ -4,10 +4,25 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 )
 
 func IDSchemaAttribute() schema.Int64Attribute {
+	return schema.Int64Attribute{
+		Computed: true,
+		PlanModifiers: []planmodifier.Int64{
+			int64planmodifier.UseStateForUnknown(),
+		},
+	}
+}
+
+// ComputedIDSchemaAttribute returns an ID attribute without UseStateForUnknown.
+// Use this for:
+// - Nested object IDs (where new items get new IDs)
+// - Resources that implement Update as Delete+Create (ID changes on update)
+func ComputedIDSchemaAttribute() schema.Int64Attribute {
 	return schema.Int64Attribute{
 		Computed: true,
 	}

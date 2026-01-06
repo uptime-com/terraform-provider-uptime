@@ -14,7 +14,7 @@ import (
 )
 
 func LocationsSchemaAttribute(l LocationsGetter) schema.SetAttribute {
-	return LocationsSchemaAttributeWithDefaults(l, "US-NY-New York", "US-CA-Los Angeles")
+	return LocationsSchemaAttributeWithDefaults(l, "United Kingdom-London", "Netherlands-Amsterdam")
 }
 
 func LocationsSchemaAttributeWithDefaults(l LocationsGetter, defaults ...string) schema.SetAttribute {

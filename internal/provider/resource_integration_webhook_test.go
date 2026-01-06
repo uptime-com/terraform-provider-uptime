@@ -44,3 +44,41 @@ func TestAccIntegrationWebhookResource(t *testing.T) {
 		},
 	}))
 }
+
+func TestAccIntegrationWebhookResource_Headers(t *testing.T) {
+	name := petname.Generate(3, "-")
+	postbackURL := "https://example.com/webhook-headers"
+
+	// Test with single header (newline-delimited key: value format)
+	singleHeader := "Authorization: Bearer test-token"
+
+	// Test with multiple headers (newline-delimited)
+	multipleHeaders := "Authorization: Bearer test-token\nX-Custom-Header: custom-value\nContent-Type: application/json"
+
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigVariables: config.Variables{
+				"name":         config.StringVariable(name),
+				"postback_url": config.StringVariable(postbackURL),
+				"headers":      config.StringVariable(singleHeader),
+			},
+			ConfigDirectory: config.StaticDirectory("testdata/resource_integration_webhook/headers"),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttrSet("uptime_integration_webhook.test", "id"),
+				resource.TestCheckResourceAttr("uptime_integration_webhook.test", "name", name),
+				resource.TestCheckResourceAttr("uptime_integration_webhook.test", "headers", singleHeader),
+			),
+		},
+		{
+			ConfigVariables: config.Variables{
+				"name":         config.StringVariable(name),
+				"postback_url": config.StringVariable(postbackURL),
+				"headers":      config.StringVariable(multipleHeaders),
+			},
+			ConfigDirectory: config.StaticDirectory("testdata/resource_integration_webhook/headers"),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_integration_webhook.test", "headers", multipleHeaders),
+			),
+		},
+	}))
+}

@@ -107,6 +107,7 @@ func TestAccCheckSSHResource_Interval(t *testing.T) {
 
 func TestAccCheckSSHResource_Locations(t *testing.T) {
 	name := petname.Generate(3, "-")
+	locs := testAccLocations(t)
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
 			ConfigDirectory: config.StaticDirectory("testdata/resource_check_ssh/locations"),
@@ -114,14 +115,14 @@ func TestAccCheckSSHResource_Locations(t *testing.T) {
 				"name": config.StringVariable(name),
 				"port": config.IntegerVariable(80),
 				"locations": config.ListVariable(
-					config.StringVariable("US-CA-Los Angeles"),
-					config.StringVariable("US-NY-New York"),
+					config.StringVariable(locs[0]),
+					config.StringVariable(locs[1]),
 				),
 			},
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_ssh.test", "locations.#", "2"),
-				resource.TestCheckResourceAttr("uptime_check_ssh.test", "locations.0", "US-CA-Los Angeles"),
-				resource.TestCheckResourceAttr("uptime_check_ssh.test", "locations.1", "US-NY-New York"),
+				resource.TestCheckTypeSetElemAttr("uptime_check_ssh.test", "locations.*", locs[0]),
+				resource.TestCheckTypeSetElemAttr("uptime_check_ssh.test", "locations.*", locs[1]),
 			),
 		},
 		{
@@ -130,14 +131,14 @@ func TestAccCheckSSHResource_Locations(t *testing.T) {
 				"name": config.StringVariable(name),
 				"port": config.IntegerVariable(80),
 				"locations": config.ListVariable(
-					config.StringVariable("Finland-Helsinki"),
-					config.StringVariable("Switzerland-Zurich"),
+					config.StringVariable(locs[2]),
+					config.StringVariable(locs[3]),
 				),
 			},
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_ssh.test", "locations.#", "2"),
-				resource.TestCheckResourceAttr("uptime_check_ssh.test", "locations.0", "Finland-Helsinki"),
-				resource.TestCheckResourceAttr("uptime_check_ssh.test", "locations.1", "Switzerland-Zurich"),
+				resource.TestCheckTypeSetElemAttr("uptime_check_ssh.test", "locations.*", locs[2]),
+				resource.TestCheckTypeSetElemAttr("uptime_check_ssh.test", "locations.*", locs[3]),
 			),
 		},
 	}))
