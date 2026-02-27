@@ -49,6 +49,7 @@ Each contact group can contain multiple contacts (email addresses, phone numbers
 that will be notified when alerts are triggered. Defaults to ['Default'] if not specified.
 Set to an empty list to disable notifications at this level and rely on parent check group notifications instead.
 - `is_paused` (Boolean)
+- `locations` (Set of String) Can only be set to PLMs, otherwise must be ignored
 - `notes` (String)
 - `num_retries` (Number) How many times the check should be retried before a location is considered down
 - `tags` (Set of String) List of tags to organize and filter monitoring checks. 
@@ -60,7 +61,6 @@ or purpose ('api', 'customer-facing'). Defaults to an empty list if not specifie
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
-- `locations` (Set of String)
 - `url` (String)
 
 ## Import
