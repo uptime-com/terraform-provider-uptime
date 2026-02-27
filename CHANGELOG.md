@@ -80,7 +80,6 @@ New Resources:
 * uptime_integration_geckoboard - Geckoboard dashboard integration
 * uptime_integration_jira_servicedesk - JIRA Service Desk integration
 * uptime_integration_klipfolio - Klipfolio dashboard integration
-* uptime_integration_librato - Librato metrics integration
 * uptime_integration_microsoft_teams - Microsoft Teams notification integration
 * uptime_integration_pagerduty - PagerDuty incident management integration
 * uptime_integration_pushbullet - Pushbullet notification integration
