@@ -35,6 +35,18 @@ func LocationsSchemaAttributeWithDefaults(l LocationsGetter, defaults ...string)
 	}
 }
 
+func LocationsOptionalSchemaAttribute(l LocationsGetter) schema.SetAttribute {
+	return schema.SetAttribute{
+		ElementType: types.StringType,
+		Optional:    true,
+		Computed:    true,
+		Description: "Can only be set to PLMs, otherwise must be ignored",
+		PlanModifiers: []planmodifier.Set{
+			LocationsPlanModifier(l),
+		},
+	}
+}
+
 func LocationsReadOnlySchemaAttribute() schema.SetAttribute {
 	return schema.SetAttribute{
 		ElementType: types.StringType,
