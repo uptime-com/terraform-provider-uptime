@@ -25,7 +25,7 @@ func NewCheckBlacklistResource(_ context.Context, p *providerImpl) resource.Reso
 					"name":           NameSchemaAttribute(),
 					"address":        AddressHostnameSchemaAttributeDescription("Domain name to check"),
 					"contact_groups": ContactGroupsSchemaAttribute(),
-					"locations":      LocationsReadOnlySchemaAttribute(),
+					"locations":      LocationsOptionalSchemaAttribute(p),
 					"tags":           TagsSchemaAttribute(),
 					"is_paused":      IsPausedSchemaAttribute(),
 					"num_retries":    NumRetriesAttribute(2),

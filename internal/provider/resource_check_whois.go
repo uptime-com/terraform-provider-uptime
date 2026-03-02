@@ -23,7 +23,7 @@ func NewCheckWHOISResource(_ context.Context, p *providerImpl) resource.Resource
 					"url":            URLSchemaAttribute(),
 					"name":           NameSchemaAttribute(),
 					"contact_groups": ContactGroupsSchemaAttribute(),
-					"locations":      LocationsReadOnlySchemaAttribute(),
+					"locations":      LocationsOptionalSchemaAttribute(p),
 					"tags":           TagsSchemaAttribute(),
 					"is_paused":      IsPausedSchemaAttribute(),
 					"threshold":      ThresholdDescriptionSchemaAttribute(20, "Raise an alert if there are less than this many days before the domain needs to be renewed."),

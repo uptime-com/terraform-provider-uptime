@@ -31,7 +31,7 @@ func NewCheckSSLCertResource(_ context.Context, p *providerImpl) resource.Resour
 					"url":            URLSchemaAttribute(),
 					"name":           NameSchemaAttribute(),
 					"contact_groups": ContactGroupsSchemaAttribute(),
-					"locations":      LocationsReadOnlySchemaAttribute(),
+					"locations":      LocationsOptionalSchemaAttribute(p),
 					"tags":           TagsSchemaAttribute(),
 					"is_paused":      IsPausedSchemaAttribute(),
 					"threshold": ThresholdDescriptionSchemaAttribute(

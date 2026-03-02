@@ -178,7 +178,6 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewIntegrationGeckoboardResource(ctx, p) },
 		func() resource.Resource { return NewIntegrationJiraServicedeskResource(ctx, p) },
 		func() resource.Resource { return NewIntegrationKlipfolioResource(ctx, p) },
-		func() resource.Resource { return NewIntegrationLibratoResource(ctx, p) },
 		func() resource.Resource { return NewIntegrationMicrosoftTeamsResource(ctx, p) },
 		func() resource.Resource { return NewIntegrationOpsgenieResource(ctx, p) },
 		func() resource.Resource { return NewIntegrationPagerdutyResource(ctx, p) },

@@ -53,6 +53,7 @@ that will be notified when alerts are triggered. Defaults to ['Default'] if not 
 Set to an empty list to disable notifications at this level and rely on parent check group notifications instead.
 - `expect_string` (String) String to expect in server response (may be repeated)
 - `is_paused` (Boolean)
+- `locations` (Set of String) Can only be set to PLMs, otherwise must be ignored
 - `notes` (String)
 - `num_retries` (Number) How many times the check should be retried before a location is considered down
 - `send_resolved_notifications` (Boolean) Whether to send notifications when the check recovers from a down state.
@@ -67,7 +68,6 @@ or purpose ('api', 'customer-facing'). Defaults to an empty list if not specifie
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
-- `locations` (Set of String)
 - `url` (String)
 
 <a id="nestedatt--sla"></a>
