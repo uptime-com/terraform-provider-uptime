@@ -1,5 +1,17 @@
 # Uptime.com Terraform provider changelog
 
+## v2.24.0
+
+Enhancements:
+* SSL certificate check now supports setting PLM (Private Location Monitor) locations
+* Remove Librato integration resource
+
+Dependency Updates:
+* Bump github.com/hashicorp/terraform-plugin-framework
+* Bump github.com/hashicorp/terraform-plugin-go
+* Bump github.com/cloudflare/circl
+* Bump github.com/uptime-com/uptime-client-go/v2
+
 ## v2.23.0
 
 Bug Fixes:
