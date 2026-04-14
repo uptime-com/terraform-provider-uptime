@@ -151,6 +151,7 @@ func (p *providerImpl) Resources(ctx context.Context) []func() resource.Resource
 		func() resource.Resource { return NewCheckAPIResource(ctx, p) },
 		func() resource.Resource { return NewCheckTransactionResource(ctx, p) },
 		func() resource.Resource { return NewCheckBlacklistResource(ctx, p) },
+		func() resource.Resource { return NewCheckCloudStatusResource(ctx, p) },
 		func() resource.Resource { return NewCheckDNSResource(ctx, p) },
 		func() resource.Resource { return NewCheckHeartbeatResource(ctx, p) },
 		func() resource.Resource { return NewCheckHTTPResource(ctx, p) },
