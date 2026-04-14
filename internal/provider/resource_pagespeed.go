@@ -172,7 +172,7 @@ func (a CheckPageSpeedResourceModelAdapter) ToAPIArgument(model CheckPageSpeedRe
 		ContactGroups: a.ContactGroups(model.ContactGroups),
 		Locations:     a.Locations(model.Locations),
 		Tags:          a.Tags(model.Tags),
-		IsPaused:      model.IsPaused.ValueBool(),
+		IsPaused:      upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Interval:      model.Interval.ValueInt64(),
 		Username:      model.Username.ValueString(),
 		Password:      model.Password.ValueString(),

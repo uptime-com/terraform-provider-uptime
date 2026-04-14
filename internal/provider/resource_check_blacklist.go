@@ -58,7 +58,7 @@ func (a CheckBlacklistResourceModelAdapter) ToAPIArgument(model CheckBlacklistRe
 		ContactGroups: a.ContactGroups(model.ContactGroups),
 		Locations:     a.Locations(model.Locations),
 		Tags:          a.Tags(model.Tags),
-		IsPaused:      model.IsPaused.ValueBool(),
+		IsPaused:      upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Address:       model.Address.ValueString(),
 		NumRetries:    model.NumRetries.ValueInt64(),
 		Notes:         model.Notes.ValueString(),

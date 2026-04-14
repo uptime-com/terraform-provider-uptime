@@ -219,9 +219,9 @@ func (a CheckGroupResourceModelAdapter) ToAPIArgument(model CheckGroupResourceMo
 		Name:                   model.Name.ValueString(),
 		ContactGroups:          a.ContactGroups(model.ContactGroups),
 		Tags:                   a.Tags(model.Tags),
-		IsPaused:               model.IsPaused.ValueBool(),
+		IsPaused:               upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Notes:                  model.Notes.ValueString(),
-		IncludeInGlobalMetrics: model.IncludeInGlobalMetrics.ValueBool(),
+		IncludeInGlobalMetrics: upapi.BoolPtr(model.IncludeInGlobalMetrics.ValueBool()),
 	}
 
 	if model.sla != nil {
