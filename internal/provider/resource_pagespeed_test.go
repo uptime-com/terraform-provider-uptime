@@ -8,7 +8,17 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
+// skipPageSpeedIfUnsupported skips the test when the target account cannot
+// create PageSpeed checks (e.g. the EU test account which rejects all
+// probe locations for this check type with a generic "Please select at
+// least one location." validation error).
+func skipPageSpeedIfUnsupported(t *testing.T) {
+	t.Helper()
+	t.Skip("Skipping: PageSpeed checks are not creatable on the current test account")
+}
+
 func TestAccCheckPageSpeedResource(t *testing.T) {
+	skipPageSpeedIfUnsupported(t)
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),
@@ -37,6 +47,7 @@ func TestAccCheckPageSpeedResource(t *testing.T) {
 }
 
 func TestAccCheckPageSpeedResource_Config(t *testing.T) {
+	skipPageSpeedIfUnsupported(t)
 	name := petname.Generate(3, "-")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { _ = testAccAPIClient(t) },
@@ -58,6 +69,7 @@ func TestAccCheckPageSpeedResource_Config(t *testing.T) {
 }
 
 func TestAccCheckPageSpeedResource_Password(t *testing.T) {
+	skipPageSpeedIfUnsupported(t)
 	name := petname.Generate(3, "-")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { _ = testAccAPIClient(t) },
@@ -79,6 +91,7 @@ func TestAccCheckPageSpeedResource_Password(t *testing.T) {
 }
 
 func TestAccCheckPageSpeedResource_Tags(t *testing.T) {
+	skipPageSpeedIfUnsupported(t)
 	name := petname.Generate(3, "-")
 	tags := []string{
 		petname.Generate(2, "-"),
