@@ -25,6 +25,8 @@ type providerImpl struct {
 	version       string
 	locations     map[string]struct{}
 	locationsOnce sync.Once
+	baseURL       string
+	token         string
 }
 
 type providerConfig struct {
@@ -101,9 +103,14 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 		}
 		cfg.RateLimit = types.Float64Value(rateLimit)
 	}
+	p.token = cfg.Token.ValueString()
+	p.baseURL = cfg.Endpoint.ValueString()
+	if p.baseURL == "" {
+		p.baseURL = "https://uptime.com/api/v1/"
+	}
 	opts := []upapi.Option{
 		upapi.WithSubaccount(cfg.Subaccount.ValueInt64()),
-		upapi.WithToken(cfg.Token.ValueString()),
+		upapi.WithToken(p.token),
 		upapi.WithUserAgent(p.UserAgentString()),
 		upapi.WithRateLimit(cfg.RateLimit.ValueFloat64()),
 		upapi.WithRetry(10, time.Second*30, os.Stderr),
@@ -125,6 +132,7 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		func() datasource.DataSource { return NewLocationsDataSource(ctx, p) },
+		func() datasource.DataSource { return NewPrivateLocationsDataSource(ctx, p) },
 		func() datasource.DataSource { return NewCredentialsDataSource(ctx, p) },
 		func() datasource.DataSource { return NewContactsDataSource(ctx, p) },
 		func() datasource.DataSource { return NewUsersDataSource(ctx, p) },
