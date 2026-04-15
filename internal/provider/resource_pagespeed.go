@@ -26,7 +26,7 @@ func NewCheckPageSpeedResource(_ context.Context, p *providerImpl) resource.Reso
 					"id":             IDSchemaAttribute(),
 					"name":           NameSchemaAttribute(),
 					"contact_groups": ContactGroupsSchemaAttribute(),
-					"locations":      LocationsSchemaAttributeWithDefaults(p, "United Kingdom-London"),
+					"locations":      LocationsSchemaAttribute(p),
 					"tags":           TagsSchemaAttribute(),
 					"is_paused":      IsPausedSchemaAttribute(),
 					"interval":       IntervalSchemaAttribute(1440),

@@ -7,7 +7,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -61,9 +63,13 @@ func NewStatusPageResource(_ context.Context, p *providerImpl) resource.Resource
 						},
 					},
 					"allow_subscriptions": schema.BoolAttribute{
+						Description: ("Automatically derived by the API from the per-channel " +
+							"allow_subscriptions_* flags; setting it explicitly is not required."),
 						Optional: true,
 						Computed: true,
-						Default:  booldefault.StaticBool(false),
+						PlanModifiers: []planmodifier.Bool{
+							boolplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"allow_search_indexing": schema.BoolAttribute{
 						Optional: true,
