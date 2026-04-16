@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/shopspring/decimal"
 
@@ -41,7 +42,8 @@ func NewCheckTCPResource(_ context.Context, p *providerImpl) resource.Resource {
 					"encryption": schema.StringAttribute{
 						Optional:    true,
 						Computed:    true,
-						Description: "Whether to use TLS",
+						Default:     stringdefault.StaticString("SSL_TLS"),
+						Description: "TLS mode: \"SSL_TLS\" (default) or \"\" to disable.",
 					},
 				},
 			},

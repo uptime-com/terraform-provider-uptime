@@ -207,12 +207,6 @@ func TestAccCheckTCPResource_SendExpectString(t *testing.T) {
 }
 
 func TestAccCheckTCPResource_Encryption(t *testing.T) {
-	// The uptime-client-go SDK marks `msp_encryption` with `omitempty`, so an
-	// explicit empty string is dropped from the request payload. The server
-	// now defaults unspecified `msp_encryption` to "SSL_TLS", which makes it
-	// impossible for the provider to land on encryption="" through this SDK.
-	// Skip until the SDK removes `omitempty` from the field.
-	t.Skip("Skipping: SDK omitempty on msp_encryption prevents sending explicit empty value; server defaults to SSL_TLS")
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),
