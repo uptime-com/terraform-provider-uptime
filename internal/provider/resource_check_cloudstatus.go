@@ -125,8 +125,7 @@ func (a CheckCloudStatusResourceModelAdapter) ToAPIArgument(model CheckCloudStat
 		ServiceTitles:    setToStringSlice(model.ServiceTitles),
 	}
 	if !model.Group.IsNull() && !model.Group.IsUnknown() {
-		v := model.Group.ValueInt64()
-		cfg.Group = &v
+		cfg.Group = &upapi.CloudStatusGroup{ID: model.Group.ValueInt64()}
 	}
 	return &upapi.CheckCloudStatus{
 		Name:              model.Name.ValueString(),
