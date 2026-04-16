@@ -7,6 +7,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+
+	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
 
 func IDSchemaAttribute() schema.Int64Attribute {
@@ -90,4 +93,18 @@ func SensitivitySchemaAttribute(defaultVal int64) schema.Int64Attribute {
 		Default:     int64default.StaticInt64(defaultVal),
 		Description: "How many locations should be down before an alert is sent",
 	}
+}
+
+func encryptionAPIValue(v types.String) *string {
+	if v.IsNull() || v.IsUnknown() {
+		return nil
+	}
+	return upapi.StringPtr(v.ValueString())
+}
+
+func encryptionModelValue(v *string) types.String {
+	if v == nil {
+		return types.StringNull()
+	}
+	return types.StringValue(*v)
 }

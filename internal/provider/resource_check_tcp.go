@@ -117,7 +117,7 @@ func (a CheckTCPResourceModelAdapter) ToAPIArgument(model CheckTCPResourceModel)
 		UseIpVersion:           model.UseIpVersion.ValueString(),
 		Notes:                  model.Notes.ValueString(),
 		IncludeInGlobalMetrics: upapi.BoolPtr(model.IncludeInGlobalMetrics.ValueBool()),
-		Encryption:             model.Encryption.ValueString(),
+		Encryption:             encryptionAPIValue(model.Encryption),
 	}
 
 	if model.sla != nil {
@@ -154,7 +154,7 @@ func (a CheckTCPResourceModelAdapter) FromAPIResult(api upapi.Check) (*CheckTCPR
 			Latency: DurationValueFromDecimalSeconds(api.ResponseTimeSLA),
 			Uptime:  DecimalValue(api.UptimeSLA),
 		}),
-		Encryption: types.StringValue(api.Encryption),
+		Encryption: encryptionModelValue(api.Encryption),
 	}
 	return &model, nil
 }
