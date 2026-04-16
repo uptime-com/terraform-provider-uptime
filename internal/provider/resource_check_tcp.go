@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/shopspring/decimal"
 
@@ -40,10 +39,13 @@ func NewCheckTCPResource(_ context.Context, p *providerImpl) resource.Resource {
 					"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
 					"sla":                       SLASchemaAttribute(),
 					"encryption": schema.StringAttribute{
-						Optional:    true,
-						Computed:    true,
-						Default:     stringdefault.StaticString("SSL_TLS"),
-						Description: "TLS mode: \"SSL_TLS\" (default) or \"\" to disable.",
+						Optional: true,
+						Computed: true,
+						// Intentionally no Default: the released SDK already sent "" on the wire
+						// for CheckTCP (no omitempty), so existing user state for unspecified
+						// encryption is "" (Off). Adding a Default of "SSL_TLS" here would
+						// silently flip that to TLS-on for everyone on the next plan.
+						Description: "TLS mode: \"SSL_TLS\" or \"\" (default) for no encryption.",
 					},
 				},
 			},
