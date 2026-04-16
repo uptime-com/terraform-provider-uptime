@@ -70,6 +70,9 @@ func (p *providerImpl) UserAgentString() string {
 }
 
 func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureRequest, rs *provider.ConfigureResponse) {
+	if p.api != nil && p.version == "test" {
+		return
+	}
 	var cfg providerConfig
 	if diags := rq.Config.Get(ctx, &cfg); diags.HasError() {
 		rs.Diagnostics.Append(diags...)

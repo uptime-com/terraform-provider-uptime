@@ -2,9 +2,12 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strconv"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
@@ -41,36 +44,93 @@ func (c *planCheckNoOp) CheckPlan(ctx context.Context, rq plancheck.CheckPlanReq
 	return
 }
 
+var (
+	testAccAPIClientOnce sync.Once
+	testAccAPIClientInst upapi.API
+	testAccAPIClientErr  error
+
+	testAccProviderOnce sync.Once
+	testAccProviderInst *providerImpl
+	testAccProviderErr  error
+)
+
+func buildTestAccAPIClient() (upapi.API, error) {
+	token := os.Getenv("UPTIME_TOKEN")
+	if token == "" {
+		return nil, fmt.Errorf("UPTIME_TOKEN must be set for acceptance tests")
+	}
+	rateLimit := 0.5
+	if val := os.Getenv("UPTIME_RATE_LIMIT"); val != "" {
+		if parsedVal, err := strconv.ParseFloat(val, 64); err == nil {
+			rateLimit = parsedVal
+		}
+	}
+	var subaccount int64
+	if val := os.Getenv("UPTIME_SUBACCOUNT"); val != "" {
+		parsed, err := strconv.ParseInt(val, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse UPTIME_SUBACCOUNT: %w", err)
+		}
+		subaccount = parsed
+	}
+	opts := []upapi.Option{
+		upapi.WithSubaccount(subaccount),
+		upapi.WithToken(token),
+		upapi.WithUserAgent((&providerImpl{version: "test"}).UserAgentString()),
+		upapi.WithRateLimit(rateLimit),
+		upapi.WithRetry(10, time.Second*30, os.Stderr),
+	}
+	if endpoint := os.Getenv("UPTIME_ENDPOINT"); endpoint != "" {
+		opts = append(opts, upapi.WithBaseURL(endpoint))
+	}
+	if os.Getenv("UPTIME_TRACE") != "" {
+		opts = append(opts, upapi.WithTrace(os.Stderr))
+	}
+	return upapi.New(opts...)
+}
+
+func sharedTestAccAPIClient() (upapi.API, error) {
+	testAccAPIClientOnce.Do(func() {
+		testAccAPIClientInst, testAccAPIClientErr = buildTestAccAPIClient()
+	})
+	return testAccAPIClientInst, testAccAPIClientErr
+}
+
+func sharedTestAccProvider() (*providerImpl, error) {
+	testAccProviderOnce.Do(func() {
+		api, err := sharedTestAccAPIClient()
+		if err != nil {
+			testAccProviderErr = err
+			return
+		}
+		p, ok := VersionFactory("test")().(*providerImpl)
+		if !ok {
+			testAccProviderErr = fmt.Errorf("VersionFactory did not return *providerImpl")
+			return
+		}
+		p.api = api
+		testAccProviderInst = p
+	})
+	return testAccProviderInst, testAccProviderErr
+}
+
 func testAccProtoV6ProviderFactories() map[string]func() (tfprotov6.ProviderServer, error) {
 	return map[string]func() (tfprotov6.ProviderServer, error){
-		"uptime": providerserver.NewProtocol6WithError(VersionFactory("test")()),
+		"uptime": func() (tfprotov6.ProviderServer, error) {
+			p, err := sharedTestAccProvider()
+			if err != nil {
+				return nil, err
+			}
+			return providerserver.NewProtocol6WithError(p)()
+		},
 	}
 }
 
 func testAccAPIClient(t testing.TB) upapi.API {
 	t.Helper()
 
-	token := os.Getenv("UPTIME_TOKEN")
-	require.NotEmpty(t, token, "UPTIME_TOKEN must be set for acceptance tests")
-
-	rateLimit := 0.15
-	if val := os.Getenv("UPTIME_RATE_LIMIT"); val != "" {
-		if parsedVal, err := strconv.ParseFloat(val, 64); err == nil {
-			rateLimit = parsedVal
-		}
-	}
-
-	opts := []upapi.Option{
-		upapi.WithToken(token),
-		upapi.WithRateLimit(rateLimit),
-	}
-	if endpoint := os.Getenv("UPTIME_ENDPOINT"); endpoint != "" {
-		opts = append(opts, upapi.WithBaseURL(endpoint))
-	}
-
-	api, err := upapi.New(opts...)
+	api, err := sharedTestAccAPIClient()
 	require.NoError(t, err, "failed to initialize uptime.com api client")
-
 	return api
 }
 

@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"os"
+	"strings"
 	"testing"
 
 	petname "github.com/dustinkirkland/golang-petname"
@@ -9,12 +11,14 @@ import (
 )
 
 // skipPageSpeedIfUnsupported skips the test when the target account cannot
-// create PageSpeed checks (e.g. the EU test account which rejects all
-// probe locations for this check type with a generic "Please select at
-// least one location." validation error).
+// create PageSpeed checks. The EU test account rejects all probe locations
+// for this check type with a generic "Please select at least one location."
+// validation error, so we skip whenever UPTIME_ENDPOINT points at EU.
 func skipPageSpeedIfUnsupported(t *testing.T) {
 	t.Helper()
-	t.Skip("Skipping: PageSpeed checks are not creatable on the current test account")
+	if strings.Contains(os.Getenv("UPTIME_ENDPOINT"), "eu.uptime.com") {
+		t.Skip("Skipping: EU test account rejects all PageSpeed probe locations")
+	}
 }
 
 func TestAccCheckPageSpeedResource(t *testing.T) {
