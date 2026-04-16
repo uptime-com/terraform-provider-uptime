@@ -20,7 +20,8 @@ variable password {
 }
 
 resource "uptime_check_pagespeed" "test" {
-  name     = var.name
-  script   = var.script
-  password = var.password
+  name      = var.name
+  script    = var.script
+  password  = var.password
+  locations = ["Dedicated-US-NY-New York"]
 }

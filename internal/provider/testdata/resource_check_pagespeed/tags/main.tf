@@ -29,7 +29,8 @@ variable "tags_use" {
 }
 
 resource "uptime_check_pagespeed" "test" {
-  name   = var.name
-  script = var.script
-  tags   = var.tags_use
+  name      = var.name
+  script    = var.script
+  tags      = var.tags_use
+  locations = ["Dedicated-US-NY-New York"]
 }

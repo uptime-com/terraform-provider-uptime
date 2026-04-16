@@ -4,7 +4,7 @@ variable name {
 
 variable service_name {
   type    = string
-  default = "aws-ec2-us-east-1"
+  default = "Amazon Service"
 }
 
 resource uptime_check_cloudstatus test {

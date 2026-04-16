@@ -8,7 +8,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
@@ -46,9 +48,13 @@ func NewCheckCloudStatusResource(_ context.Context, p *providerImpl) resource.Re
 					"service_name": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default:  stringdefault.StaticString(""),
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+							stringplanmodifier.RequiresReplaceIfConfigured(),
+						},
 						Description: "Deprecated: legacy single-component identifier. Prefer `group` + " +
-							"`monitoring_type`.",
+							"`monitoring_type`. The server forbids changing this on an existing check, " +
+							"so an explicit value change forces resource replacement.",
 					},
 					"group": schema.Int64Attribute{
 						Optional:    true,
@@ -166,13 +172,21 @@ func (a CheckCloudStatusResourceModelAdapter) FromAPIResult(api upapi.Check) (*C
 	return &model, nil
 }
 
-// PreservePlanValues keeps the `group` write-only value from the plan since
-// the API never echoes it back. Implements PlanValuePreserver.
+// PreservePlanValues keeps fields that the API does not faithfully echo back.
+// Implements PlanValuePreserver.
+//
+// `group` is write-only on the server (the response object differs from the
+// integer ID we sent). `name` is rewritten by the server to the group's name
+// for group-based checks, so we keep the user-supplied value to avoid
+// "Provider produced inconsistent result after apply" errors.
 func (a CheckCloudStatusResourceModelAdapter) PreservePlanValues(result *CheckCloudStatusResourceModel, plan *CheckCloudStatusResourceModel) *CheckCloudStatusResourceModel {
 	if result == nil || plan == nil {
 		return result
 	}
 	result.Group = plan.Group
+	if !plan.Group.IsNull() && !plan.Group.IsUnknown() {
+		result.Name = plan.Name
+	}
 	return result
 }
 

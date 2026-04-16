@@ -67,23 +67,23 @@ func TestAccCheckCloudStatusResource(t *testing.T) {
 		{
 			ConfigVariables: config.Variables{
 				"name":         config.StringVariable(names[0]),
-				"service_name": config.StringVariable("aws-ec2-us-east-1"),
+				"service_name": config.StringVariable("Amazon Service"),
 			},
 			ConfigDirectory: config.StaticDirectory("testdata/resource_check_cloudstatus/_basic"),
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_cloudstatus.test", "name", names[0]),
-				resource.TestCheckResourceAttr("uptime_check_cloudstatus.test", "service_name", "aws-ec2-us-east-1"),
+				resource.TestCheckResourceAttr("uptime_check_cloudstatus.test", "service_name", "Amazon Service"),
 			),
 		},
 		{
 			ConfigVariables: config.Variables{
 				"name":         config.StringVariable(names[1]),
-				"service_name": config.StringVariable("aws-ec2-us-east-2"),
+				"service_name": config.StringVariable("100ms API"),
 			},
 			ConfigDirectory: config.StaticDirectory("testdata/resource_check_cloudstatus/_basic"),
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_cloudstatus.test", "name", names[1]),
-				resource.TestCheckResourceAttr("uptime_check_cloudstatus.test", "service_name", "aws-ec2-us-east-2"),
+				resource.TestCheckResourceAttr("uptime_check_cloudstatus.test", "service_name", "100ms API"),
 			),
 		},
 	}))
@@ -111,14 +111,14 @@ func TestAccCheckCloudStatusResource_ContactGroups(t *testing.T) {
 			ConfigVariables: config.Variables{
 				"name": config.StringVariable(name),
 				"contact_groups": config.ListVariable(
+					config.StringVariable("Default"),
 					config.StringVariable("nobody"),
-					config.StringVariable("noone"),
 				),
 			},
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_cloudstatus.test", "contact_groups.#", "2"),
-				resource.TestCheckResourceAttr("uptime_check_cloudstatus.test", "contact_groups.0", "nobody"),
-				resource.TestCheckResourceAttr("uptime_check_cloudstatus.test", "contact_groups.1", "noone"),
+				resource.TestCheckResourceAttr("uptime_check_cloudstatus.test", "contact_groups.0", "Default"),
+				resource.TestCheckResourceAttr("uptime_check_cloudstatus.test", "contact_groups.1", "nobody"),
 			),
 		},
 	}))
