@@ -39,13 +39,19 @@ jobs:
           cache: true
       - name: Run unit tests
         run: go test -v ./...
-      - name: Run acceptance tests
+      - name: Run acceptance tests (EU)
         env:
           TF_ACC: "yup"
           UPTIME_TOKEN: "${{ secrets.UPTIME_TOKEN_EU }}"
-          UPTIME_RATE_LIMIT: "1.0"
+          UPTIME_RATE_LIMIT: "2.0"
           UPTIME_ENDPOINT: "https://eu.uptime.com/api/v1/"
         run: go test -test.timeout=50m -test.parallel=1 -v ./... -run ^TestAcc[A-Z]
+      - name: Run acceptance tests (US - PageSpeed & CloudStatus only)
+        env:
+          TF_ACC: "yup"
+          UPTIME_TOKEN: "${{ secrets.UPTIME_TOKEN }}"
+          UPTIME_RATE_LIMIT: "2.0"
+        run: go test -test.timeout=20m -test.parallel=1 -v ./internal/provider -run '^TestAccCheck(PageSpeed|CloudStatus)'
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')

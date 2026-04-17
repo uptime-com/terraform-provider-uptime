@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/shopspring/decimal"
 
@@ -35,7 +36,8 @@ func NewCheckIMAPResource(_ context.Context, p *providerImpl) resource.Resource 
 					"encryption": schema.StringAttribute{
 						Optional:    true,
 						Computed:    true,
-						Description: "Whether to use TLS",
+						Default:     stringdefault.StaticString("SSL_TLS"),
+						Description: "TLS mode: \"SSL_TLS\" (default) or \"\" to disable.",
 					},
 					"use_ip_version":            UseIPVersionSchemaAttribute(),
 					"num_retries":               NumRetriesAttribute(2),
@@ -102,15 +104,15 @@ func (a CheckIMAPResourceModelAdapter) ToAPIArgument(model CheckIMAPResourceMode
 		ContactGroups:          a.ContactGroups(model.ContactGroups),
 		Locations:              a.Locations(model.Locations),
 		Tags:                   a.Tags(model.Tags),
-		IsPaused:               model.IsPaused.ValueBool(),
+		IsPaused:               upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Interval:               model.Interval.ValueInt64(),
 		Port:                   model.Port.ValueInt64(),
 		ExpectString:           model.ExpectString.ValueString(),
-		Encryption:             model.Encryption.ValueString(),
+		Encryption:             encryptionAPIValue(model.Encryption),
 		NumRetries:             model.NumRetries.ValueInt64(),
 		UseIPVersion:           model.UseIPVersion.ValueString(),
 		Notes:                  model.Notes.ValueString(),
-		IncludeInGlobalMetrics: model.IncludeInGlobalMetrics.ValueBool(),
+		IncludeInGlobalMetrics: upapi.BoolPtr(model.IncludeInGlobalMetrics.ValueBool()),
 	}
 
 	if model.sla != nil {
@@ -138,7 +140,7 @@ func (a CheckIMAPResourceModelAdapter) FromAPIResult(api upapi.Check) (*CheckIMA
 		Interval:               types.Int64Value(api.Interval),
 		Port:                   types.Int64Value(api.Port),
 		ExpectString:           types.StringValue(api.ExpectString),
-		Encryption:             types.StringValue(api.Encryption),
+		Encryption:             encryptionModelValue(api.Encryption),
 		NumRetries:             types.Int64Value(api.NumRetries),
 		UseIPVersion:           types.StringValue(api.UseIPVersion),
 		Notes:                  types.StringValue(api.Notes),

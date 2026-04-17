@@ -248,7 +248,7 @@ func (a CheckSSLCertResourceModelAdapter) ToAPIArgument(model CheckSSLCertResour
 		ContactGroups: a.ContactGroups(model.ContactGroups),
 		Locations:     a.Locations(model.Locations),
 		Tags:          a.Tags(model.Tags),
-		IsPaused:      model.IsPaused.ValueBool(),
+		IsPaused:      upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Threshold:     model.Threshold.ValueInt64(),
 		NumRetries:    model.NumRetries.ValueInt64(),
 		Notes:         model.Notes.ValueString(),
@@ -256,8 +256,8 @@ func (a CheckSSLCertResourceModelAdapter) ToAPIArgument(model CheckSSLCertResour
 	if model.config != nil {
 		api.SSLConfig = upapi.CheckSSLCertConfig{
 			Protocol:                model.config.Protocol.ValueString(),
-			CRL:                     model.config.CRL.ValueBool(),
-			FirstElementOnly:        model.config.FirstElementOnly.ValueBool(),
+			CRL:                     upapi.BoolPtr(model.config.CRL.ValueBool()),
+			FirstElementOnly:        upapi.BoolPtr(model.config.FirstElementOnly.ValueBool()),
 			Match:                   model.config.Match.ValueString(),
 			Issuer:                  model.config.Issuer.ValueString(),
 			MinVersion:              model.config.MinVersion.ValueString(),
@@ -288,8 +288,8 @@ func (a CheckSSLCertResourceModelAdapter) FromAPIResult(api upapi.Check) (*Check
 		Notes:         types.StringValue(api.Notes),
 		Config: a.ConfigAttributeValue(CheckSSLCertConfigAttribute{
 			Protocol:                types.StringValue(api.SSLConfig.Protocol),
-			CRL:                     types.BoolValue(api.SSLConfig.CRL),
-			FirstElementOnly:        types.BoolValue(api.SSLConfig.FirstElementOnly),
+			CRL:                     types.BoolValue(api.SSLConfig.CRL != nil && *api.SSLConfig.CRL),
+			FirstElementOnly:        types.BoolValue(api.SSLConfig.FirstElementOnly != nil && *api.SSLConfig.FirstElementOnly),
 			Match:                   types.StringValue(api.SSLConfig.Match),
 			Issuer:                  types.StringValue(api.SSLConfig.Issuer),
 			MinVersion:              types.StringValue(api.SSLConfig.MinVersion),

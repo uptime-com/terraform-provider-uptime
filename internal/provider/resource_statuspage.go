@@ -61,9 +61,13 @@ func NewStatusPageResource(_ context.Context, p *providerImpl) resource.Resource
 						},
 					},
 					"allow_subscriptions": schema.BoolAttribute{
+						Description: "Automatically derived by the API from the per-channel " +
+							"allow_subscriptions_* flags; setting it explicitly has no effect.",
+						DeprecationMessage: "allow_subscriptions is now server-derived from the " +
+							"per-channel allow_subscriptions_* flags; setting it explicitly has no " +
+							"effect and this attribute will become read-only in a future major release.",
 						Optional: true,
 						Computed: true,
-						Default:  booldefault.StaticBool(false),
 					},
 					"allow_search_indexing": schema.BoolAttribute{
 						Optional: true,
@@ -315,7 +319,7 @@ func (c StatusPageResourceModelAdapter) ToAPIArgument(model StatusPageResourceMo
 		PageType:                  model.PageType.ValueString(),
 		Slug:                      model.Slug.ValueString(),
 		CNAME:                     model.CNAME.ValueString(),
-		AllowSubscriptions:        model.AllowSubscriptions.ValueBool(),
+		AllowSubscriptions:        boolOptionalAPIValue(model.AllowSubscriptions),
 		AllowSearchIndexing:       model.AllowSearchIndexing.ValueBool(),
 		AllowDrillDown:            model.AllowDrillDown.ValueBool(),
 		AuthUsername:              model.AuthUsername.ValueString(),
@@ -364,7 +368,7 @@ func (c StatusPageResourceModelAdapter) FromAPIResult(api upapi.StatusPage) (*St
 		PageType:                  types.StringValue(api.PageType),
 		Slug:                      types.StringValue(api.Slug),
 		CNAME:                     types.StringValue(api.CNAME),
-		AllowSubscriptions:        types.BoolValue(api.AllowSubscriptions),
+		AllowSubscriptions:        boolOptionalModelValue(api.AllowSubscriptions),
 		AllowSearchIndexing:       types.BoolValue(api.AllowSearchIndexing),
 		AllowDrillDown:            types.BoolValue(api.AllowDrillDown),
 		AuthUsername:              types.StringValue(api.AuthUsername),

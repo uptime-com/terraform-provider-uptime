@@ -83,9 +83,9 @@ func (a CheckWebhookResourceModelAdapter) ToAPIArgument(model CheckWebhookResour
 		Name:                   model.Name.ValueString(),
 		ContactGroups:          a.ContactGroups(model.ContactGroups),
 		Tags:                   a.Tags(model.Tags),
-		IsPaused:               model.IsPaused.ValueBool(),
+		IsPaused:               upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Notes:                  model.Notes.ValueString(),
-		IncludeInGlobalMetrics: model.IncludeInGlobalMetrics.ValueBool(),
+		IncludeInGlobalMetrics: upapi.BoolPtr(model.IncludeInGlobalMetrics.ValueBool()),
 		WebhookUrl:             model.WebhookURL.ValueString(),
 	}
 	if model.sla != nil {

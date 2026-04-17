@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"os"
+	"strings"
 	"testing"
 
 	petname "github.com/dustinkirkland/golang-petname"
@@ -8,7 +10,19 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
+// skipPageSpeedIfUnsupported skips the test when the target account cannot
+// create PageSpeed checks. The EU test account rejects all probe locations
+// for this check type with a generic "Please select at least one location."
+// validation error, so we skip whenever UPTIME_ENDPOINT points at EU.
+func skipPageSpeedIfUnsupported(t *testing.T) {
+	t.Helper()
+	if strings.Contains(os.Getenv("UPTIME_ENDPOINT"), "eu.uptime.com") {
+		t.Skip("Skipping: EU test account rejects all PageSpeed probe locations")
+	}
+}
+
 func TestAccCheckPageSpeedResource(t *testing.T) {
+	skipPageSpeedIfUnsupported(t)
 	names := [2]string{
 		petname.Generate(3, "-"),
 		petname.Generate(3, "-"),
@@ -37,6 +51,7 @@ func TestAccCheckPageSpeedResource(t *testing.T) {
 }
 
 func TestAccCheckPageSpeedResource_Config(t *testing.T) {
+	skipPageSpeedIfUnsupported(t)
 	name := petname.Generate(3, "-")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { _ = testAccAPIClient(t) },
@@ -58,6 +73,7 @@ func TestAccCheckPageSpeedResource_Config(t *testing.T) {
 }
 
 func TestAccCheckPageSpeedResource_Password(t *testing.T) {
+	skipPageSpeedIfUnsupported(t)
 	name := petname.Generate(3, "-")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { _ = testAccAPIClient(t) },
@@ -79,6 +95,7 @@ func TestAccCheckPageSpeedResource_Password(t *testing.T) {
 }
 
 func TestAccCheckPageSpeedResource_Tags(t *testing.T) {
+	skipPageSpeedIfUnsupported(t)
 	name := petname.Generate(3, "-")
 	tags := []string{
 		petname.Generate(2, "-"),

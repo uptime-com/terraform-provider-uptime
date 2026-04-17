@@ -63,7 +63,7 @@ and must have at least one dot separator between valid DNS labels.
 Each contact group can contain multiple contacts (email addresses, phone numbers, or integrations)
 that will be notified when alerts are triggered. Defaults to ['Default'] if not specified.
 Set to an empty list to disable notifications at this level and rely on parent check group notifications instead.
-- `encryption` (String) Whether to use TLS
+- `encryption` (String) TLS mode: "SSL_TLS" (enable TLS) or "" (no encryption). If omitted on a new resource, the server picks its default (currently "SSL_TLS"); existing TCP checks without an explicit value keep whatever was previously stored ("" for provider versions prior to SDK omitempty).
 - `expect_string` (String) String to expect in server response (may be repeated)
 - `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
 - `interval` (Number) The interval between checks in minutes

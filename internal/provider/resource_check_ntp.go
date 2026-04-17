@@ -100,14 +100,14 @@ func (a CheckNTPResourceModelAdapter) ToAPIArgument(model CheckNTPResourceModel)
 		ContactGroups:          a.ContactGroups(model.ContactGroups),
 		Locations:              a.Locations(model.Locations),
 		Tags:                   a.Tags(model.Tags),
-		IsPaused:               model.IsPaused.ValueBool(),
+		IsPaused:               upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Interval:               model.Interval.ValueInt64(),
 		Threshold:              model.Threshold.ValueInt64(),
 		Sensitivity:            model.Sensitivity.ValueInt64(),
 		NumRetries:             model.NumRetries.ValueInt64(),
 		UseIPVersion:           model.UseIPVersion.ValueString(),
 		Notes:                  model.Notes.ValueString(),
-		IncludeInGlobalMetrics: model.IncludeInGlobalMetrics.ValueBool(),
+		IncludeInGlobalMetrics: upapi.BoolPtr(model.IncludeInGlobalMetrics.ValueBool()),
 	}
 
 	if model.sla != nil {

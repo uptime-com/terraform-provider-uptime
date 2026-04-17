@@ -110,12 +110,12 @@ func (a CheckUDPResourceModelAdapter) ToAPIArgument(model CheckUDPResourceModel)
 		ContactGroups:          a.ContactGroups(model.ContactGroups),
 		Locations:              a.Locations(model.Locations),
 		Tags:                   a.Tags(model.Tags),
-		IsPaused:               model.IsPaused.ValueBool(),
+		IsPaused:               upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Interval:               model.Interval.ValueInt64(),
 		NumRetries:             model.NumRetries.ValueInt64(),
 		UseIpVersion:           model.UseIpVersion.ValueString(),
 		Notes:                  model.Notes.ValueString(),
-		IncludeInGlobalMetrics: model.IncludeInGlobalMetrics.ValueBool(),
+		IncludeInGlobalMetrics: upapi.BoolPtr(model.IncludeInGlobalMetrics.ValueBool()),
 	}
 
 	if model.sla != nil {
