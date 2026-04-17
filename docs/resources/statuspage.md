@@ -45,6 +45,7 @@ resource "uptime_statuspage" "public" {
 - `allow_drill_down` (Boolean)
 - `allow_pdf_report` (Boolean)
 - `allow_search_indexing` (Boolean)
+- `allow_subscriptions` (Boolean, Deprecated) Automatically derived by the API from the per-channel allow_subscriptions_* flags; setting it explicitly has no effect.
 - `allow_subscriptions_email` (Boolean)
 - `allow_subscriptions_rss` (Boolean)
 - `allow_subscriptions_slack` (Boolean)
@@ -84,7 +85,6 @@ resource "uptime_statuspage" "public" {
 
 ### Read-Only
 
-- `allow_subscriptions` (Boolean) Automatically derived by the API from the per-channel allow_subscriptions_* flags; setting it explicitly is not required.
 - `id` (Number) The ID of this resource.
 - `url` (String)
 

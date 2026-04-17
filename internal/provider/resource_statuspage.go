@@ -61,8 +61,12 @@ func NewStatusPageResource(_ context.Context, p *providerImpl) resource.Resource
 						},
 					},
 					"allow_subscriptions": schema.BoolAttribute{
-						Description: ("Automatically derived by the API from the per-channel " +
-							"allow_subscriptions_* flags; setting it explicitly is not required."),
+						Description: "Automatically derived by the API from the per-channel " +
+							"allow_subscriptions_* flags; setting it explicitly has no effect.",
+						DeprecationMessage: "allow_subscriptions is now server-derived from the " +
+							"per-channel allow_subscriptions_* flags; setting it explicitly has no " +
+							"effect and this attribute will become read-only in a future major release.",
+						Optional: true,
 						Computed: true,
 					},
 					"allow_search_indexing": schema.BoolAttribute{
