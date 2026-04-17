@@ -15,6 +15,7 @@ SCRIPT
 }
 
 resource "uptime_check_pagespeed" "test" {
-  name   = var.name
-  script = var.script
+  name      = var.name
+  script    = var.script
+  locations = ["Dedicated-US-NY-New York"]
 }

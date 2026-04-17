@@ -39,9 +39,17 @@ func NewCheckTCPResource(_ context.Context, p *providerImpl) resource.Resource {
 					"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
 					"sla":                       SLASchemaAttribute(),
 					"encryption": schema.StringAttribute{
-						Optional:    true,
-						Computed:    true,
-						Description: "Whether to use TLS",
+						Optional: true,
+						Computed: true,
+						// Intentionally no Default: the released SDK already sent "" on the wire
+						// for CheckTCP (no omitempty), so existing user state for unspecified
+						// encryption is "" (Off). Adding a Default of "SSL_TLS" here would
+						// silently flip that to TLS-on for everyone on the next plan.
+						Description: "TLS mode: \"SSL_TLS\" (enable TLS) or \"\" (no encryption). " +
+							"If omitted on a new resource, the server picks its default " +
+							"(currently \"SSL_TLS\"); existing TCP checks without an explicit " +
+							"value keep whatever was previously stored (\"\" for provider " +
+							"versions prior to SDK omitempty).",
 					},
 				},
 			},
@@ -107,13 +115,13 @@ func (a CheckTCPResourceModelAdapter) ToAPIArgument(model CheckTCPResourceModel)
 		ContactGroups:          a.ContactGroups(model.ContactGroups),
 		Locations:              a.Locations(model.Locations),
 		Tags:                   a.Tags(model.Tags),
-		IsPaused:               model.IsPaused.ValueBool(),
+		IsPaused:               upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Interval:               model.Interval.ValueInt64(),
 		NumRetries:             model.NumRetries.ValueInt64(),
 		UseIpVersion:           model.UseIpVersion.ValueString(),
 		Notes:                  model.Notes.ValueString(),
-		IncludeInGlobalMetrics: model.IncludeInGlobalMetrics.ValueBool(),
-		Encryption:             model.Encryption.ValueString(),
+		IncludeInGlobalMetrics: upapi.BoolPtr(model.IncludeInGlobalMetrics.ValueBool()),
+		Encryption:             encryptionAPIValue(model.Encryption),
 	}
 
 	if model.sla != nil {
@@ -150,7 +158,7 @@ func (a CheckTCPResourceModelAdapter) FromAPIResult(api upapi.Check) (*CheckTCPR
 			Latency: DurationValueFromDecimalSeconds(api.ResponseTimeSLA),
 			Uptime:  DecimalValue(api.UptimeSLA),
 		}),
-		Encryption: types.StringValue(api.Encryption),
+		Encryption: encryptionModelValue(api.Encryption),
 	}
 	return &model, nil
 }

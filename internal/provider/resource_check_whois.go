@@ -92,7 +92,7 @@ func (a CheckWHOISResourceModelAdapter) ToAPIArgument(model CheckWHOISResourceMo
 		ContactGroups: a.ContactGroups(model.ContactGroups),
 		Locations:     a.Locations(model.Locations),
 		Tags:          a.Tags(model.Tags),
-		IsPaused:      model.IsPaused.ValueBool(),
+		IsPaused:      upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Address:       model.Address.ValueString(),
 		ExpectString:  model.ExpectString.ValueString(),
 		Threshold:     model.Threshold.ValueInt64(),

@@ -91,13 +91,13 @@ func (a CheckRDAPResourceModelAdapter) ToAPIArgument(model CheckRDAPResourceMode
 		ContactGroups:             a.ContactGroups(model.ContactGroups),
 		Locations:                 a.Locations(model.Locations),
 		Tags:                      a.Tags(model.Tags),
-		IsPaused:                  model.IsPaused.ValueBool(),
+		IsPaused:                  upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Address:                   model.Address.ValueString(),
 		ExpectString:              model.ExpectString.ValueString(),
 		Threshold:                 model.Threshold.ValueInt64(),
 		NumRetries:                model.NumRetries.ValueInt64(),
 		Notes:                     model.Notes.ValueString(),
-		SendResolvedNotifications: model.SendResolvedNotifications.ValueBool(),
+		SendResolvedNotifications: upapi.BoolPtr(model.SendResolvedNotifications.ValueBool()),
 	}
 	if model.sla != nil {
 		if !model.sla.Uptime.IsUnknown() {

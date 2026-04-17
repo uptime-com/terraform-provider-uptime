@@ -73,11 +73,11 @@ func (a CheckRUM2ResourceModelAdapter) ToAPIArgument(model CheckRUM2ResourceMode
 		Name:                   model.Name.ValueString(),
 		ContactGroups:          a.ContactGroups(model.ContactGroups),
 		Tags:                   a.Tags(model.Tags),
-		IsPaused:               model.IsPaused.ValueBool(),
+		IsPaused:               upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Address:                model.Address.ValueString(),
 		Notes:                  model.Notes.ValueString(),
 		UptimeSLA:              model.SLAUptime.ValueDecimal(),
-		IncludeInGlobalMetrics: model.IncludeInGlobalMetrics.ValueBool(),
+		IncludeInGlobalMetrics: upapi.BoolPtr(model.IncludeInGlobalMetrics.ValueBool()),
 	}
 
 	return &api, nil

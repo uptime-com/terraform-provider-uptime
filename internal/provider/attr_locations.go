@@ -30,6 +30,7 @@ func LocationsSchemaAttributeWithDefaults(l LocationsGetter, defaults ...string)
 		Optional: true,
 		Computed: true,
 		PlanModifiers: []planmodifier.Set{
+			LocationsDefaultPreserveState(),
 			LocationsPlanModifier(l),
 		},
 	}
@@ -70,6 +71,35 @@ func (a LocationsAttributeAdapter) LocationsValue(v LocationsAttribute) types.Se
 
 type LocationsGetter interface {
 	GetLocations(context.Context) (map[string]struct{}, error)
+}
+
+// LocationsDefaultPreserveState keeps the prior state value for `locations`
+// when the user did not set it in config. Plan modifiers run after the
+// schema Default, so without this the static Default silently rewrites the
+// plan for every existing resource - and expanding the default list in a
+// provider update would add probe locations to already-provisioned checks.
+func LocationsDefaultPreserveState() planmodifier.Set {
+	return &locationsDefaultPreserveState{}
+}
+
+type locationsDefaultPreserveState struct{}
+
+func (l *locationsDefaultPreserveState) Description(context.Context) string {
+	return "Preserve the prior state value when the config does not set locations."
+}
+
+func (l *locationsDefaultPreserveState) MarkdownDescription(ctx context.Context) string {
+	return l.Description(ctx)
+}
+
+func (l *locationsDefaultPreserveState) PlanModifySet(_ context.Context, rq planmodifier.SetRequest, rs *planmodifier.SetResponse) {
+	if !rq.ConfigValue.IsNull() {
+		return
+	}
+	if rq.StateValue.IsNull() || rq.StateValue.IsUnknown() {
+		return
+	}
+	rs.PlanValue = rq.StateValue
 }
 
 func LocationsPlanModifier(l LocationsGetter) planmodifier.Set {
