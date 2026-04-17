@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -11,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
@@ -64,8 +66,12 @@ func NewCheckCloudStatusResource(_ context.Context, p *providerImpl) resource.Re
 						Optional: true,
 						Computed: true,
 						Default:  stringdefault.StaticString(""),
+						Validators: []validator.String{
+							OneOfStringValidator([]string{"", "ALL", "SPECIFIC"}),
+						},
 						Description: "Selects how `group` is monitored: `ALL` for every service in the group, " +
-							"`SPECIFIC` for entries listed in `services`/`service_titles`.",
+							"`SPECIFIC` for entries listed in `services`/`service_titles`. Leave empty " +
+							"(default) for legacy `service_name`-based checks.",
 					},
 					"services": schema.SetAttribute{
 						Optional:    true,
@@ -123,12 +129,20 @@ func (a CheckCloudStatusResourceModelAdapter) Get(ctx context.Context, sg StateG
 }
 
 func (a CheckCloudStatusResourceModelAdapter) ToAPIArgument(model CheckCloudStatusResourceModel) (*upapi.CheckCloudStatus, error) {
+	services, err := setToInt64Slice(model.Services)
+	if err != nil {
+		return nil, fmt.Errorf("services: %w", err)
+	}
+	serviceTitles, err := setToStringSlice(model.ServiceTitles)
+	if err != nil {
+		return nil, fmt.Errorf("service_titles: %w", err)
+	}
 	cfg := upapi.CheckCloudStatusConfig{
 		NotifyOnlyOnDown: model.NotifyOnlyOnDown.ValueBool(),
 		ServiceName:      model.ServiceName.ValueString(),
 		MonitoringType:   model.MonitoringType.ValueString(),
-		Services:         setToInt64Slice(model.Services),
-		ServiceTitles:    setToStringSlice(model.ServiceTitles),
+		Services:         services,
+		ServiceTitles:    serviceTitles,
 	}
 	if !model.Group.IsNull() && !model.Group.IsUnknown() {
 		cfg.Group = &upapi.CloudStatusGroup{ID: model.Group.ValueInt64()}
@@ -154,12 +168,10 @@ func (a CheckCloudStatusResourceModelAdapter) FromAPIResult(api upapi.Check) (*C
 		IsPaused:         types.BoolValue(api.IsPaused),
 		NotifyOnlyOnDown: types.BoolValue(false),
 		ServiceName:      types.StringValue(""),
-		// `group` is write-only server-side; preserve plan value upstream of state by
-		// returning a null so Terraform keeps whatever the user set.
-		Group:          types.Int64Null(),
-		MonitoringType: types.StringValue(""),
-		Services:       types.SetValueMust(types.Int64Type, []attr.Value{}),
-		ServiceTitles:  types.SetValueMust(types.StringType, []attr.Value{}),
+		Group:            types.Int64Null(),
+		MonitoringType:   types.StringValue(""),
+		Services:         types.SetValueMust(types.Int64Type, []attr.Value{}),
+		ServiceTitles:    types.SetValueMust(types.StringType, []attr.Value{}),
 	}
 	if api.CloudStatusConfig != nil {
 		c := api.CloudStatusConfig
@@ -168,6 +180,9 @@ func (a CheckCloudStatusResourceModelAdapter) FromAPIResult(api upapi.Check) (*C
 		model.MonitoringType = types.StringValue(c.MonitoringType)
 		model.Services = int64SliceToSet(c.Services)
 		model.ServiceTitles = stringSliceToSet(c.ServiceTitles)
+		if c.Group != nil && c.Group.ID != 0 {
+			model.Group = types.Int64Value(c.Group.ID)
+		}
 	}
 	return &model, nil
 }
@@ -175,16 +190,18 @@ func (a CheckCloudStatusResourceModelAdapter) FromAPIResult(api upapi.Check) (*C
 // PreservePlanValues keeps fields that the API does not faithfully echo back.
 // Implements PlanValuePreserver.
 //
-// `group` is write-only on the server (the response object differs from the
-// integer ID we sent). `name` is rewritten by the server to the group's name
-// for group-based checks, so we keep the user-supplied value to avoid
-// "Provider produced inconsistent result after apply" errors.
+// For group-based checks the server rewrites `name` to the group's display
+// name, so we keep the user-supplied value to avoid "Provider produced
+// inconsistent result after apply" errors. `group` is only pinned to the
+// plan when the plan has a known non-null value - during Read-after-import
+// the state Group is null and the API-returned group ID (populated in
+// FromAPIResult) should flow through to state so drift detection works.
 func (a CheckCloudStatusResourceModelAdapter) PreservePlanValues(result *CheckCloudStatusResourceModel, plan *CheckCloudStatusResourceModel) *CheckCloudStatusResourceModel {
 	if result == nil || plan == nil {
 		return result
 	}
-	result.Group = plan.Group
 	if !plan.Group.IsNull() && !plan.Group.IsUnknown() {
+		result.Group = plan.Group
 		result.Name = plan.Name
 	}
 	return result
@@ -210,36 +227,36 @@ func (c CheckCloudStatusResourceAPI) Delete(ctx context.Context, pk upapi.Primar
 	return c.provider.api.Checks().Delete(ctx, pk)
 }
 
-func setToInt64Slice(s types.Set) []int64 {
+func setToInt64Slice(s types.Set) ([]int64, error) {
 	if s.IsNull() || s.IsUnknown() {
-		return nil
+		return nil, nil
 	}
 	elems := s.Elements()
 	out := make([]int64, 0, len(elems))
-	for _, e := range elems {
+	for i, e := range elems {
 		v, ok := e.(basetypes.Int64Value)
 		if !ok {
-			continue
+			return nil, fmt.Errorf("element %d: expected Int64Value, got %T", i, e)
 		}
 		out = append(out, v.ValueInt64())
 	}
-	return out
+	return out, nil
 }
 
-func setToStringSlice(s types.Set) []string {
+func setToStringSlice(s types.Set) ([]string, error) {
 	if s.IsNull() || s.IsUnknown() {
-		return nil
+		return nil, nil
 	}
 	elems := s.Elements()
 	out := make([]string, 0, len(elems))
-	for _, e := range elems {
+	for i, e := range elems {
 		v, ok := e.(basetypes.StringValue)
 		if !ok {
-			continue
+			return nil, fmt.Errorf("element %d: expected StringValue, got %T", i, e)
 		}
 		out = append(out, v.ValueString())
 	}
-	return out
+	return out, nil
 }
 
 func int64SliceToSet(in []int64) types.Set {

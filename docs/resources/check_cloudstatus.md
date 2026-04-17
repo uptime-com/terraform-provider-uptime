@@ -54,7 +54,7 @@ Set to an empty list to disable notifications at this level and rely on parent c
 - `group` (Number) Cloud status group ID to monitor. Write-only on the server.
 - `is_paused` (Boolean)
 - `locations` (Set of String) Can only be set to PLMs, otherwise must be ignored
-- `monitoring_type` (String) Selects how `group` is monitored: `ALL` for every service in the group, `SPECIFIC` for entries listed in `services`/`service_titles`.
+- `monitoring_type` (String) Selects how `group` is monitored: `ALL` for every service in the group, `SPECIFIC` for entries listed in `services`/`service_titles`. Leave empty (default) for legacy `service_name`-based checks.
 - `notify_only_on_down` (Boolean) Opt out of maintenance notifications.
 - `service_name` (String) Deprecated: legacy single-component identifier. Prefer `group` + `monitoring_type`. The server forbids changing this on an existing check, so an explicit value change forces resource replacement.
 - `service_titles` (Set of String) Service title strings; matching current and future services are auto-monitored when `monitoring_type` is `SPECIFIC`.

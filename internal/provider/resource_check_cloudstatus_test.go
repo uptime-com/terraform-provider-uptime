@@ -2,11 +2,13 @@ package provider
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/hashicorp/terraform-plugin-testing/config"
@@ -16,7 +18,9 @@ import (
 // skipIfNoCloudStatusServices skips the test when the account has no
 // cloudstatus services or groups provisioned (e.g. the EU test account).
 // The SDK does not expose listers for these endpoints yet, so we call them
-// directly.
+// directly. Genuine errors (auth, transport, decode, server 5xx) fail the
+// test rather than silently skip, so a broken CI setup does not get masked
+// as "no data".
 func skipIfNoCloudStatusServices(t *testing.T) {
 	t.Helper()
 	if os.Getenv("TF_ACC") == "" {
@@ -31,27 +35,45 @@ func skipIfNoCloudStatusServices(t *testing.T) {
 		base = "https://uptime.com/api/v1/"
 	}
 	base = strings.TrimRight(base, "/") + "/"
-	hasItems := func(path string) bool {
+	client := &http.Client{Timeout: 15 * time.Second}
+	countItems := func(path string) (int, error) {
 		req, err := http.NewRequest(http.MethodGet, base+path, nil)
 		if err != nil {
-			return false
+			return 0, fmt.Errorf("build request %s: %w", path, err)
 		}
 		req.Header.Set("Authorization", "Token "+token)
-		resp, err := http.DefaultClient.Do(req)
+		resp, err := client.Do(req)
 		if err != nil {
-			return false
+			return 0, fmt.Errorf("GET %s: %w", path, err)
 		}
 		defer resp.Body.Close()
-		body, _ := io.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return 0, fmt.Errorf("read %s body: %w", path, err)
+		}
+		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+			return 0, fmt.Errorf("GET %s: %s: %s", path, resp.Status, string(body))
+		}
 		var payload struct {
 			Count int `json:"count"`
 		}
-		if jerr := json.Unmarshal(body, &payload); jerr != nil {
-			return false
+		if err := json.Unmarshal(body, &payload); err != nil {
+			return 0, fmt.Errorf("decode %s body: %w", path, err)
 		}
-		return payload.Count > 0
+		return payload.Count, nil
 	}
-	if hasItems("checks/cloudstatus-services/") || hasItems("checks/cloudstatus-groups/") {
+	svcCount, err := countItems("checks/cloudstatus-services/")
+	if err != nil {
+		t.Fatalf("cloudstatus precheck: %v", err)
+	}
+	if svcCount > 0 {
+		return
+	}
+	grpCount, err := countItems("checks/cloudstatus-groups/")
+	if err != nil {
+		t.Fatalf("cloudstatus precheck: %v", err)
+	}
+	if grpCount > 0 {
 		return
 	}
 	t.Skip("Skipping: account has no cloudstatus services/groups provisioned")
