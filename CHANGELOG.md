@@ -1,5 +1,21 @@
 # Uptime.com Terraform provider changelog
 
+## v2.25.0
+
+Enhancements:
+* New `uptime_check_cloudstatus` resource for monitoring public cloud provider status feeds. Supports both the legacy single-component `service_name` mode and the new group-based configuration (`group` + `monitoring_type = "ALL"` or `"SPECIFIC"` with `services` / `service_titles`).
+
+Bug Fixes:
+* `uptime_statuspage.allow_subscriptions` is no longer sent on API writes. The field is server-derived from the per-channel `allow_subscriptions_*` flags, so the client now omits it and lets the server populate state. A `DeprecationMessage` warns users still setting it explicitly.
+* `uptime_check_tcp.encryption` description now reflects actual defaulting behavior (the schema intentionally has no Default to avoid silently flipping existing `""` state to `SSL_TLS`).
+* `uptime_check_pagespeed.locations` no longer drifts on existing resources when the provider default location set is expanded; the new `LocationsDefaultPreserveState` plan modifier keeps the prior state value when config is null.
+
+Dependency Updates:
+* Bump github.com/uptime-com/uptime-client-go/v2 to v2.11.0 (adds `*bool` tri-state for `allow_subscriptions` and `*string` tri-state for `msp_encryption`)
+* Bump github.com/hashicorp/terraform-plugin-framework
+* Bump github.com/hashicorp/terraform-plugin-testing
+* Bump google.golang.org/grpc
+
 ## v2.24.0
 
 Enhancements:
