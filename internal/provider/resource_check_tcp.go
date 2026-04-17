@@ -45,7 +45,11 @@ func NewCheckTCPResource(_ context.Context, p *providerImpl) resource.Resource {
 						// for CheckTCP (no omitempty), so existing user state for unspecified
 						// encryption is "" (Off). Adding a Default of "SSL_TLS" here would
 						// silently flip that to TLS-on for everyone on the next plan.
-						Description: "TLS mode: \"SSL_TLS\" or \"\" (default) for no encryption.",
+						Description: "TLS mode: \"SSL_TLS\" (enable TLS) or \"\" (no encryption). " +
+							"If omitted on a new resource, the server picks its default " +
+							"(currently \"SSL_TLS\"); existing TCP checks without an explicit " +
+							"value keep whatever was previously stored (\"\" for provider " +
+							"versions prior to SDK omitempty).",
 					},
 				},
 			},
