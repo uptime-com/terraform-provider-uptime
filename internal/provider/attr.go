@@ -108,3 +108,17 @@ func encryptionModelValue(v *string) types.String {
 	}
 	return types.StringValue(*v)
 }
+
+func boolOptionalAPIValue(v types.Bool) *bool {
+	if v.IsNull() || v.IsUnknown() {
+		return nil
+	}
+	return upapi.BoolPtr(v.ValueBool())
+}
+
+func boolOptionalModelValue(v *bool) types.Bool {
+	if v == nil {
+		return types.BoolNull()
+	}
+	return types.BoolValue(*v)
+}
