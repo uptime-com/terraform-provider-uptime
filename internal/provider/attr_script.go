@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 
@@ -28,7 +27,7 @@ func (s scriptValidator) ValidateString(_ context.Context, rq validator.StringRe
 	if rq.ConfigValue.IsNull() || rq.ConfigValue.IsUnknown() {
 		return
 	}
-	if !json.Valid(bytes.NewBufferString(rq.ConfigValue.String()).Bytes()) {
+	if !json.Valid([]byte(rq.ConfigValue.ValueString())) {
 		rs.Diagnostics.AddAttributeError(
 			rq.Path,
 			"Script must be valid JSON",
