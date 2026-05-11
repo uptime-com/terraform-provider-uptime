@@ -64,6 +64,41 @@ func TestAccStatusPageComponentResource(t *testing.T) {
 	})
 }
 
+func TestAccStatusPageComponentResource_SortingWeight(t *testing.T) {
+	name := petname.Generate(3, "-")
+	componentName := petname.Generate(3, "-")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { _ = testAccAPIClient(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				ConfigDirectory: config.StaticDirectory("testdata/resource_statuspage_component/sorting_weight"),
+				ConfigVariables: config.Variables{
+					"name":           config.StringVariable(name),
+					"component_name": config.StringVariable(componentName),
+					"sorting_weight": config.IntegerVariable(10),
+				},
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("uptime_statuspage_component.test", "name", componentName),
+					resource.TestCheckResourceAttr("uptime_statuspage_component.test", "sorting_weight", "10"),
+				),
+			},
+			{
+				ConfigDirectory: config.StaticDirectory("testdata/resource_statuspage_component/sorting_weight"),
+				ConfigVariables: config.Variables{
+					"name":           config.StringVariable(name),
+					"component_name": config.StringVariable(componentName),
+					"sorting_weight": config.IntegerVariable(500),
+				},
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("uptime_statuspage_component.test", "sorting_weight", "500"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccStatusPageComponentResource_Clean(t *testing.T) {
 	name := petname.Generate(3, "-")
 	componentNames := [2]string{

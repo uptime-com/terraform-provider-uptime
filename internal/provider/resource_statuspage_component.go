@@ -8,6 +8,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -69,6 +71,14 @@ func NewStatusPageComponentResource(_ context.Context, p *providerImpl) resource
 							OneOfStringValidator([]string{"operational", "major-outage", "partial-outage", "degraded-performance", "under-maintenance"}),
 						},
 					},
+					"sorting_weight": schema.Int64Attribute{
+						Optional:    true,
+						Computed:    true,
+						Description: "Render order on the status page (ascending). Lower values appear first; ties break by component ID. Omit to let the server pick a default.",
+						PlanModifiers: []planmodifier.Int64{
+							int64planmodifier.UseStateForUnknown(),
+						},
+					},
 				},
 			},
 		},
@@ -98,6 +108,7 @@ type StatusPageComponentResourceModel struct {
 	Status         types.String `tfsdk:"status"`
 	AutoStatusDown types.String `tfsdk:"auto_status_down"`
 	AutoStatusUp   types.String `tfsdk:"auto_status_up"`
+	SortingWeight  types.Int64  `tfsdk:"sorting_weight"`
 }
 
 func (m StatusPageComponentResourceModel) PrimaryKey() upapi.PrimaryKey {
@@ -133,6 +144,7 @@ func (a StatusPageComponentResourceModelAdapter) ToAPIArgument(
 			Status:         model.Status.ValueString(),
 			AutoStatusDown: model.AutoStatusDown.ValueString(),
 			AutoStatusUp:   model.AutoStatusUp.ValueString(),
+			SortingWeight:  model.SortingWeight.ValueInt64Pointer(),
 		},
 	}
 	if model.ServiceID.IsUnknown() {
@@ -140,6 +152,9 @@ func (a StatusPageComponentResourceModelAdapter) ToAPIArgument(
 	}
 	if model.GroupID.IsUnknown() {
 		arg.GroupID = nil
+	}
+	if model.SortingWeight.IsUnknown() {
+		arg.SortingWeight = nil
 	}
 
 	return arg, nil
@@ -160,6 +175,7 @@ func (a StatusPageComponentResourceModelAdapter) FromAPIResult(
 		Status:         types.StringValue(api.Status),
 		AutoStatusDown: types.StringValue(api.AutoStatusDown),
 		AutoStatusUp:   types.StringValue(api.AutoStatusUp),
+		SortingWeight:  types.Int64PointerValue(api.SortingWeight),
 	}, nil
 }
 

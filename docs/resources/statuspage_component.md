@@ -49,6 +49,7 @@ resource "uptime_statuspage_component" "api" {
 - `group_id` (Number)
 - `is_group` (Boolean)
 - `service_id` (Number)
+- `sorting_weight` (Number) Render order on the status page (ascending). Lower values appear first; ties break by component ID. Omit to let the server pick a default.
 - `status` (String)
 
 ### Read-Only
