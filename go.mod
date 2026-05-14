@@ -15,7 +15,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/shopspring/decimal v1.4.0
 	github.com/stretchr/testify v1.11.1
-	github.com/uptime-com/uptime-client-go/v2 v2.11.0
+	github.com/uptime-com/uptime-client-go/v2 v2.12.0
 )
 
 require (
@@ -73,5 +73,3 @@ require (
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/uptime-com/uptime-client-go/v2 => ../uptime-client-go
