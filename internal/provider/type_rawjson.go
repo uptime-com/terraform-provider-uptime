@@ -197,6 +197,12 @@ func (v rawJsonValue) StringSemanticEquals(_ context.Context, val basetypes.Stri
 
 // ToTerraformValue returns a tftypes.Value representation of the value.
 func (v rawJsonValue) ToTerraformValue(context.Context) (tftypes.Value, error) {
+	if v.IsUnknown() {
+		return tftypes.NewValue(tftypes.String, tftypes.UnknownValue), nil
+	}
+	if v.IsNull() {
+		return tftypes.NewValue(tftypes.String, nil), nil
+	}
 	return tftypes.NewValue(tftypes.String, v.value), nil
 }
 
