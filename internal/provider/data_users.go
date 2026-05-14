@@ -127,21 +127,31 @@ func (d UsersDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 }
 
 func (d UsersDataSource) Read(ctx context.Context, _ datasource.ReadRequest, rs *datasource.ReadResponse) {
-	api, err := d.p.api.Users().List(ctx, upapi.UserListOptions{})
-	if err != nil {
-		rs.Diagnostics.AddError("API call failed", err.Error())
-		return
+	const pageSize int64 = 100
+	var users []upapi.User
+	for page := int64(1); ; page++ {
+		api, err := d.p.api.Users().List(ctx, upapi.UserListOptions{
+			Page:     page,
+			PageSize: pageSize,
+		})
+		if err != nil {
+			rs.Diagnostics.AddError("API call failed", err.Error())
+			return
+		}
+		users = append(users, api.Items...)
+		if int64(len(api.Items)) < pageSize || int64(len(users)) >= api.TotalCount {
+			break
+		}
 	}
 
 	model := UsersDataSourceModel{
 		ID:    types.StringValue(""),
-		Users: make([]UsersDataSourceItemModel, len(api.Items)),
+		Users: make([]UsersDataSourceItemModel, len(users)),
 	}
 
-	for i := range api.Items {
-		// Convert AssignedSubaccounts slice to types.List
-		subaccountsValues := make([]attr.Value, len(api.Items[i].AssignedSubaccounts))
-		for j, v := range api.Items[i].AssignedSubaccounts {
+	for i := range users {
+		subaccountsValues := make([]attr.Value, len(users[i].AssignedSubaccounts))
+		for j, v := range users[i].AssignedSubaccounts {
 			subaccountsValues[j] = types.StringValue(v)
 		}
 		subaccounts := types.ListNull(types.StringType)
@@ -150,20 +160,20 @@ func (d UsersDataSource) Read(ctx context.Context, _ datasource.ReadRequest, rs 
 		}
 
 		model.Users[i] = UsersDataSourceItemModel{
-			ID:                  types.Int64Value(api.Items[i].PK),
-			URL:                 types.StringValue(api.Items[i].URL),
-			FirstName:           types.StringValue(api.Items[i].FirstName),
-			LastName:            types.StringValue(api.Items[i].LastName),
-			Email:               types.StringValue(api.Items[i].Email),
-			IsActive:            types.BoolValue(api.Items[i].IsActive),
-			IsPrimary:           types.BoolValue(api.Items[i].IsPrimary),
-			AccessLevel:         types.StringValue(api.Items[i].AccessLevel),
-			IsAPIEnabled:        types.BoolValue(api.Items[i].IsAPIEnabled),
-			NotifyPaidInvoices:  types.BoolValue(api.Items[i].NotifyPaidInvoices),
+			ID:                  types.Int64Value(users[i].PK),
+			URL:                 types.StringValue(users[i].URL),
+			FirstName:           types.StringValue(users[i].FirstName),
+			LastName:            types.StringValue(users[i].LastName),
+			Email:               types.StringValue(users[i].Email),
+			IsActive:            types.BoolValue(users[i].IsActive),
+			IsPrimary:           types.BoolValue(users[i].IsPrimary),
+			AccessLevel:         types.StringValue(users[i].AccessLevel),
+			IsAPIEnabled:        types.BoolValue(users[i].IsAPIEnabled),
+			NotifyPaidInvoices:  types.BoolValue(users[i].NotifyPaidInvoices),
 			AssignedSubaccounts: subaccounts,
-			RequireTwoFactor:    types.StringValue(api.Items[i].RequireTwoFactor),
-			MustTwoFactor:       types.BoolValue(api.Items[i].MustTwoFactor),
-			Timezone:            types.StringValue(api.Items[i].Timezone),
+			RequireTwoFactor:    types.StringValue(users[i].RequireTwoFactor),
+			MustTwoFactor:       types.BoolValue(users[i].MustTwoFactor),
+			Timezone:            types.StringValue(users[i].Timezone),
 		}
 	}
 
