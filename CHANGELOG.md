@@ -1,19 +1,5 @@
 # Uptime.com Terraform provider changelog
 
-## v2.26.0
-
-Enhancements:
-* New `uptime_cloudstatus_groups` data source for discovering cloud provider IDs from HCL. Supports `search` for substring filtering on provider names.
-* New `uptime_cloudstatus_services` data source for discovering service IDs. Supports filtering by `group` (id or name substring) and by `search` on service names.
-* `uptime_statuspage_component` (resource and data source) now exposes `sorting_weight`. The attribute is Optional+Computed; omit it to let the server assign the next available weight.
-* `uptime_users` data source now paginates the underlying API call instead of returning only the first page, so accounts with more than the default page size are listed in full.
-
-Testing:
-* Restore the single-account acceptance test workflow against uptime.com. The split EU/US matrix is removed because eu.uptime.com is decommissioned.
-
-Dependency Updates:
-* Bump github.com/uptime-com/uptime-client-go/v2 to v2.12.0 (cloudstatus services/groups lookup endpoints and statuspage component `sorting_weight`).
-
 ## v2.25.0
 
 Enhancements:

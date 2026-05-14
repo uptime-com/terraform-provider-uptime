@@ -65,13 +65,13 @@ func TestAccCheckTCPResource_ContactGroups(t *testing.T) {
 				"port": config.IntegerVariable(80),
 				"contact_groups": config.ListVariable(
 					config.StringVariable("nobody"),
-					config.StringVariable("noone"),
+					config.StringVariable("Default"),
 				),
 			},
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_check_tcp.test", "contact_groups.#", "2"),
-				resource.TestCheckResourceAttr("uptime_check_tcp.test", "contact_groups.0", "nobody"),
-				resource.TestCheckResourceAttr("uptime_check_tcp.test", "contact_groups.1", "noone"),
+				resource.TestCheckResourceAttr("uptime_check_tcp.test", "contact_groups.0", "Default"),
+				resource.TestCheckResourceAttr("uptime_check_tcp.test", "contact_groups.1", "nobody"),
 			),
 		},
 	}))

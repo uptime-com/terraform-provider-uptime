@@ -46,7 +46,7 @@ func NewCheckMaintenanceResource(_ context.Context, p *providerImpl) resource.Re
 						Computed:    true,
 						Description: "Whether to pause the check during scheduled maintenance windows",
 					},
-					"schedule": schema.SetNestedAttribute{
+					"schedule": schema.ListNestedAttribute{
 						Optional: true,
 						Computed: true,
 						NestedObject: schema.NestedAttributeObject{
@@ -144,7 +144,7 @@ type CheckMaintenanceResourceModel struct {
 	CheckID                     types.Int64  `tfsdk:"check_id"`
 	State                       types.String `tfsdk:"state"`
 	PauseOnScheduledMaintenance types.Bool   `tfsdk:"pause_on_scheduled_maintenance"`
-	Schedule                    types.Set    `tfsdk:"schedule"`
+	Schedule                    types.List   `tfsdk:"schedule"`
 
 	schedule []CheckMaintenanceScheduleAttribute `tfsdk:"-"`
 }
@@ -186,7 +186,7 @@ func (a CheckMaintenanceResourceModelAdapter) Get(
 	return &model, nil
 }
 
-func (a CheckMaintenanceResourceModelAdapter) ScheduleContext(ctx context.Context, v types.Set) ([]CheckMaintenanceScheduleAttribute, diag.Diagnostics) {
+func (a CheckMaintenanceResourceModelAdapter) ScheduleContext(ctx context.Context, v types.List) ([]CheckMaintenanceScheduleAttribute, diag.Diagnostics) {
 	if v.IsNull() || v.IsUnknown() {
 		return nil, nil
 	}
@@ -198,12 +198,12 @@ func (a CheckMaintenanceResourceModelAdapter) ScheduleContext(ctx context.Contex
 	return out, nil
 }
 
-func (a CheckMaintenanceResourceModelAdapter) ScheduleValue(model []CheckMaintenanceScheduleAttribute) (types.Set, diag.Diagnostics) {
+func (a CheckMaintenanceResourceModelAdapter) ScheduleValue(model []CheckMaintenanceScheduleAttribute) (types.List, diag.Diagnostics) {
 	values, diags := a.scheduleAttributeValues(model)
 	if diags.HasError() {
-		return types.Set{}, diags
+		return types.List{}, diags
 	}
-	return types.SetValueMust(types.ObjectType{}.WithAttributeTypes(a.scheduleAttributeTypes()), values), diags
+	return types.ListValueMust(types.ObjectType{}.WithAttributeTypes(a.scheduleAttributeTypes()), values), diags
 }
 
 func (a CheckMaintenanceResourceModelAdapter) scheduleAttributeTypes() map[string]attr.Type {
@@ -318,7 +318,7 @@ func (a CheckMaintenanceResourceModelAdapter) FromAPIResult(
 			}
 			s.Weekdays = a.SliceValue(wd)
 		} else {
-			s.Weekdays = types.SetNull(types.Int32Type)
+			s.Weekdays = types.SetValueMust(types.Int32Type, []attr.Value{})
 		}
 
 		var d diag.Diagnostics

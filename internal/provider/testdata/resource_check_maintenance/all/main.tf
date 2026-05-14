@@ -69,11 +69,9 @@ resource uptime_check_maintenance test {
     },
     {
       type = "MONTHLY"
-      from_time     = var.monthly_from_time
-      to_time       = var.monthly_to_time
-      monthday      = var.monthday
-      monthday_from = var.monthday_from
-      monthday_to   = var.monthday_to
+      from_time = var.monthly_from_time
+      to_time   = var.monthly_to_time
+      monthday  = var.monthday
     },
     {
       type = "ONCE"

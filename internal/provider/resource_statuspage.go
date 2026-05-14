@@ -231,7 +231,7 @@ func NewStatusPageResource(_ context.Context, p *providerImpl) resource.Resource
 					"theme": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default:  stringdefault.StaticString("LEGACY"),
+						Default:  stringdefault.StaticString("INSPIRE"),
 					},
 					"custom_header_bg_color_hex": schema.StringAttribute{
 						Optional: true,
