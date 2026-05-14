@@ -67,5 +67,6 @@ Read-Only:
 - `is_group` (Boolean) Whether this component is a group
 - `name` (String) Name of the component
 - `service_id` (Number) ID of the associated service/check
+- `sorting_weight` (Number) Render order on the status page (ascending). Lower values appear first; ties break by component ID.
 - `status` (String) Current status of the component
 - `url` (String) API URL for the component

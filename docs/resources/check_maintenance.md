@@ -74,7 +74,7 @@ resource "uptime_check_maintenance" "app" {
 ### Optional
 
 - `pause_on_scheduled_maintenance` (Boolean) Whether to pause the check during scheduled maintenance windows
-- `schedule` (Attributes Set) (see [below for nested schema](#nestedatt--schedule))
+- `schedule` (Attributes List) (see [below for nested schema](#nestedatt--schedule))
 - `state` (String)
 
 <a id="nestedatt--schedule"></a>

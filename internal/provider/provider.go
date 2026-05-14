@@ -146,6 +146,8 @@ func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.Data
 		func() datasource.DataSource { return NewStatusPageSubscriberDataSource(ctx, p) },
 		func() datasource.DataSource { return NewStatusPageUserDataSource(ctx, p) },
 		func() datasource.DataSource { return NewCheckGroupsDataSource(ctx, p) },
+		func() datasource.DataSource { return NewCloudStatusGroupsDataSource(ctx, p) },
+		func() datasource.DataSource { return NewCloudStatusServicesDataSource(ctx, p) },
 	}
 }
 

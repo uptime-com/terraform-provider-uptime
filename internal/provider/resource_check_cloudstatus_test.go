@@ -15,12 +15,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-// skipIfNoCloudStatusServices skips the test when the account has no
-// cloudstatus services or groups provisioned (e.g. the EU test account).
-// The SDK does not expose listers for these endpoints yet, so we call them
-// directly. Genuine errors (auth, transport, decode, server 5xx) fail the
-// test rather than silently skip, so a broken CI setup does not get masked
-// as "no data".
+// skipIfNoCloudStatusServices skips the test when the target account has no
+// cloudstatus services or groups provisioned. The SDK does not expose listers
+// for these endpoints yet, so we call them directly. Genuine errors (auth,
+// transport, decode, server 5xx) fail the test rather than silently skip, so
+// a broken CI setup does not get masked as "no data".
 func skipIfNoCloudStatusServices(t *testing.T) {
 	t.Helper()
 	if os.Getenv("TF_ACC") == "" {

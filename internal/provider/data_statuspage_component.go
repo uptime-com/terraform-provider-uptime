@@ -69,6 +69,10 @@ var StatusPageComponentDataSchema = schema.Schema{
 						Computed:    true,
 						Description: "Status to set when service is up",
 					},
+					"sorting_weight": schema.Int64Attribute{
+						Computed:    true,
+						Description: "Render order on the status page (ascending). Lower values appear first; ties break by component ID.",
+					},
 				},
 			},
 		},
@@ -92,6 +96,7 @@ type StatusPageComponentDataSourceItemModel struct {
 	Status         types.String `tfsdk:"status"`
 	AutoStatusDown types.String `tfsdk:"auto_status_down"`
 	AutoStatusUp   types.String `tfsdk:"auto_status_up"`
+	SortingWeight  types.Int64  `tfsdk:"sorting_weight"`
 }
 
 var _ datasource.DataSource = &StatusPageComponentDataSource{}
@@ -151,6 +156,7 @@ func (d StatusPageComponentDataSource) Read(ctx context.Context, rq datasource.R
 			Status:         types.StringValue(api.Items[i].Status),
 			AutoStatusDown: types.StringValue(api.Items[i].AutoStatusDown),
 			AutoStatusUp:   types.StringValue(api.Items[i].AutoStatusUp),
+			SortingWeight:  types.Int64PointerValue(api.Items[i].SortingWeight),
 		}
 	}
 
