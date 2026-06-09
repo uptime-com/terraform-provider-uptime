@@ -23,7 +23,7 @@ func NewCredentialResource(_ context.Context, p *providerImpl) resource.Resource
 			TypeNameSuffix: "credential",
 			Schema: schema.Schema{
 				Attributes: map[string]schema.Attribute{
-					"id": ComputedIDSchemaAttribute(), // Uses delete+create for updates
+					"id": IDSchemaAttribute(),
 					"display_name": schema.StringAttribute{
 						Required: true,
 					},
@@ -261,10 +261,12 @@ func (c CredentialResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable
 }
 
 func (c CredentialResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.Credential) (*upapi.Credential, error) {
-	if err := c.Delete(ctx, pk); err != nil {
+	obj, err := c.provider.api.Credentials().Update(ctx, pk, arg)
+	if err != nil {
 		return nil, err
 	}
-	return c.Create(ctx, arg)
+	obj.Secret = arg.Secret
+	return obj, nil
 }
 
 func (c CredentialResourceAPI) Delete(ctx context.Context, pk upapi.PrimaryKeyable) error {
