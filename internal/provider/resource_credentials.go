@@ -243,12 +243,18 @@ type CredentialResourceAPI struct {
 
 func (c CredentialResourceAPI) Create(ctx context.Context, arg upapi.Credential) (*upapi.Credential, error) {
 	obj, err := c.provider.api.Credentials().Create(ctx, arg)
+	if err != nil {
+		return nil, err
+	}
 	obj.Secret = arg.Secret
-	return obj, err
+	return obj, nil
 }
 
 func (c CredentialResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Credential, error) {
 	obj, err := c.provider.api.Credentials().Get(ctx, pk)
+	if err != nil {
+		return nil, err
+	}
 	secret := pk.(CredentialResourceModel).secret
 	obj.Secret = upapi.CredentialSecret{
 		Certificate: secret.Certificate.ValueString(),
@@ -257,7 +263,7 @@ func (c CredentialResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable
 		Password:    secret.Password.ValueString(),
 		Secret:      secret.Secret.ValueString(),
 	}
-	return obj, err
+	return obj, nil
 }
 
 func (c CredentialResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.Credential) (*upapi.Credential, error) {
