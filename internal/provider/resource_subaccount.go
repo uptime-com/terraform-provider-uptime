@@ -13,13 +13,14 @@ import (
 )
 
 func NewSubaccountResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[SubaccountResourceModel, upapi.SubaccountCreateRequest, upapi.Subaccount]{
-		api: &SubaccountResourceAPI{provider: p},
-		mod: SubaccountResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[SubaccountResourceModel, upapi.SubaccountCreateRequest, upapi.Subaccount](
+		&SubaccountResourceAPI{provider: p},
+		SubaccountResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "subaccount",
 			Schema: schema.Schema{
-				Description: "Manage Uptime.com subaccounts.\n\n" +
+				Description: "Manage Uptime.com subaccounts. Import using the subaccount ID: " +
+					"`terraform import uptime_subaccount.example 123`\n\n" +
 					"**IMPORTANT:** This resource requires the subaccounts feature to be enabled for your account. " +
 					"Attempts to create subaccounts without this feature enabled will fail with a PERMISSION_DENIED error.",
 				Attributes: map[string]schema.Attribute{
@@ -29,7 +30,8 @@ func NewSubaccountResource(_ context.Context, p *providerImpl) resource.Resource
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type SubaccountResourceModel struct {

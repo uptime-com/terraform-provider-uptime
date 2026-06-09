@@ -33,6 +33,17 @@ func TestAccCheckPageSpeedResource(t *testing.T) {
 				resource.TestCheckResourceAttr("uptime_check_pagespeed.test", "name", names[1]),
 			),
 		},
+		{
+			ConfigVariables: config.Variables{
+				"name":    config.StringVariable(names[1]),
+				"address": config.StringVariable("example.net"),
+			},
+			ConfigDirectory:         config.StaticDirectory("testdata/resource_check_pagespeed/_basic"),
+			ResourceName:            "uptime_check_pagespeed.test",
+			ImportState:             true,
+			ImportStateVerify:       true,
+			ImportStateVerifyIgnore: []string{"password", "headers", "script"},
+		},
 	}))
 }
 

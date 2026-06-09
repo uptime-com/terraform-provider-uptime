@@ -54,6 +54,15 @@ func TestAccSubaccountResource(t *testing.T) {
 					resource.TestCheckResourceAttr("uptime_subaccount.test", "name", names[1]),
 				),
 			},
+			{
+				ConfigDirectory: config.StaticDirectory("testdata/resource_subaccount/_basic"),
+				ConfigVariables: config.Variables{
+					"name": config.StringVariable(names[1]),
+				},
+				ResourceName:      "uptime_subaccount.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }

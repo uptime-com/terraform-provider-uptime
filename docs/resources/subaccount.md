@@ -3,13 +3,13 @@
 page_title: "uptime_subaccount Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Manage Uptime.com subaccounts.
+  Manage Uptime.com subaccounts. Import using the subaccount ID: terraform import uptime_subaccount.example 123
   IMPORTANT: This resource requires the subaccounts feature to be enabled for your account. Attempts to create subaccounts without this feature enabled will fail with a PERMISSION_DENIED error.
 ---
 
 # uptime_subaccount (Resource)
 
-Manage Uptime.com subaccounts.
+Manage Uptime.com subaccounts. Import using the subaccount ID: `terraform import uptime_subaccount.example 123`
 
 **IMPORTANT:** This resource requires the subaccounts feature to be enabled for your account. Attempts to create subaccounts without this feature enabled will fail with a PERMISSION_DENIED error.
 

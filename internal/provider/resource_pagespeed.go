@@ -15,13 +15,13 @@ import (
 )
 
 func NewCheckPageSpeedResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckPageSpeedResourceModel, upapi.CheckPageSpeed, upapi.Check]{
-		api: CheckPageSpeedResourceAPI{provider: p},
-		mod: CheckPageSpeedResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[CheckPageSpeedResourceModel, upapi.CheckPageSpeed, upapi.Check](
+		CheckPageSpeedResourceAPI{provider: p},
+		CheckPageSpeedResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "check_pagespeed",
 			Schema: schema.Schema{
-				Description: "Page Speed Check",
+				Description: "Page Speed Check. Import using the check ID: `terraform import uptime_check_pagespeed.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":             IDSchemaAttribute(),
 					"name":           NameSchemaAttribute(),
@@ -79,7 +79,8 @@ func NewCheckPageSpeedResource(_ context.Context, p *providerImpl) resource.Reso
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CheckPageSpeedResourceModel struct {
