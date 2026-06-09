@@ -87,6 +87,36 @@ func TestAccContactResource_PhonecallList(t *testing.T) {
 	}))
 }
 
+// TestAccContactResource_IntegrationNoDrift reproduces SYS-1264: when an
+// integration references a contact group, the backend links the integration
+// back into the contact's `integrations` field. The contact must not churn
+// that server-managed field on subsequent plans.
+func TestAccContactResource_IntegrationNoDrift(t *testing.T) {
+	name := petname.Generate(3, "-")
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_contact/integration_drift"),
+			ConfigVariables: config.Variables{
+				"name": config.StringVariable(name),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_contact.test", "name", name),
+				resource.TestCheckResourceAttr("uptime_integration_slack.test", "contact_groups.0", name),
+			),
+		},
+		{
+			// Same config: must produce an empty plan. With the old empty-set
+			// Default on `integrations`, the server-added association churned
+			// here as `~ integrations = [- "<name>"]`.
+			ConfigDirectory: config.StaticDirectory("testdata/resource_contact/integration_drift"),
+			ConfigVariables: config.Variables{
+				"name": config.StringVariable(name),
+			},
+			PlanOnly: true,
+		},
+	}))
+}
+
 func TestAccContactResource_SMSList(t *testing.T) {
 	names := [2]string{
 		petname.Generate(3, "-"),

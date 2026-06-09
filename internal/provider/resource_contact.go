@@ -42,17 +42,24 @@ func NewContactResource(_ context.Context, p *providerImpl) resource.Resource {
 						Optional:    true,
 						Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 					},
+					// No Default: the backend links integrations into a contact
+					// as a side effect of an integration's contact_groups, so this
+					// field is server-managed. An empty-set Default would force the
+					// plan back to [] whenever it is omitted, churning that
+					// association on every apply (SYS-1264). Without a Default,
+					// Optional+Computed preserves the prior state value.
 					"integrations": schema.SetAttribute{
 						ElementType: types.StringType,
 						Computed:    true,
 						Optional:    true,
-						Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 					},
+					// Server-managed association (mobile devices register push
+					// profiles out-of-band), so omit the Default for the same
+					// reason as integrations above (SYS-1264).
 					"push_notification_profiles": schema.SetAttribute{
 						ElementType: types.StringType,
 						Computed:    true,
 						Optional:    true,
-						Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 					},
 				},
 			},
