@@ -2,13 +2,26 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
+
+// isNotFoundError reports whether err represents an HTTP 404 response from the
+// Uptime.com API. It is used during refresh to detect resources that were
+// deleted out-of-band so they can be dropped from state instead of failing.
+func isNotFoundError(err error) bool {
+	var apiErr *upapi.Error
+	if errors.As(err, &apiErr) {
+		return apiErr.Response != nil && apiErr.Response.StatusCode == http.StatusNotFound
+	}
+	return false
+}
 
 type API[A, R any] interface {
 	Create(context.Context, A) (*R, error)
@@ -132,6 +145,10 @@ func (r APIResource[M, A, R]) Read(ctx context.Context, rq resource.ReadRequest,
 
 	res, err := r.api.Read(ctx, *stateModel)
 	if err != nil {
+		if isNotFoundError(err) {
+			rs.State.RemoveResource(ctx)
+			return
+		}
 		rs.Diagnostics.Append(r.apiOperationError(apiOperationRead, err))
 		return
 	}

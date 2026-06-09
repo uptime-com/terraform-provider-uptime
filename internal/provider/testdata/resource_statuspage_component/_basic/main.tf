@@ -7,8 +7,9 @@ variable "component_name" {
 }
 
 resource "uptime_check_api" "test" {
-  name   = "test"
-  script = <<SCRIPT
+  name           = "test"
+  contact_groups = []
+  script         = <<SCRIPT
 [
   {
     "step_def": "C_GET",
