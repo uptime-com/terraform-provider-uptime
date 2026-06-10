@@ -104,7 +104,7 @@ Header names are case-insensitive. Multiple values for the same header are suppo
 - `proxy` (String)
 - `send_string` (String) String to post
 - `sensitivity` (Number) How many locations should be down before an alert is sent
-- `sla` (Attributes) SLA related attributes (see [below for nested schema](#nestedatt--sla))
+- `sla` (Attributes) SLA related attributes. When omitted, the server-managed SLA is left untouched; to clear it, set explicit zero values (`uptime = "0"`, `latency = "0s"`). (see [below for nested schema](#nestedatt--sla))
 - `status_code` (String)
 - `tags` (Set of String) List of tags to organize and filter monitoring checks. 
 Each account can have up to 3,000 unique tags, with a 100-character limit per tag. 

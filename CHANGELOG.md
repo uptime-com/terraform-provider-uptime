@@ -23,6 +23,10 @@ Bug Fixes:
   after apply". The update endpoint does not echo back `credential_id` and `property_name`, so
   the provider now preserves those values from the plan instead of writing the empty response
   back to state.
+* `uptime_check_*` resources no longer churn `sla` on every plan and no longer wipe a
+  server-managed SLA when the `sla` block is omitted from config. A preserve-state plan modifier
+  now keeps the prior SLA when config does not set it. **Behavior change:** to clear an SLA, set
+  explicit zero values (`uptime = "0"`, `latency = "0s"`) instead of omitting the block.
 
 Documentation:
 * `uptime_subaccount` now documents that subaccounts cannot be deleted via the API and
