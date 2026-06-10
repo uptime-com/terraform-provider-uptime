@@ -22,7 +22,10 @@ func NewSubaccountResource(_ context.Context, p *providerImpl) resource.Resource
 				Description: "Manage Uptime.com subaccounts. Import using the subaccount ID: " +
 					"`terraform import uptime_subaccount.example 123`\n\n" +
 					"**IMPORTANT:** This resource requires the subaccounts feature to be enabled for your account. " +
-					"Attempts to create subaccounts without this feature enabled will fail with a PERMISSION_DENIED error.",
+					"Attempts to create subaccounts without this feature enabled will fail with a PERMISSION_DENIED error.\n\n" +
+					"**IMPORTANT:** Subaccounts cannot be deleted via the Uptime.com API, so `terraform destroy` " +
+					"will fail for this resource. Remove it from state with `terraform state rm` and delete the " +
+					"subaccount via the web interface.",
 				Attributes: map[string]schema.Attribute{
 					"id":   IDSchemaAttribute(),
 					"url":  URLSchemaAttribute(),

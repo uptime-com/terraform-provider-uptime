@@ -5,6 +5,7 @@ subcategory: ""
 description: |-
   Manage Uptime.com subaccounts. Import using the subaccount ID: terraform import uptime_subaccount.example 123
   IMPORTANT: This resource requires the subaccounts feature to be enabled for your account. Attempts to create subaccounts without this feature enabled will fail with a PERMISSION_DENIED error.
+  IMPORTANT: Subaccounts cannot be deleted via the Uptime.com API, so terraform destroy will fail for this resource. Remove it from state with terraform state rm and delete the subaccount via the web interface.
 ---
 
 # uptime_subaccount (Resource)
@@ -12,6 +13,8 @@ description: |-
 Manage Uptime.com subaccounts. Import using the subaccount ID: `terraform import uptime_subaccount.example 123`
 
 **IMPORTANT:** This resource requires the subaccounts feature to be enabled for your account. Attempts to create subaccounts without this feature enabled will fail with a PERMISSION_DENIED error.
+
+**IMPORTANT:** Subaccounts cannot be deleted via the Uptime.com API, so `terraform destroy` will fail for this resource. Remove it from state with `terraform state rm` and delete the subaccount via the web interface.
 
 ## Example Usage
 

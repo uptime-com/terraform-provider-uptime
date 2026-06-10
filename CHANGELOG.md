@@ -1,5 +1,29 @@
 # Uptime.com Terraform provider changelog
 
+## Unreleased
+
+Enhancements:
+* `uptime_subaccount`, `uptime_tag` and `uptime_check_pagespeed` now support `terraform import`
+  (SYS-1257).
+
+Bug Fixes:
+* `uptime_credential` updates are now performed in place instead of delete+create, so the
+  credential ID is stable and updates no longer fail for credentials referenced by checks
+  (SYS-1262). Changing `credential_type` now requires replacement, because the API does not
+  support changing the type in place.
+* Resources deleted out-of-band no longer fail `terraform plan`/`refresh` with a 404 error;
+  they are removed from state with a warning instead (SYS-1180). The warning also flags a
+  possible subaccount/endpoint misconfiguration, since that makes every read return 404.
+* `uptime_contact.integrations` and `uptime_contact.push_notification_profiles` no longer churn
+  on every plan when the backend links integrations or push profiles to the contact (SYS-1264).
+  **Behavior change:** these attributes are now server-managed when omitted from the
+  configuration. Previously, omitting them planned an empty set, which removed server-created
+  associations on apply; now omission leaves them untouched.
+
+Documentation:
+* `uptime_subaccount` now documents that subaccounts cannot be deleted via the API and
+  `terraform destroy` will fail for them.
+
 ## v2.25.0
 
 Enhancements:

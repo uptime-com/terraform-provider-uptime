@@ -23,6 +23,21 @@ func isNotFoundError(err error) bool {
 	return false
 }
 
+// notFoundWarning surfaces a 404-triggered state removal in the plan output.
+// A 404 can also mean a wrong subaccount/endpoint configuration, in which case
+// silently dropping resources would cascade into recreating everything.
+func notFoundWarning(typeNameSuffix string, pk upapi.PrimaryKeyable) diag.Diagnostic {
+	return diag.NewWarningDiagnostic(
+		"Resource Not Found",
+		fmt.Sprintf(
+			"uptime_%s with ID %d returned 404 and was removed from state. "+
+				"If the resource was not deleted out-of-band, check the provider's "+
+				"subaccount and endpoint configuration before applying.",
+			typeNameSuffix, pk.PrimaryKey(),
+		),
+	)
+}
+
 type API[A, R any] interface {
 	Create(context.Context, A) (*R, error)
 	Read(context.Context, upapi.PrimaryKeyable) (*R, error)
@@ -146,6 +161,7 @@ func (r APIResource[M, A, R]) Read(ctx context.Context, rq resource.ReadRequest,
 	res, err := r.api.Read(ctx, *stateModel)
 	if err != nil {
 		if isNotFoundError(err) {
+			rs.Diagnostics.Append(notFoundWarning(r.meta.TypeNameSuffix, (*stateModel).PrimaryKey()))
 			rs.State.RemoveResource(ctx)
 			return
 		}
