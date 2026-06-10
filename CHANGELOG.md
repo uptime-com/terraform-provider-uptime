@@ -19,6 +19,10 @@ Bug Fixes:
   **Behavior change:** these attributes are now server-managed when omitted from the
   configuration. Previously, omitting them planned an empty set, which removed server-created
   associations on apply; now omission leaves them untouched.
+* `uptime_service_variable` updates no longer fail with "Provider produced inconsistent result
+  after apply". The update endpoint does not echo back `credential_id` and `property_name`, so
+  the provider now preserves those values from the plan instead of writing the empty response
+  back to state.
 
 Documentation:
 * `uptime_subaccount` now documents that subaccounts cannot be deleted via the API and
