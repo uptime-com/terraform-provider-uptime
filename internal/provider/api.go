@@ -2,13 +2,41 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
+
+// isNotFoundError reports whether err represents an HTTP 404 response from the
+// Uptime.com API. It is used during refresh to detect resources that were
+// deleted out-of-band so they can be dropped from state instead of failing.
+func isNotFoundError(err error) bool {
+	var apiErr *upapi.Error
+	if errors.As(err, &apiErr) {
+		return apiErr.Response != nil && apiErr.Response.StatusCode == http.StatusNotFound
+	}
+	return false
+}
+
+// notFoundWarning surfaces a 404-triggered state removal in the plan output.
+// A 404 can also mean a wrong subaccount/endpoint configuration, in which case
+// silently dropping resources would cascade into recreating everything.
+func notFoundWarning(typeNameSuffix string, pk upapi.PrimaryKeyable) diag.Diagnostic {
+	return diag.NewWarningDiagnostic(
+		"Resource Not Found",
+		fmt.Sprintf(
+			"uptime_%s with ID %d returned 404 and was removed from state. "+
+				"If the resource was not deleted out-of-band, check the provider's "+
+				"subaccount and endpoint configuration before applying.",
+			typeNameSuffix, pk.PrimaryKey(),
+		),
+	)
+}
 
 type API[A, R any] interface {
 	Create(context.Context, A) (*R, error)
@@ -132,6 +160,11 @@ func (r APIResource[M, A, R]) Read(ctx context.Context, rq resource.ReadRequest,
 
 	res, err := r.api.Read(ctx, *stateModel)
 	if err != nil {
+		if isNotFoundError(err) {
+			rs.Diagnostics.Append(notFoundWarning(r.meta.TypeNameSuffix, (*stateModel).PrimaryKey()))
+			rs.State.RemoveResource(ctx)
+			return
+		}
 		rs.Diagnostics.Append(r.apiOperationError(apiOperationRead, err))
 		return
 	}

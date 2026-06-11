@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"fmt"
 	"regexp"
 	"testing"
 
@@ -18,6 +19,10 @@ func TestAccCredentialResource(t *testing.T) {
 		petname.Generate(1, "-"),
 		petname.Generate(1, "-"),
 	}
+	// Captured in step 1 and compared in step 2 to assert the credential is
+	// updated in place rather than recreated (the old code did delete+create,
+	// which changed the id and failed for in-use credentials - SYS-1262).
+	var createdID string
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
 			ConfigDirectory: config.StaticDirectory("testdata/resource_credential/_basic"),
@@ -30,6 +35,10 @@ func TestAccCredentialResource(t *testing.T) {
 				resource.TestCheckResourceAttr("uptime_credential.test", "display_name", names[0]),
 				resource.TestCheckResourceAttr("uptime_credential.test", "credential_type", "BASIC"),
 				resource.TestCheckResourceAttr("uptime_credential.test", "secret.password", passwords[0]),
+				resource.TestCheckResourceAttrWith("uptime_credential.test", "id", func(v string) error {
+					createdID = v
+					return nil
+				}),
 			),
 		},
 		{
@@ -43,6 +52,12 @@ func TestAccCredentialResource(t *testing.T) {
 				resource.TestCheckResourceAttr("uptime_credential.test", "display_name", names[1]),
 				resource.TestCheckResourceAttr("uptime_credential.test", "credential_type", "BASIC"),
 				resource.TestCheckResourceAttr("uptime_credential.test", "secret.password", passwords[1]),
+				resource.TestCheckResourceAttrWith("uptime_credential.test", "id", func(v string) error {
+					if v != createdID {
+						return fmt.Errorf("credential was recreated (id %s -> %s), expected in-place update", createdID, v)
+					}
+					return nil
+				}),
 			),
 		},
 	}))

@@ -121,6 +121,21 @@ func (a ServiceVariableResourceModelAdapter) FromAPIResult(api ServiceVariableWr
 	}, nil
 }
 
+// PreservePlanValues restores credential_id and property_name from the plan
+// (or prior state on Read) when the API response omits them. The update
+// endpoint does not echo these back, leaving a 0/"" result that mismatches the
+// planned value of these Required attributes and trips "Provider produced
+// inconsistent result after apply".
+func (a ServiceVariableResourceModelAdapter) PreservePlanValues(result, plan *ServiceVariableResourceModel) *ServiceVariableResourceModel {
+	if result.CredentialID.ValueInt64() == 0 {
+		result.CredentialID = plan.CredentialID
+	}
+	if result.PropertyName.ValueString() == "" {
+		result.PropertyName = plan.PropertyName
+	}
+	return result
+}
+
 type ServiceVariableResourceAPI struct {
 	provider *providerImpl
 }

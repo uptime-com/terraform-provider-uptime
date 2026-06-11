@@ -11,12 +11,13 @@ import (
 )
 
 func NewTagResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[TagResourceModel, upapi.Tag, upapi.Tag]{
+	return NewImportableAPIResource[TagResourceModel, upapi.Tag, upapi.Tag](
 		TagResourceAPI{provider: p},
 		TagResourceModelAdapter{},
 		APIResourceMetadata{
 			TypeNameSuffix: "tag",
 			Schema: schema.Schema{
+				Description: "Tag resource. Import using the tag ID: `terraform import uptime_tag.example 123`",
 				Attributes: map[string]schema.Attribute{
 					"id":  IDSchemaAttribute(),
 					"url": URLSchemaAttribute(),
@@ -27,7 +28,8 @@ func NewTagResource(_ context.Context, p *providerImpl) resource.Resource {
 				},
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type TagResourceModel struct {

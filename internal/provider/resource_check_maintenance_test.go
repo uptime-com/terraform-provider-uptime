@@ -68,6 +68,11 @@ func TestAccCheckMaintenanceResource_Weekly(t *testing.T) {
 }
 
 func TestAccCheckMaintenanceResource_Monthly(t *testing.T) {
+	// TODO(TRUST-923): re-enable once the maintenance_v2 path expands the
+	// `monthday` shorthand. It currently 400s ("Unknown error") on accounts
+	// with the maintenance_schedules feature flag enabled.
+	t.Skip("Skipping until TRUST-923 is fixed: maintenance_v2 rejects MONTHLY monthday shorthand")
+
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
 		{
@@ -123,6 +128,11 @@ func TestAccCheckMaintenanceResource_Once(t *testing.T) {
 }
 
 func TestAccCheckMaintenanceResource_All(t *testing.T) {
+	// TODO(TRUST-923): re-enable once the maintenance_v2 path expands the
+	// `monthday` shorthand. The MONTHLY entry here 400s ("Unknown error") on
+	// accounts with the maintenance_schedules feature flag enabled.
+	t.Skip("Skipping until TRUST-923 is fixed: maintenance_v2 rejects MONTHLY monthday shorthand")
+
 	name := petname.Generate(3, "-")
 	// Generate future dates to avoid issues with past maintenance windows
 	startDate := time.Now().UTC().Add(24 * time.Hour).Format(time.RFC3339)

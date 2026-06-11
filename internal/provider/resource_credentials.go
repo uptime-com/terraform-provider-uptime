@@ -9,6 +9,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -23,7 +25,7 @@ func NewCredentialResource(_ context.Context, p *providerImpl) resource.Resource
 			TypeNameSuffix: "credential",
 			Schema: schema.Schema{
 				Attributes: map[string]schema.Attribute{
-					"id": ComputedIDSchemaAttribute(), // Uses delete+create for updates
+					"id": IDSchemaAttribute(),
 					"display_name": schema.StringAttribute{
 						Required: true,
 					},
@@ -31,10 +33,16 @@ func NewCredentialResource(_ context.Context, p *providerImpl) resource.Resource
 						Computed: true,
 						Optional: true,
 					},
+					// RequiresReplace: the credentials PATCH endpoint ignores
+					// credential_type and validates the new secret against the
+					// old type, so a type change must be a delete+create.
 					"credential_type": schema.StringAttribute{
 						Required: true,
 						Validators: []validator.String{
 							OneOfStringValidator([]string{"BASIC", "CERTIFICATE", "TOKEN"}),
+						},
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.RequiresReplace(),
 						},
 					},
 					"hint": schema.StringAttribute{
@@ -237,34 +245,38 @@ func (a CredentialResourceModelAdapter) SecretAttributeValue(m CredentialSecretA
 	return types.ObjectValueMust(a.secretAttributeTypes(), a.secretAttributeValues(m))
 }
 
+// PreservePlanValues keeps the secret from the plan (or prior state on Read),
+// because the API never returns secret values. Unset Computed+Optional
+// sub-fields arrive unknown in the plan and are coerced to "" by ValueString,
+// matching what ToAPIArgument sends to the API.
+func (a CredentialResourceModelAdapter) PreservePlanValues(result, plan *CredentialResourceModel) *CredentialResourceModel {
+	if plan.secret == nil {
+		return result
+	}
+	result.Secret = a.SecretAttributeValue(CredentialSecretAttribute{
+		Certificate: types.StringValue(plan.secret.Certificate.ValueString()),
+		Key:         types.StringValue(plan.secret.Key.ValueString()),
+		Password:    types.StringValue(plan.secret.Password.ValueString()),
+		Passphrase:  types.StringValue(plan.secret.Passphrase.ValueString()),
+		Secret:      types.StringValue(plan.secret.Secret.ValueString()),
+	})
+	return result
+}
+
 type CredentialResourceAPI struct {
 	provider *providerImpl
 }
 
 func (c CredentialResourceAPI) Create(ctx context.Context, arg upapi.Credential) (*upapi.Credential, error) {
-	obj, err := c.provider.api.Credentials().Create(ctx, arg)
-	obj.Secret = arg.Secret
-	return obj, err
+	return c.provider.api.Credentials().Create(ctx, arg)
 }
 
 func (c CredentialResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Credential, error) {
-	obj, err := c.provider.api.Credentials().Get(ctx, pk)
-	secret := pk.(CredentialResourceModel).secret
-	obj.Secret = upapi.CredentialSecret{
-		Certificate: secret.Certificate.ValueString(),
-		Key:         secret.Key.ValueString(),
-		Passphrase:  secret.Passphrase.ValueString(),
-		Password:    secret.Password.ValueString(),
-		Secret:      secret.Secret.ValueString(),
-	}
-	return obj, err
+	return c.provider.api.Credentials().Get(ctx, pk)
 }
 
 func (c CredentialResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.Credential) (*upapi.Credential, error) {
-	if err := c.Delete(ctx, pk); err != nil {
-		return nil, err
-	}
-	return c.Create(ctx, arg)
+	return c.provider.api.Credentials().Update(ctx, pk, arg)
 }
 
 func (c CredentialResourceAPI) Delete(ctx context.Context, pk upapi.PrimaryKeyable) error {

@@ -38,6 +38,10 @@ func TestAccServiceVariableResource(t *testing.T) {
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("uptime_service_variable.test", "variable_name", "api_key"),
 				resource.TestCheckResourceAttr("uptime_service_variable.test", "property_name", "password"),
+				resource.TestCheckResourceAttrPair(
+					"uptime_service_variable.test", "credential_id",
+					"uptime_credential.test", "id",
+				),
 			),
 		},
 	}))
