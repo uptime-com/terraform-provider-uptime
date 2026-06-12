@@ -1,6 +1,6 @@
 # Uptime.com Terraform provider changelog
 
-## Unreleased
+## v2.27.0
 
 Enhancements:
 * `uptime_subaccount`, `uptime_tag` and `uptime_check_pagespeed` now support `terraform import`
@@ -31,6 +31,9 @@ Bug Fixes:
 Documentation:
 * `uptime_subaccount` now documents that subaccounts cannot be deleted via the API and
   `terraform destroy` will fail for them.
+
+Dependency Updates:
+* Bump github.com/hashicorp/terraform-plugin-testing to v1.16.0
 
 ## v2.25.0
 
