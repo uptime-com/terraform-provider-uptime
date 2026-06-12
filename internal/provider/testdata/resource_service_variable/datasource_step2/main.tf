@@ -39,4 +39,9 @@ resource "uptime_service_variable" "test" {
   credential_id = local.test_credential.id
   variable_name = var.variable_name
   property_name = "password"
+
+  # credential_id is resolved through the data source, so there is no implicit
+  # edge to uptime_credential.test. Without this, destroy order is undefined and
+  # the credential can be deleted while still in use by this service variable.
+  depends_on = [uptime_credential.test]
 }

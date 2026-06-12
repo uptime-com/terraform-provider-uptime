@@ -43,9 +43,9 @@ resource "uptime_contact" "with_integrations" {
 ### Optional
 
 - `email_list` (Set of String)
-- `integrations` (Set of String)
+- `integrations` (Set of String) Integrations linked to this contact. Server-managed unless set explicitly: when omitted, associations created by integrations' `contact_groups` are left untouched. Set an explicit value to manage the list from this resource.
 - `phonecall_list` (Set of String)
-- `push_notification_profiles` (Set of String)
+- `push_notification_profiles` (Set of String) Push notification profiles linked to this contact. Server-managed unless set explicitly: mobile devices register profiles out-of-band, and omitting this attribute leaves them untouched.
 - `sms_list` (Set of String)
 
 ### Read-Only

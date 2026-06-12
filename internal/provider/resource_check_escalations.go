@@ -118,6 +118,11 @@ func (r *CheckEscalationsResource) Read(ctx context.Context, rq resource.ReadReq
 
 	result, err := r.provider.api.Checks().GetEscalations(ctx, *model)
 	if err != nil {
+		if isNotFoundError(err) {
+			rs.Diagnostics.Append(notFoundWarning("check_escalations", *model))
+			rs.State.RemoveResource(ctx)
+			return
+		}
 		rs.Diagnostics.AddError("API Get Escalations Operation Failed", err.Error())
 		return
 	}

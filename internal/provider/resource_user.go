@@ -155,6 +155,11 @@ func (r *UserResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 
 	user, err := r.provider.api.Users().Get(ctx, upapi.PrimaryKey(state.ID.ValueInt64()))
 	if err != nil {
+		if isNotFoundError(err) {
+			resp.Diagnostics.Append(notFoundWarning("user", upapi.PrimaryKey(state.ID.ValueInt64())))
+			resp.State.RemoveResource(ctx)
+			return
+		}
 		resp.Diagnostics.AddError("Failed to read user", err.Error())
 		return
 	}

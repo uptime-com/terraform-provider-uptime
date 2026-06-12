@@ -41,6 +41,16 @@ func TestAccTagResource(t *testing.T) {
 				ConfigDirectory: config.StaticDirectory("testdata/resource_tag/color_hex"),
 				ConfigVariables: config.Variables{
 					"tag":       config.StringVariable(names[0]),
+					"color_hex": config.StringVariable("#ff0000"),
+				},
+				ResourceName:      "uptime_tag.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				ConfigDirectory: config.StaticDirectory("testdata/resource_tag/color_hex"),
+				ConfigVariables: config.Variables{
+					"tag":       config.StringVariable(names[0]),
 					"color_hex": config.StringVariable("#AA0000"),
 				},
 				ExpectError: regexp.MustCompile(`Provided configuration value is not a valid hex color`),

@@ -3,12 +3,12 @@
 page_title: "uptime_check_pagespeed Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  Page Speed Check
+  Page Speed Check. Import using the check ID: terraform import uptime_check_pagespeed.example 123
 ---
 
 # uptime_check_pagespeed (Resource)
 
-Page Speed Check
+Page Speed Check. Import using the check ID: `terraform import uptime_check_pagespeed.example 123`
 
 
 

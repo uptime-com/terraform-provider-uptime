@@ -55,6 +55,49 @@ func TestAccCheckHTTPResource(t *testing.T) {
 	}))
 }
 
+// TestAccCheckHTTPResource_SLAPreservedWhenOmitted guards against SLA being
+// wiped when the sla block is dropped from config. Without the preserve-state
+// plan modifier, omitting sla plans a zero object that the API writes back as
+// msp_*_sla=0, churning `~ sla` on every apply.
+func TestAccCheckHTTPResource_SLAPreservedWhenOmitted(t *testing.T) {
+	name1 := petname.Generate(3, "-")
+	name2 := petname.Generate(3, "-")
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/sla_preserve_set"),
+			ConfigVariables: config.Variables{
+				"name": config.StringVariable(name1),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_http.test", "sla.uptime", "0.999"),
+				resource.TestCheckResourceAttr("uptime_check_http.test", "sla.latency", "1s"),
+			),
+		},
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/sla_preserve_unset"),
+			ConfigVariables: config.Variables{
+				"name": config.StringVariable(name2),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_http.test", "name", name2),
+				resource.TestCheckResourceAttr("uptime_check_http.test", "sla.uptime", "0.999"),
+				resource.TestCheckResourceAttr("uptime_check_http.test", "sla.latency", "1s"),
+			),
+		},
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/sla_preserve_unset"),
+			ConfigVariables: config.Variables{
+				"name": config.StringVariable(name2),
+			},
+			ConfigPlanChecks: resource.ConfigPlanChecks{
+				PreApply: []plancheck.PlanCheck{
+					plancheck.ExpectEmptyPlan(),
+				},
+			},
+		},
+	}))
+}
+
 func TestAccCheckHTTPResource_ContactGroups(t *testing.T) {
 	name := petname.Generate(3, "-")
 	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{

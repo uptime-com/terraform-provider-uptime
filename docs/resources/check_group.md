@@ -78,7 +78,7 @@ Set to an empty list to disable notifications at this level and rely on parent c
 - `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
 - `is_paused` (Boolean)
 - `notes` (String)
-- `sla` (Attributes) SLA related attributes (see [below for nested schema](#nestedatt--sla))
+- `sla` (Attributes) SLA related attributes. When omitted, the server-managed SLA is left untouched; to clear it, set explicit zero values (`uptime = "0"`, `latency = "0s"`). (see [below for nested schema](#nestedatt--sla))
 - `tags` (Set of String) List of tags to organize and filter monitoring checks. 
 Each account can have up to 3,000 unique tags, with a 100-character limit per tag. 
 Tags help categorize resources for filtering in Dashboards, Public Status Pages, and SLA Reports. 

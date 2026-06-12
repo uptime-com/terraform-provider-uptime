@@ -42,17 +42,31 @@ func NewContactResource(_ context.Context, p *providerImpl) resource.Resource {
 						Optional:    true,
 						Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 					},
+					// No Default: the backend links integrations into a contact
+					// as a side effect of an integration's contact_groups, so this
+					// field is server-managed. An empty-set Default would force the
+					// plan back to [] whenever it is omitted, churning that
+					// association on every apply (SYS-1264). Without a Default,
+					// Optional+Computed preserves the prior state value.
 					"integrations": schema.SetAttribute{
+						Description: "Integrations linked to this contact. Server-managed unless set " +
+							"explicitly: when omitted, associations created by integrations' " +
+							"`contact_groups` are left untouched. Set an explicit value to manage " +
+							"the list from this resource.",
 						ElementType: types.StringType,
 						Computed:    true,
 						Optional:    true,
-						Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 					},
+					// Server-managed association (mobile devices register push
+					// profiles out-of-band), so omit the Default for the same
+					// reason as integrations above (SYS-1264).
 					"push_notification_profiles": schema.SetAttribute{
+						Description: "Push notification profiles linked to this contact. Server-managed " +
+							"unless set explicitly: mobile devices register profiles out-of-band, and " +
+							"omitting this attribute leaves them untouched.",
 						ElementType: types.StringType,
 						Computed:    true,
 						Optional:    true,
-						Default:     setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 					},
 				},
 			},

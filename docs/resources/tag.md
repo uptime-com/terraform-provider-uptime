@@ -3,12 +3,12 @@
 page_title: "uptime_tag Resource - terraform-provider-uptime"
 subcategory: ""
 description: |-
-  
+  Tag resource. Import using the tag ID: terraform import uptime_tag.example 123
 ---
 
 # uptime_tag (Resource)
 
-
+Tag resource. Import using the tag ID: `terraform import uptime_tag.example 123`
 
 ## Example Usage
 
