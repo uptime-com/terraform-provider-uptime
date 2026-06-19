@@ -1,5 +1,22 @@
 # Uptime.com Terraform provider changelog
 
+## v2.28.0
+
+Enhancements:
+* **New Resource:** `uptime_maintenance_schedule` - manage account-level maintenance
+  windows (RRULE/ONE_OFF) targeting checks by service or tag (TRUST-584).
+* **New Resource:** `uptime_maintenance_notification` - manage maintenance-window
+  notifications (TRUST-584).
+
+Bug Fixes:
+* `uptime_service_variable` now also preserves `variable_name` from the plan when the update
+  endpoint omits it, completing the v2.27.0 fix so in-place updates no longer fail with
+  "Provider produced inconsistent result after apply: .variable_name: was ..., but now \"\"".
+
+Dependency Updates:
+* Bump github.com/uptime-com/uptime-client-go/v2 to v2.13.0 for the maintenance schedules and
+  notifications endpoints (TRUST-584).
+
 ## v2.27.0
 
 Enhancements:
