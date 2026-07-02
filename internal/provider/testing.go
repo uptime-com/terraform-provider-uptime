@@ -59,7 +59,7 @@ func buildTestAccAPIClient() (upapi.API, error) {
 	if token == "" {
 		return nil, fmt.Errorf("UPTIME_TOKEN must be set for acceptance tests")
 	}
-	rateLimit := 0.5
+	rateLimit := 0.66
 	if val := os.Getenv("UPTIME_RATE_LIMIT"); val != "" {
 		if parsedVal, err := strconv.ParseFloat(val, 64); err == nil {
 			rateLimit = parsedVal

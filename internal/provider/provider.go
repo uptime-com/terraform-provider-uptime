@@ -128,6 +128,7 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		func() datasource.DataSource { return NewLocationsDataSource(ctx, p) },
+		func() datasource.DataSource { return NewPrivateLocationsDataSource(ctx, p) },
 		func() datasource.DataSource { return NewCredentialsDataSource(ctx, p) },
 		func() datasource.DataSource { return NewContactsDataSource(ctx, p) },
 		func() datasource.DataSource { return NewUsersDataSource(ctx, p) },
