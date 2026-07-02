@@ -1,12 +1,16 @@
 package provider
 
 import (
+	"context"
+	"errors"
 	"testing"
+	"time"
 
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
 
 // TestServiceVariablePreservePlanValues verifies that Required attributes the update
@@ -57,6 +61,101 @@ func TestServiceVariablePreservePlanValues(t *testing.T) {
 			t.Errorf("variable_name: got %q, want \"other_name\"", got.VariableName.ValueString())
 		}
 	})
+}
+
+// TestServiceVariablePreserveReadValues verifies that refresh trusts the API and does
+// not backfill from prior state, so a UI-side removal of the credential link (which the
+// API reports as empty) surfaces as drift instead of being masked (SYS-1284).
+func TestServiceVariablePreserveReadValues(t *testing.T) {
+	adapter := ServiceVariableResourceModelAdapter{}
+
+	state := &ServiceVariableResourceModel{
+		CredentialID: types.Int64Value(28966),
+		PropertyName: types.StringValue("secret"),
+		VariableName: types.StringValue("token_raven_token"),
+	}
+	result := &ServiceVariableResourceModel{
+		CredentialID: types.Int64Value(0),
+		PropertyName: types.StringValue(""),
+		VariableName: types.StringValue(""),
+	}
+
+	got := adapter.PreserveReadValues(result, state)
+	if got.CredentialID.ValueInt64() != 0 {
+		t.Errorf("credential_id: got %d, want 0 (must not backfill from state)", got.CredentialID.ValueInt64())
+	}
+	if got.PropertyName.ValueString() != "" {
+		t.Errorf("property_name: got %q, want \"\" (must not backfill from state)", got.PropertyName.ValueString())
+	}
+	if got.VariableName.ValueString() != "" {
+		t.Errorf("variable_name: got %q, want \"\" (must not backfill from state)", got.VariableName.ValueString())
+	}
+}
+
+// stubServiceVariablesAPI embeds upapi.API and overrides only ServiceVariables so
+// the Read path can be exercised without a live client. The embedded endpoint
+// leaves every method but Get unimplemented (they panic if called).
+type stubServiceVariablesAPI struct {
+	upapi.API
+	get *upapi.ServiceVariable
+}
+
+func (s stubServiceVariablesAPI) ServiceVariables() upapi.ServiceVariablesEndpoint {
+	return stubServiceVariablesEndpoint{get: s.get}
+}
+
+type stubServiceVariablesEndpoint struct {
+	upapi.ServiceVariablesEndpoint
+	get *upapi.ServiceVariable
+}
+
+func (s stubServiceVariablesEndpoint) Get(context.Context, upapi.PrimaryKeyable) (*upapi.ServiceVariable, error) {
+	return s.get, nil
+}
+
+// TestServiceVariableReadDeletedDrift verifies that a link the API reports as
+// soft-deleted (deleted_at set) is treated as gone on refresh, so the deletion
+// surfaces as drift instead of being masked by the backfill (SYS-1284).
+func TestServiceVariableReadDeletedDrift(t *testing.T) {
+	deletedAt := time.Unix(1_700_000_000, 0)
+	api := ServiceVariableResourceAPI{provider: &providerImpl{
+		api: stubServiceVariablesAPI{get: &upapi.ServiceVariable{ID: 42, DeletedAt: &deletedAt}},
+	}}
+
+	_, err := api.Read(context.Background(), ServiceVariableResourceModel{ID: types.Int64Value(42)})
+	if !errors.Is(err, errResourceGone) {
+		t.Fatalf("Read of deleted link: got err %v, want errResourceGone", err)
+	}
+	if !isNotFoundError(err) {
+		t.Errorf("isNotFoundError(%v) = false, want true so the resource is dropped from state", err)
+	}
+}
+
+// TestServiceVariableReadLive verifies that a live link is returned as-is and, when
+// credential_id is only present in the nested credential object, is recovered from it.
+func TestServiceVariableReadLive(t *testing.T) {
+	api := ServiceVariableResourceAPI{provider: &providerImpl{
+		api: stubServiceVariablesAPI{get: &upapi.ServiceVariable{
+			ID:           42,
+			Credential:   &upapi.ServiceVariableCredential{ID: 99},
+			PropertyName: "password",
+			VariableName: "api_password",
+		}},
+	}}
+
+	got, err := api.Read(context.Background(), ServiceVariableResourceModel{
+		ID:        types.Int64Value(42),
+		ServiceID: types.Int64Value(7),
+	})
+	if err != nil {
+		t.Fatalf("Read of live link: unexpected error %v", err)
+	}
+	if got.CredentialID != 99 {
+		t.Errorf("credential_id: got %d, want 99 (recovered from nested credential)", got.CredentialID)
+	}
+	if got.ServiceID != 7 {
+		t.Errorf("service_id: got %d, want 7 (preserved from prior state)", got.ServiceID)
+	}
 }
 
 func TestAccServiceVariableResource(t *testing.T) {
