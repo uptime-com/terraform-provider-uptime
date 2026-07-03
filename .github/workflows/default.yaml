@@ -42,8 +42,9 @@ jobs:
       - name: Run acceptance tests
         env:
           TF_ACC: "yup"
-          UPTIME_TOKEN: "${{ secrets.UPTIME_TOKEN }}"
-          UPTIME_RATE_LIMIT: "1.0"
+          UPTIME_ENDPOINT: "https://staging.uptime.com/api/v1/"
+          UPTIME_TOKEN: "${{ secrets.UPTIME_TOKEN_STAGING }}"
+          UPTIME_RATE_LIMIT: "2.0"
         run: go test -test.timeout=50m -test.parallel=1 -v ./... -run ^TestAcc[A-Z]
 
   release:
