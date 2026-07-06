@@ -1,5 +1,22 @@
 # Uptime.com Terraform provider changelog
 
+## v2.29.0
+
+New Data Sources:
+* `uptime_private_locations` - list private monitoring locations, exposing their `country`
+  attribute (SYS-1248).
+
+Bug Fixes:
+* `uptime_service_variable` now detects UI-side deletion of the check<->credential link on
+  refresh. The apply-time backfill of empty API fields no longer runs on read, so a link
+  deleted in the UI (returned with a `deleted_at` marker) is dropped from state and surfaces
+  as drift instead of being silently restored (SYS-1284).
+
+Dependency Updates:
+* Bump github.com/uptime-com/uptime-client-go/v2 to v2.14.0 for the `IsPrivate` and `Country`
+  fields on ProbeServer (SYS-1248).
+* Bump golang.org/x/net (#245).
+
 ## v2.28.0
 
 Enhancements:
