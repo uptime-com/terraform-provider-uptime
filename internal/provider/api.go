@@ -12,10 +12,20 @@ import (
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
 
-// isNotFoundError reports whether err represents an HTTP 404 response from the
-// Uptime.com API. It is used during refresh to detect resources that were
-// deleted out-of-band so they can be dropped from state instead of failing.
+// errResourceGone signals that the API returned a record that still exists at
+// the HTTP level but is logically deleted (e.g. carries a deleted_at marker).
+// A resource Read may return it, wrapped or not, to have the resource dropped
+// from state exactly like a 404 so out-of-band deletions surface as drift.
+var errResourceGone = errors.New("resource marked deleted by API")
+
+// isNotFoundError reports whether err represents a resource that no longer
+// exists: either an HTTP 404 response from the Uptime.com API or an
+// errResourceGone marker. It is used during refresh to detect resources that
+// were deleted out-of-band so they can be dropped from state instead of failing.
 func isNotFoundError(err error) bool {
+	if errors.Is(err, errResourceGone) {
+		return true
+	}
 	var apiErr *upapi.Error
 	if errors.As(err, &apiErr) {
 		return apiErr.Response != nil && apiErr.Response.StatusCode == http.StatusNotFound
@@ -23,16 +33,17 @@ func isNotFoundError(err error) bool {
 	return false
 }
 
-// notFoundWarning surfaces a 404-triggered state removal in the plan output.
-// A 404 can also mean a wrong subaccount/endpoint configuration, in which case
-// silently dropping resources would cascade into recreating everything.
+// notFoundWarning surfaces a state removal in the plan output. It fires when the
+// API reports a resource as gone (a 404, or a deleted_at marker). A 404 can also
+// mean a wrong subaccount/endpoint configuration, in which case silently dropping
+// resources would cascade into recreating everything.
 func notFoundWarning(typeNameSuffix string, pk upapi.PrimaryKeyable) diag.Diagnostic {
 	return diag.NewWarningDiagnostic(
 		"Resource Not Found",
 		fmt.Sprintf(
-			"uptime_%s with ID %d returned 404 and was removed from state. "+
-				"If the resource was not deleted out-of-band, check the provider's "+
-				"subaccount and endpoint configuration before applying.",
+			"uptime_%s with ID %d no longer exists on the server and was removed "+
+				"from state. If the resource was not deleted out-of-band, check the "+
+				"provider's subaccount and endpoint configuration before applying.",
 			typeNameSuffix, pk.PrimaryKey(),
 		),
 	)
@@ -60,9 +71,20 @@ type APIModeler[M APIModel, A, R any] interface {
 }
 
 // PlanValuePreserver is an optional interface that APIModelers can implement
-// to preserve plan values for fields that the API does not return.
+// to preserve plan values for fields that the API does not return. It is applied
+// on Create and Update (apply time), and on Read unless the modeler also
+// implements ReadValuePreserver.
 type PlanValuePreserver[M APIModel] interface {
 	PreservePlanValues(result *M, plan *M) *M
+}
+
+// ReadValuePreserver is an optional interface that APIModelers can implement to
+// override how prior state is reconciled with the API response on Read only.
+// When implemented, Read calls PreserveReadValues instead of PreservePlanValues,
+// letting a resource trust the server response on refresh so out-of-band changes
+// surface as drift.
+type ReadValuePreserver[M APIModel] interface {
+	PreserveReadValues(result *M, state *M) *M
 }
 
 type APIResourceMetadata struct {
@@ -175,8 +197,12 @@ func (r APIResource[M, A, R]) Read(ctx context.Context, rq resource.ReadRequest,
 		return
 	}
 
-	// Preserve state values for fields that the API doesn't return
-	if preserver, ok := any(r.mod).(PlanValuePreserver[M]); ok {
+	// On refresh, prefer a Read-specific reconciler when the modeler provides one
+	// (it may trust the API to surface out-of-band drift); otherwise fall back to
+	// the apply-time plan-value preservation for fields the API doesn't return.
+	if preserver, ok := any(r.mod).(ReadValuePreserver[M]); ok {
+		resultModel = preserver.PreserveReadValues(resultModel, stateModel)
+	} else if preserver, ok := any(r.mod).(PlanValuePreserver[M]); ok {
 		resultModel = preserver.PreservePlanValues(resultModel, stateModel)
 	}
 

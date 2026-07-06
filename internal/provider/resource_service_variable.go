@@ -121,10 +121,12 @@ func (a ServiceVariableResourceModelAdapter) FromAPIResult(api ServiceVariableWr
 	}, nil
 }
 
-// PreservePlanValues restores credential_id, property_name and variable_name from the
-// plan (or prior state on Read) when the API response omits them. These are Required
-// attributes, so an empty 0/"" result mismatches the planned value and trips "Provider
-// produced inconsistent result after apply".
+// PreservePlanValues restores credential_id, property_name and variable_name from
+// the plan when the API response omits them. These are Required attributes, so an
+// empty 0/"" result mismatches the planned value and trips "Provider produced
+// inconsistent result after apply". This runs at apply time only (Create/Update);
+// PreserveReadValues deliberately opts refresh out of this backfill so that
+// out-of-band deletions are not masked.
 func (a ServiceVariableResourceModelAdapter) PreservePlanValues(result, plan *ServiceVariableResourceModel) *ServiceVariableResourceModel {
 	if result.CredentialID.ValueInt64() == 0 {
 		result.CredentialID = plan.CredentialID
@@ -135,6 +137,13 @@ func (a ServiceVariableResourceModelAdapter) PreservePlanValues(result, plan *Se
 	if result.VariableName.ValueString() == "" {
 		result.VariableName = plan.VariableName
 	}
+	return result
+}
+
+// PreserveReadValues trusts the API response on refresh: it does not backfill from
+// prior state. Combined with the deleted_at handling in Read, this lets a UI-side
+// removal of the credential link show up as drift instead of being silently masked.
+func (a ServiceVariableResourceModelAdapter) PreserveReadValues(result, _ *ServiceVariableResourceModel) *ServiceVariableResourceModel {
 	return result
 }
 
@@ -169,6 +178,12 @@ func (c ServiceVariableResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKe
 	result, err := c.provider.api.ServiceVariables().Get(ctx, pk)
 	if err != nil {
 		return nil, err
+	}
+	// The API keeps returning the link after it is unbound in the UI, only
+	// flagging it with deleted_at. Treat that as gone so the deletion surfaces
+	// as drift instead of being masked by the apply-time backfill.
+	if result.DeletedAt != nil {
+		return nil, errResourceGone
 	}
 	// Extract credential_id from nested credential object if not at top level
 	if result.CredentialID == 0 && result.Credential != nil {
