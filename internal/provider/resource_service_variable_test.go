@@ -131,6 +131,26 @@ func TestServiceVariableReadDeletedDrift(t *testing.T) {
 	}
 }
 
+// TestServiceVariableReadHardDeletedGone verifies that a link removed from the check
+// in the UI is treated as gone on refresh. That removal is a hard delete, so the API
+// answers a subsequent Get with HTTP 200 and an empty body (no deleted_at), which the
+// client decodes as a zero-valued record. Read must surface that as errResourceGone so
+// the resource is dropped from state and the next apply recreates the link, instead of
+// issuing a no-op update against id 0 that never restores it (SYS-1284 follow-up).
+func TestServiceVariableReadHardDeletedGone(t *testing.T) {
+	api := ServiceVariableResourceAPI{provider: &providerImpl{
+		api: stubServiceVariablesAPI{get: &upapi.ServiceVariable{ID: 0}},
+	}}
+
+	_, err := api.Read(context.Background(), ServiceVariableResourceModel{ID: types.Int64Value(42)})
+	if !errors.Is(err, errResourceGone) {
+		t.Fatalf("Read of hard-deleted link: got err %v, want errResourceGone", err)
+	}
+	if !isNotFoundError(err) {
+		t.Errorf("isNotFoundError(%v) = false, want true so the resource is dropped from state", err)
+	}
+}
+
 // TestServiceVariableReadLive verifies that a live link is returned as-is and, when
 // credential_id is only present in the nested credential object, is recovered from it.
 func TestServiceVariableReadLive(t *testing.T) {

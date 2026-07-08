@@ -179,10 +179,13 @@ func (c ServiceVariableResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKe
 	if err != nil {
 		return nil, err
 	}
-	// The API keeps returning the link after it is unbound in the UI, only
-	// flagging it with deleted_at. Treat that as gone so the deletion surfaces
-	// as drift instead of being masked by the apply-time backfill.
-	if result.DeletedAt != nil {
+	// A link removed from the check in the UI is hard-deleted, so a later Get
+	// answers HTTP 200 with an empty body that decodes to a zero-valued record
+	// (ID 0, no deleted_at). A soft-deleted link instead comes back flagged with
+	// deleted_at. Treat either as gone so the removal surfaces as drift and the
+	// next apply recreates the link, rather than being masked by the apply-time
+	// backfill or issuing a no-op update against ID 0 that never restores it.
+	if result.ID == 0 || result.DeletedAt != nil {
 		return nil, errResourceGone
 	}
 	// Extract credential_id from nested credential object if not at top level
