@@ -134,7 +134,7 @@ func testAccAPIClient(t testing.TB) upapi.API {
 	return api
 }
 
-// testAccLocations fetches available probe server locations from the API.
+// testAccLocations fetches the locations valid for check creation from the API.
 // It returns a slice of location strings (excluding "AUTO" and "TEST").
 // Skips the test if TF_ACC is not set.
 func testAccLocations(t testing.TB) []string {
@@ -145,20 +145,24 @@ func testAccLocations(t testing.TB) []string {
 	}
 
 	api := testAccAPIClient(t)
-	servers, err := api.ProbeServers().List(context.Background())
-	require.NoError(t, err, "failed to fetch probe servers")
+	// Use the check-locations endpoint (/api/v1/checks/locations/) rather than the
+	// probe-servers list: it is the authoritative set of locations accepted when a
+	// check is created. The two diverge on non-production environments, where the
+	// probe-servers list may advertise locations that check creation rejects.
+	result, err := api.Checks().ListLocations(context.Background())
+	require.NoError(t, err, "failed to fetch check locations")
 
-	locations := make([]string, 0, len(servers.Items))
+	locations := make([]string, 0, len(result.Items))
 	seen := make(map[string]struct{})
-	for _, s := range servers.Items {
-		if s.Location == "AUTO" || s.Location == "TEST" {
+	for _, loc := range result.Items {
+		if loc == "AUTO" || loc == "TEST" {
 			continue
 		}
-		if _, ok := seen[s.Location]; ok {
+		if _, ok := seen[loc]; ok {
 			continue
 		}
-		seen[s.Location] = struct{}{}
-		locations = append(locations, s.Location)
+		seen[loc] = struct{}{}
+		locations = append(locations, loc)
 	}
 	require.GreaterOrEqual(t, len(locations), 4, "expected at least 4 locations")
 	return locations
