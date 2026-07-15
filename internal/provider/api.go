@@ -12,10 +12,12 @@ import (
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
 
-// errResourceGone signals that the API returned a record that still exists at
-// the HTTP level but is logically deleted (e.g. carries a deleted_at marker).
-// A resource Read may return it, wrapped or not, to have the resource dropped
-// from state exactly like a 404 so out-of-band deletions surface as drift.
+// errResourceGone signals that a 200 response nonetheless describes a resource
+// that is logically gone: it carries a deleted_at marker, or the body is empty
+// and decodes to a zero-valued record (some endpoints answer a deleted record
+// with 200 and empty results instead of 404). A resource Read may return it,
+// wrapped or not, to have the resource dropped from state exactly like a 404 so
+// out-of-band deletions surface as drift.
 var errResourceGone = errors.New("resource marked deleted by API")
 
 // isNotFoundError reports whether err represents a resource that no longer
