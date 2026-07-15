@@ -174,16 +174,55 @@ func NewStatusPageResource(_ context.Context, p *providerImpl) resource.Resource
 						Default:  stringdefault.StaticString(""),
 					},
 					"custom_header_html": schema.StringAttribute{
+						Description: "Custom header HTML rendered only under the LEGACY theme. " +
+							"API-managed status pages use the INSPIRE theme, so use " +
+							"custom_header_html_inspire instead.",
 						Optional: true,
 						Computed: true,
 						Default:  stringdefault.StaticString(""),
+						Validators: []validator.String{
+							LegacyOnlyBrandingWarningValidator("custom_header_html_inspire"),
+						},
 					},
 					"custom_footer_html": schema.StringAttribute{
+						Description: "Custom footer HTML rendered only under the LEGACY theme. " +
+							"API-managed status pages use the INSPIRE theme, so use " +
+							"custom_footer_html_inspire instead.",
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+						Validators: []validator.String{
+							LegacyOnlyBrandingWarningValidator("custom_footer_html_inspire"),
+						},
+					},
+					"custom_css": schema.StringAttribute{
+						Description: "Custom CSS rendered only under the LEGACY theme. " +
+							"API-managed status pages use the INSPIRE theme, so use " +
+							"custom_css_inspire instead.",
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+						Validators: []validator.String{
+							LegacyOnlyBrandingWarningValidator("custom_css_inspire"),
+						},
+					},
+					"custom_header_html_inspire": schema.StringAttribute{
+						Description: "Custom header HTML rendered on the status page under the " +
+							"INSPIRE theme (the theme used by all API-managed status pages).",
 						Optional: true,
 						Computed: true,
 						Default:  stringdefault.StaticString(""),
 					},
-					"custom_css": schema.StringAttribute{
+					"custom_footer_html_inspire": schema.StringAttribute{
+						Description: "Custom footer HTML rendered on the status page under the " +
+							"INSPIRE theme (the theme used by all API-managed status pages).",
+						Optional: true,
+						Computed: true,
+						Default:  stringdefault.StaticString(""),
+					},
+					"custom_css_inspire": schema.StringAttribute{
+						Description: "Custom CSS rendered on the status page under the INSPIRE " +
+							"theme (the theme used by all API-managed status pages).",
 						Optional: true,
 						Computed: true,
 						Default:  stringdefault.StaticString(""),
@@ -283,6 +322,9 @@ type StatusPageResourceModel struct {
 	CustomHeaderHtml          types.String `tfsdk:"custom_header_html"`
 	CustomFooterHtml          types.String `tfsdk:"custom_footer_html"`
 	CustomCss                 types.String `tfsdk:"custom_css"`
+	CustomHeaderHtmlInspire   types.String `tfsdk:"custom_header_html_inspire"`
+	CustomFooterHtmlInspire   types.String `tfsdk:"custom_footer_html_inspire"`
+	CustomCssInspire          types.String `tfsdk:"custom_css_inspire"`
 	CompanyWebsiteUrl         types.String `tfsdk:"company_website_url"`
 	Timezone                  types.String `tfsdk:"timezone"`
 	AllowSubscriptionsEmail   types.Bool   `tfsdk:"allow_subscriptions_email"`
@@ -343,6 +385,9 @@ func (c StatusPageResourceModelAdapter) ToAPIArgument(model StatusPageResourceMo
 		CustomHeaderHtml:          model.CustomHeaderHtml.ValueString(),
 		CustomFooterHtml:          model.CustomFooterHtml.ValueString(),
 		CustomCss:                 model.CustomCss.ValueString(),
+		CustomHeaderHtmlInspire:   model.CustomHeaderHtmlInspire.ValueString(),
+		CustomFooterHtmlInspire:   model.CustomFooterHtmlInspire.ValueString(),
+		CustomCssInspire:          model.CustomCssInspire.ValueString(),
 		CompanyWebsiteUrl:         model.CompanyWebsiteUrl.ValueString(),
 		Timezone:                  model.Timezone.ValueString(),
 		AllowSubscriptionsEmail:   model.AllowSubscriptionsEmail.ValueBool(),
@@ -392,6 +437,9 @@ func (c StatusPageResourceModelAdapter) FromAPIResult(api upapi.StatusPage) (*St
 		CustomHeaderHtml:          types.StringValue(api.CustomHeaderHtml),
 		CustomFooterHtml:          types.StringValue(api.CustomFooterHtml),
 		CustomCss:                 types.StringValue(api.CustomCss),
+		CustomHeaderHtmlInspire:   types.StringValue(api.CustomHeaderHtmlInspire),
+		CustomFooterHtmlInspire:   types.StringValue(api.CustomFooterHtmlInspire),
+		CustomCssInspire:          types.StringValue(api.CustomCssInspire),
 		CompanyWebsiteUrl:         types.StringValue(api.CompanyWebsiteUrl),
 		Timezone:                  types.StringValue(api.Timezone),
 		AllowSubscriptionsEmail:   types.BoolValue(api.AllowSubscriptionsEmail),
