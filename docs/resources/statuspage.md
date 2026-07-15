@@ -56,10 +56,13 @@ resource "uptime_statuspage" "public" {
 - `cname` (String)
 - `company_website_url` (String)
 - `contact_email` (String)
-- `custom_css` (String)
-- `custom_footer_html` (String)
+- `custom_css` (String) Custom CSS rendered only under the LEGACY theme. API-managed status pages use the INSPIRE theme, so use custom_css_inspire instead.
+- `custom_css_inspire` (String) Custom CSS rendered on the status page under the INSPIRE theme (the theme used by all API-managed status pages).
+- `custom_footer_html` (String) Custom footer HTML rendered only under the LEGACY theme. API-managed status pages use the INSPIRE theme, so use custom_footer_html_inspire instead.
+- `custom_footer_html_inspire` (String) Custom footer HTML rendered on the status page under the INSPIRE theme (the theme used by all API-managed status pages).
 - `custom_header_bg_color_hex` (String)
-- `custom_header_html` (String)
+- `custom_header_html` (String) Custom header HTML rendered only under the LEGACY theme. API-managed status pages use the INSPIRE theme, so use custom_header_html_inspire instead.
+- `custom_header_html_inspire` (String) Custom header HTML rendered on the status page under the INSPIRE theme (the theme used by all API-managed status pages).
 - `custom_header_text_color_hex` (String)
 - `default_history_date_range` (Number)
 - `description` (String)
