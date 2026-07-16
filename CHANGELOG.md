@@ -1,5 +1,27 @@
 # Uptime.com Terraform provider changelog
 
+## v2.30.0
+
+Bug Fixes:
+* `uptime_check_http` now preserves the exact case of header names as echoed by the API.
+  Headers previously round-tripped through `textproto.ReadMIMEHeader`, which canonicalizes
+  keys (e.g. `SOME-Header` -> `Some-Header`); because `headers` is Optional+Computed, this
+  tripped Terraform's plan/result consistency check with "inconsistent result after apply"
+  (#250, #252).
+* `uptime_statuspage` now exposes the INSPIRE-theme custom branding fields
+  (`custom_header_html_inspire`, `custom_footer_html_inspire`, `custom_css_inspire`). Status
+  pages managed through the Uptime API always use the INSPIRE theme, so the plain `custom_*`
+  fields (LEGACY theme) applied but never rendered. A plan-time warning on the plain fields
+  now points users to the `*_inspire` variants (#251).
+* `uptime_service_variable` now treats an empty API result (ID 0) as gone, not just a
+  soft-deleted link. Removing a vault/credential from a check in the UI is a hard delete, so
+  a later read returned HTTP 200 with an empty body; the resource previously stayed in state
+  with ID 0 and the next apply no-op'd instead of recreating the link. Read now drops the
+  resource so the next apply recreates it (SYS-1284, #249).
+
+Dependency Updates:
+* Bump `golang.org/x/crypto` from 0.51.0 to 0.52.0 (#248).
+
 ## v2.29.0
 
 New Data Sources:
