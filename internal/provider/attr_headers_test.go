@@ -29,6 +29,12 @@ func TestHeadersAttributeAdapter_HeadersAttributeContext(t *testing.T) {
 				"Foo: Baz\r\n" +
 				"Qux: Quux\r\n",
 		},
+		"non-canonical case preserved": {
+			arg: types.MapValueMust(HeadersType.ElementType(), map[string]attr.Value{
+				"SOME-Header": types.ListValueMust(types.StringType, []attr.Value{types.StringValue("value1")}),
+			}),
+			expect: "SOME-Header: value1\r\n",
+		},
 		"null": {
 			arg: types.MapNull(HeadersType.ElementType()),
 		},
@@ -76,9 +82,20 @@ func TestHeadersAttributeAdapter_HeadersAttributeValue(t *testing.T) {
 				"Qux": types.ListValueMust(types.StringType, []attr.Value{types.StringValue("Quux")}),
 			}),
 		},
+		"non-canonical case preserved": {
+			arg: "SOME-Header: value1\r\n",
+			expect: types.MapValueMust(HeadersType.ElementType(), map[string]attr.Value{
+				"SOME-Header": types.ListValueMust(types.StringType, []attr.Value{types.StringValue("value1")}),
+			}),
+		},
 		"empty": {
 			arg:    "",
 			expect: types.MapValueMust(HeadersType.ElementType(), map[string]attr.Value{}),
+		},
+		"malformed": {
+			arg:         "no-colon-here\r\n",
+			expect:      types.MapNull(HeadersType.ElementType()),
+			expectError: true,
 		},
 	}
 

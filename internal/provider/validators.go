@@ -62,6 +62,35 @@ func (v *oneOfStringValidator) ValidateString(_ context.Context, rq validator.St
 	}
 }
 
+// LegacyOnlyBrandingWarningValidator warns that a status page custom-branding
+// field is rendered only under the LEGACY theme. Status pages managed through the
+// Uptime API always use the INSPIRE theme, so setting this field is stored but has
+// no visible effect; the caller should set the *_inspire variant instead.
+func LegacyOnlyBrandingWarningValidator(inspireAttr string) validator.String {
+	return legacyOnlyBrandingWarningValidator{inspireAttr: inspireAttr}
+}
+
+type legacyOnlyBrandingWarningValidator struct {
+	zoyaDescriber
+	inspireAttr string
+}
+
+func (v legacyOnlyBrandingWarningValidator) ValidateString(_ context.Context, rq validator.StringRequest, rs *validator.StringResponse) {
+	if rq.ConfigValue.IsNull() || rq.ConfigValue.IsUnknown() || rq.ConfigValue.ValueString() == "" {
+		return
+	}
+	rs.Diagnostics.AddAttributeWarning(
+		rq.Path,
+		"Custom branding is not rendered under the INSPIRE theme",
+		fmt.Sprintf(
+			"Status pages managed through the Uptime API always use the INSPIRE theme, "+
+				"which renders only the %q attribute. The value set here is stored but will "+
+				"not be displayed on the status page. Set %q instead to apply custom branding.",
+			v.inspireAttr, v.inspireAttr,
+		),
+	)
+}
+
 func HostnameValidator() validator.String {
 	return hostnameValidator{}
 }

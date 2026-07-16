@@ -90,9 +90,10 @@ Set to an empty list to disable notifications at this level and rely on parent c
 - `encryption` (String) Whether to verify SSL/TLS certificates
 - `expect_string` (String)
 - `expect_string_type` (String) Valid values for this property are: "STRING" - exact match, "REGEX" - match by regular expression, "INVERSE_REGEX" - fail if the regular expression matches
-- `headers` (Map of List of String) A map of HTTP headers where each header name maps to a list of values. 
-Header names are case-insensitive. Multiple values for the same header are supported 
-(e.g., { 'Accept': ['application/json', 'text/plain'] }). Defaults to an empty map if not specified.
+- `headers` (Map of List of String) A map of HTTP headers where each header name maps to a list of values.
+Header names are stored exactly as written; their casing is preserved. Multiple values for the
+same header are supported (e.g., { 'Accept': ['application/json', 'text/plain'] }). Defaults to an
+empty map if not specified.
 - `include_in_global_metrics` (Boolean) Include this check in uptime/response time calculations for the dashboard and status pages
 - `interval` (Number) The interval between checks in minutes
 - `is_paused` (Boolean)

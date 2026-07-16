@@ -4,9 +4,52 @@ import (
 	"testing"
 
 	petname "github.com/dustinkirkland/golang-petname"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
+
+	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
+
+// TestStatusPageAdapterCustomBrandingRoundTrip pins the mapping of the LEGACY and
+// INSPIRE custom-branding fields in both directions. Distinct values per field
+// guard against copy-paste swaps between the near-identical mapping lines.
+func TestStatusPageAdapterCustomBrandingRoundTrip(t *testing.T) {
+	a := StatusPageResourceModelAdapter{}
+	m := StatusPageResourceModel{
+		CustomHeaderHtml:        types.StringValue("legacy-header"),
+		CustomFooterHtml:        types.StringValue("legacy-footer"),
+		CustomCss:               types.StringValue("legacy-css"),
+		CustomHeaderHtmlInspire: types.StringValue("inspire-header"),
+		CustomFooterHtmlInspire: types.StringValue("inspire-footer"),
+		CustomCssInspire:        types.StringValue("inspire-css"),
+	}
+	arg, err := a.ToAPIArgument(m)
+	require.NoError(t, err)
+	require.Equal(t, "legacy-header", arg.CustomHeaderHtml)
+	require.Equal(t, "legacy-footer", arg.CustomFooterHtml)
+	require.Equal(t, "legacy-css", arg.CustomCss)
+	require.Equal(t, "inspire-header", arg.CustomHeaderHtmlInspire)
+	require.Equal(t, "inspire-footer", arg.CustomFooterHtmlInspire)
+	require.Equal(t, "inspire-css", arg.CustomCssInspire)
+
+	back, err := a.FromAPIResult(upapi.StatusPage{
+		CustomHeaderHtml:        "legacy-header",
+		CustomFooterHtml:        "legacy-footer",
+		CustomCss:               "legacy-css",
+		CustomHeaderHtmlInspire: "inspire-header",
+		CustomFooterHtmlInspire: "inspire-footer",
+		CustomCssInspire:        "inspire-css",
+	})
+	require.NoError(t, err)
+	require.Equal(t, "legacy-header", back.CustomHeaderHtml.ValueString())
+	require.Equal(t, "legacy-footer", back.CustomFooterHtml.ValueString())
+	require.Equal(t, "legacy-css", back.CustomCss.ValueString())
+	require.Equal(t, "inspire-header", back.CustomHeaderHtmlInspire.ValueString())
+	require.Equal(t, "inspire-footer", back.CustomFooterHtmlInspire.ValueString())
+	require.Equal(t, "inspire-css", back.CustomCssInspire.ValueString())
+}
 
 // TODO: Extend the test to cover more fields
 func TestAccStatusPageResource(t *testing.T) {
@@ -73,6 +116,9 @@ func TestAccStatusPageExtendedResource(t *testing.T) {
 					"theme":                        config.StringVariable("INSPIRE"),
 					"custom_header_bg_color_hex":   config.StringVariable("#000000"),
 					"custom_header_text_color_hex": config.StringVariable("#FFFFFF"),
+					"custom_header_html_inspire":   config.StringVariable("<header>hello</header>"),
+					"custom_footer_html_inspire":   config.StringVariable("<footer>bye</footer>"),
+					"custom_css_inspire":           config.StringVariable("color: red;"),
 				},
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("uptime_statuspage.test", "name", names[0]),
@@ -86,6 +132,9 @@ func TestAccStatusPageExtendedResource(t *testing.T) {
 					resource.TestCheckResourceAttr("uptime_statuspage.test", "theme", "INSPIRE"),
 					resource.TestCheckResourceAttr("uptime_statuspage.test", "custom_header_bg_color_hex", "#000000"),
 					resource.TestCheckResourceAttr("uptime_statuspage.test", "custom_header_text_color_hex", "#FFFFFF"),
+					resource.TestCheckResourceAttr("uptime_statuspage.test", "custom_header_html_inspire", "<header>hello</header>"),
+					resource.TestCheckResourceAttr("uptime_statuspage.test", "custom_footer_html_inspire", "<footer>bye</footer>"),
+					resource.TestCheckResourceAttr("uptime_statuspage.test", "custom_css_inspire", "color: red;"),
 				),
 			},
 			{
@@ -102,6 +151,9 @@ func TestAccStatusPageExtendedResource(t *testing.T) {
 					"theme":                        config.StringVariable("INSPIRE"),
 					"custom_header_bg_color_hex":   config.StringVariable("#FFFFFF"),
 					"custom_header_text_color_hex": config.StringVariable("#000000"),
+					"custom_header_html_inspire":   config.StringVariable(""),
+					"custom_footer_html_inspire":   config.StringVariable(""),
+					"custom_css_inspire":           config.StringVariable(""),
 				},
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("uptime_statuspage.test", "name", names[1]),
@@ -115,6 +167,9 @@ func TestAccStatusPageExtendedResource(t *testing.T) {
 					resource.TestCheckResourceAttr("uptime_statuspage.test", "theme", "INSPIRE"),
 					resource.TestCheckResourceAttr("uptime_statuspage.test", "custom_header_bg_color_hex", "#FFFFFF"),
 					resource.TestCheckResourceAttr("uptime_statuspage.test", "custom_header_text_color_hex", "#000000"),
+					resource.TestCheckResourceAttr("uptime_statuspage.test", "custom_header_html_inspire", ""),
+					resource.TestCheckResourceAttr("uptime_statuspage.test", "custom_footer_html_inspire", ""),
+					resource.TestCheckResourceAttr("uptime_statuspage.test", "custom_css_inspire", ""),
 				),
 			},
 		},

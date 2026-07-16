@@ -228,6 +228,19 @@ func TestAccCheckHTTPResource_Headers(t *testing.T) {
 				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.Qux.0", "Quux"),
 			),
 		},
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/headers"),
+			ConfigVariables: config.Variables{
+				"name": config.StringVariable(name),
+				"headers": config.MapVariable(map[string]config.Variable{
+					"SOME-Header": config.ListVariable(config.StringVariable("value1")),
+				}),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.SOME-Header.#", "1"),
+				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.SOME-Header.0", "value1"),
+			),
+		},
 	}))
 }
 

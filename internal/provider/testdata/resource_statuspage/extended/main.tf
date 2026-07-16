@@ -42,6 +42,18 @@ variable "custom_header_text_color_hex" {
   type = string
 }
 
+variable "custom_header_html_inspire" {
+  type = string
+}
+
+variable "custom_footer_html_inspire" {
+  type = string
+}
+
+variable "custom_css_inspire" {
+  type = string
+}
+
 resource "uptime_statuspage" "test" {
   name                         = var.name
   allow_subscriptions_email    = var.allow_subscriptions_email
@@ -54,4 +66,7 @@ resource "uptime_statuspage" "test" {
   theme                        = var.theme
   custom_header_bg_color_hex   = var.custom_header_bg_color_hex
   custom_header_text_color_hex = var.custom_header_text_color_hex
+  custom_header_html_inspire   = var.custom_header_html_inspire
+  custom_footer_html_inspire   = var.custom_footer_html_inspire
+  custom_css_inspire           = var.custom_css_inspire
 }
