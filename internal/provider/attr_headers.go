@@ -5,9 +5,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"net/http"
-	"net/textproto"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -15,14 +13,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/pkg/errors"
 )
 
 func HeadersSchemaAttribute() schema.Attribute {
 	return schema.MapAttribute{
-		Description: `A map of HTTP headers where each header name maps to a list of values. 
-Header names are case-insensitive. Multiple values for the same header are supported 
-(e.g., { 'Accept': ['application/json', 'text/plain'] }). Defaults to an empty map if not specified.`,
+		Description: `A map of HTTP headers where each header name maps to a list of values.
+Header names are stored exactly as written; their casing is preserved. Multiple values for the
+same header are supported (e.g., { 'Accept': ['application/json', 'text/plain'] }). Defaults to an
+empty map if not specified.`,
 		ElementType: types.ListType{
 			ElemType: types.StringType,
 		},
@@ -64,18 +62,26 @@ func (a HeadersAttributeAdapter) HeadersAttributeValue(in string) (types.Map, er
 	if strings.TrimSpace(in) == "" {
 		return types.MapValueMust(HeadersType.ElementType(), map[string]attr.Value{}), nil
 	}
-	tp := textproto.NewReader(bufio.NewReader(bytes.NewBufferString(in)))
-	header, err := tp.ReadMIMEHeader()
-	if err != nil && !errors.Is(err, io.EOF) {
+	values := make(map[string][]attr.Value)
+	scanner := bufio.NewScanner(strings.NewReader(in))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
+		idx := strings.IndexByte(line, ':')
+		if idx < 0 {
+			return types.MapNull(HeadersType.ElementType()), fmt.Errorf("malformed header line: %q", line)
+		}
+		name := line[:idx]
+		value := strings.TrimSpace(line[idx+1:])
+		values[name] = append(values[name], types.StringValue(value))
+	}
+	if err := scanner.Err(); err != nil {
 		return types.MapNull(HeadersType.ElementType()), err
 	}
-	elems := make(map[string]attr.Value)
-	for name := range header {
-		values := header.Values(name)
-		elem := make([]attr.Value, len(values))
-		for i := range values {
-			elem[i] = types.StringValue(values[i])
-		}
+	elems := make(map[string]attr.Value, len(values))
+	for name, elem := range values {
 		elems[name] = types.ListValueMust(types.StringType, elem)
 	}
 	return types.MapValueMust(HeadersType.ElementType(), elems), nil
