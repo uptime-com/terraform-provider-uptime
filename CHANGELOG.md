@@ -1,5 +1,15 @@
 # Uptime.com Terraform provider changelog
 
+## Unreleased
+
+Bug Fixes:
+* `uptime_service_variable` now fails the apply when a create or update returns no resource ID,
+  instead of writing id 0 into state. The endpoint answers a rejected write with HTTP 200 and an
+  empty results object; because `id` is Computed, Terraform accepted id 0 as a valid apply result,
+  so a rejected write reported success and did nothing. The empty-result handling added in the
+  SYS-1284 follow-up then reads such an entry as gone on every refresh, leaving the plan proposing
+  the same create on every run (SYS-1284 follow-up).
+
 ## v2.29.0
 
 New Data Sources:
