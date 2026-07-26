@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"errors"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -151,6 +152,15 @@ type ServiceVariableResourceAPI struct {
 	provider *providerImpl
 }
 
+// errServiceVariableNoID reports a write the endpoint rejected with HTTP 200 and an
+// empty results object, which decodes to a zero-valued record. Because id is Computed,
+// persisting it would make Terraform accept id 0 as a valid apply result.
+var errServiceVariableNoID = errors.New(
+	"service variable write returned no ID: the API rejected the request without reporting an error status. " +
+		"A variable with this name may already exist on the check; verify variable_name, credential_id, " +
+		"service_id and the configured subaccount",
+)
+
 func (c ServiceVariableResourceAPI) Create(ctx context.Context, arg ServiceVariableWrapper) (*ServiceVariableWrapper, error) {
 	createReq := upapi.ServiceVariableCreateRequest{
 		ServiceID:    arg.ServiceID,
@@ -161,6 +171,9 @@ func (c ServiceVariableResourceAPI) Create(ctx context.Context, arg ServiceVaria
 	result, err := c.provider.api.ServiceVariables().Create(ctx, createReq)
 	if err != nil {
 		return nil, err
+	}
+	if result == nil || result.ID == 0 {
+		return nil, errServiceVariableNoID
 	}
 	// Extract credential_id from nested credential object if not at top level
 	if result.CredentialID == 0 && result.Credential != nil {
@@ -208,6 +221,9 @@ func (c ServiceVariableResourceAPI) Update(ctx context.Context, pk upapi.Primary
 	result, err := c.provider.api.ServiceVariables().Update(ctx, pk, updateReq)
 	if err != nil {
 		return nil, err
+	}
+	if result == nil || result.ID == 0 {
+		return nil, errServiceVariableNoID
 	}
 	// Extract credential_id from nested credential object if not at top level
 	if result.CredentialID == 0 && result.Credential != nil {
