@@ -51,6 +51,42 @@ func TestStatusPageAdapterCustomBrandingRoundTrip(t *testing.T) {
 	require.Equal(t, "inspire-css", back.CustomCssInspire.ValueString())
 }
 
+// TestStatusPageAdapterPreserveAuthPassword verifies that auth_password is carried
+// from the plan into the result, since the API never returns the write-only secret.
+// Without this the empty API response would clobber the planned value and Terraform
+// would fail the apply with "inconsistent values for sensitive attribute".
+func TestStatusPageAdapterPreserveAuthPassword(t *testing.T) {
+	a := StatusPageResourceModelAdapter{}
+
+	t.Run("known plan value is preserved over empty API result", func(t *testing.T) {
+		plan := &StatusPageResourceModel{AuthPassword: types.StringValue("s3cret")}
+		result := &StatusPageResourceModel{AuthPassword: types.StringValue("")}
+		got := a.PreservePlanValues(result, plan)
+		require.Equal(t, "s3cret", got.AuthPassword.ValueString())
+	})
+
+	t.Run("null plan value leaves result untouched", func(t *testing.T) {
+		plan := &StatusPageResourceModel{AuthPassword: types.StringNull()}
+		result := &StatusPageResourceModel{AuthPassword: types.StringValue("")}
+		got := a.PreservePlanValues(result, plan)
+		require.Equal(t, "", got.AuthPassword.ValueString())
+	})
+
+	t.Run("unknown plan value is not copied into result", func(t *testing.T) {
+		plan := &StatusPageResourceModel{AuthPassword: types.StringUnknown()}
+		result := &StatusPageResourceModel{AuthPassword: types.StringValue("")}
+		got := a.PreservePlanValues(result, plan)
+		require.False(t, got.AuthPassword.IsUnknown())
+		require.Equal(t, "", got.AuthPassword.ValueString())
+	})
+
+	t.Run("nil arguments are safe", func(t *testing.T) {
+		require.Nil(t, a.PreservePlanValues(nil, &StatusPageResourceModel{}))
+		result := &StatusPageResourceModel{AuthPassword: types.StringValue("keep")}
+		require.Equal(t, result, a.PreservePlanValues(result, nil))
+	})
+}
+
 // TODO: Extend the test to cover more fields
 func TestAccStatusPageResource(t *testing.T) {
 	names := [2]string{
