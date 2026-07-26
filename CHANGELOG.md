@@ -9,6 +9,10 @@ Bug Fixes:
   so a rejected write reported success and did nothing. The empty-result handling added in the
   SYS-1284 follow-up then reads such an entry as gone on every refresh, leaving the plan proposing
   the same create on every run (SYS-1284 follow-up).
+* `uptime_statuspage` no longer fails the apply with "Provider produced inconsistent result after
+  apply: .auth_password: inconsistent values for sensitive attribute" when `auth_password` is set.
+  The password is a write-only secret the API never returns, so the provider now preserves the
+  planned value instead of writing the empty API response back to state (SYS-1301).
 
 ## v2.29.0
 
