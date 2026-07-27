@@ -92,25 +92,59 @@ func TestServiceVariablePreserveReadValues(t *testing.T) {
 	}
 }
 
-// stubServiceVariablesAPI embeds upapi.API and overrides only ServiceVariables so
-// the Read path can be exercised without a live client. The embedded endpoint
-// leaves every method but Get unimplemented (they panic if called).
+// stubServiceVariablesAPI embeds upapi.API and overrides only ServiceVariables so the
+// CRUD paths can be exercised without a live client. Get returns get; Create and Update
+// return write, or err when it is set. Every other method is left unimplemented by the
+// embedded interface and panics if called.
+//
+// The real client never answers (nil, nil) - endpointCreatorImpl always returns either an
+// error or a record - so a test that leaves get or write nil would panic inside provider
+// code rather than here. The accessors reject that up front to keep the panic local.
 type stubServiceVariablesAPI struct {
 	upapi.API
-	get *upapi.ServiceVariable
+	get   *upapi.ServiceVariable
+	write *upapi.ServiceVariable
+	err   error
 }
 
 func (s stubServiceVariablesAPI) ServiceVariables() upapi.ServiceVariablesEndpoint {
-	return stubServiceVariablesEndpoint{get: s.get}
+	return stubServiceVariablesEndpoint{get: s.get, write: s.write, err: s.err}
 }
 
 type stubServiceVariablesEndpoint struct {
 	upapi.ServiceVariablesEndpoint
-	get *upapi.ServiceVariable
+	get   *upapi.ServiceVariable
+	write *upapi.ServiceVariable
+	err   error
 }
 
 func (s stubServiceVariablesEndpoint) Get(context.Context, upapi.PrimaryKeyable) (*upapi.ServiceVariable, error) {
+	if s.get == nil {
+		panic("stubServiceVariablesEndpoint: Get called but get is not set")
+	}
 	return s.get, nil
+}
+
+func (s stubServiceVariablesEndpoint) Create(
+	context.Context, upapi.ServiceVariableCreateRequest,
+) (*upapi.ServiceVariable, error) {
+	return s.writeResult("Create")
+}
+
+func (s stubServiceVariablesEndpoint) Update(
+	context.Context, upapi.PrimaryKeyable, upapi.ServiceVariableUpdateRequest,
+) (*upapi.ServiceVariable, error) {
+	return s.writeResult("Update")
+}
+
+func (s stubServiceVariablesEndpoint) writeResult(op string) (*upapi.ServiceVariable, error) {
+	if s.err != nil {
+		return nil, s.err
+	}
+	if s.write == nil {
+		panic("stubServiceVariablesEndpoint: " + op + " called but write is not set")
+	}
+	return s.write, nil
 }
 
 // TestServiceVariableReadDeletedDrift verifies that a link the API reports as
@@ -176,6 +210,118 @@ func TestServiceVariableReadLive(t *testing.T) {
 	if got.ServiceID != 7 {
 		t.Errorf("service_id: got %d, want 7 (preserved from prior state)", got.ServiceID)
 	}
+}
+
+// TestServiceVariableWriteMissingID verifies that a write whose response carries no ID is
+// reported as an error instead of being persisted. The endpoint answers a rejected write
+// with HTTP 200 and an empty results object; because id is Computed, Terraform would accept
+// the resulting id 0 as a valid apply result and the failure would only surface later, as a
+// refresh that reads the resource as gone and recreates it on every plan.
+func TestServiceVariableWriteMissingID(t *testing.T) {
+	api := ServiceVariableResourceAPI{provider: &providerImpl{
+		api: stubServiceVariablesAPI{write: &upapi.ServiceVariable{ID: 0}},
+	}}
+	arg := ServiceVariableWrapper{
+		ServiceID: 7,
+		ServiceVariable: upapi.ServiceVariable{
+			CredentialID: 99,
+			PropertyName: "secret",
+			VariableName: "token_arya_sanity",
+		},
+	}
+
+	t.Run("create", func(t *testing.T) {
+		got, err := api.Create(context.Background(), arg)
+		if !errors.Is(err, errServiceVariableNoID) {
+			t.Fatalf("Create with empty result: got err %v, want errServiceVariableNoID", err)
+		}
+		if got != nil {
+			t.Errorf("Create with empty result: got %+v, want nil so id 0 is never persisted", got)
+		}
+		if isNotFoundError(err) {
+			t.Error("isNotFoundError = true, want false: a failed write must surface as an " +
+				"apply error, not silently drop the resource from state")
+		}
+	})
+
+	t.Run("update", func(t *testing.T) {
+		got, err := api.Update(context.Background(), ServiceVariableResourceModel{ID: types.Int64Value(42)}, arg)
+		if !errors.Is(err, errServiceVariableNoID) {
+			t.Fatalf("Update with empty result: got err %v, want errServiceVariableNoID", err)
+		}
+		if got != nil {
+			t.Errorf("Update with empty result: got %+v, want nil so id 0 is never persisted", got)
+		}
+		if isNotFoundError(err) {
+			t.Error("isNotFoundError = true, want false: a failed write must surface as an " +
+				"apply error, not silently drop the resource from state")
+		}
+	})
+}
+
+// TestServiceVariableWriteLive verifies the guard does not reject a normal write, that
+// credential_id is still recovered from the nested credential object, and that service_id
+// is carried over from the request - the API does not echo it back.
+func TestServiceVariableWriteLive(t *testing.T) {
+	api := ServiceVariableResourceAPI{provider: &providerImpl{
+		api: stubServiceVariablesAPI{write: &upapi.ServiceVariable{
+			ID:           42,
+			Credential:   &upapi.ServiceVariableCredential{ID: 99},
+			PropertyName: "secret",
+			VariableName: "token_arya_sanity",
+		}},
+	}}
+	arg := ServiceVariableWrapper{ServiceID: 7}
+
+	assert := func(t *testing.T, got *ServiceVariableWrapper, err error) {
+		t.Helper()
+		if err != nil {
+			t.Fatalf("write of live link: unexpected error %v", err)
+		}
+		if got.ID != 42 {
+			t.Errorf("id: got %d, want 42", got.ID)
+		}
+		if got.CredentialID != 99 {
+			t.Errorf("credential_id: got %d, want 99 (recovered from nested credential)", got.CredentialID)
+		}
+		if got.ServiceID != 7 {
+			t.Errorf("service_id: got %d, want 7 (preserved from the request)", got.ServiceID)
+		}
+	}
+
+	t.Run("create", func(t *testing.T) {
+		got, err := api.Create(context.Background(), arg)
+		assert(t, got, err)
+	})
+
+	t.Run("update", func(t *testing.T) {
+		got, err := api.Update(context.Background(), ServiceVariableResourceModel{ID: types.Int64Value(42)}, arg)
+		assert(t, got, err)
+	})
+}
+
+// TestServiceVariableWriteError verifies that a genuine client error is returned as-is and
+// not masked by the empty-result guard, which would misreport the cause of the failure.
+func TestServiceVariableWriteError(t *testing.T) {
+	apiErr := errors.New("connection refused")
+	api := ServiceVariableResourceAPI{provider: &providerImpl{
+		api: stubServiceVariablesAPI{err: apiErr},
+	}}
+
+	t.Run("create", func(t *testing.T) {
+		_, err := api.Create(context.Background(), ServiceVariableWrapper{ServiceID: 7})
+		if !errors.Is(err, apiErr) {
+			t.Fatalf("Create: got err %v, want the client error", err)
+		}
+	})
+
+	t.Run("update", func(t *testing.T) {
+		_, err := api.Update(context.Background(), ServiceVariableResourceModel{ID: types.Int64Value(42)},
+			ServiceVariableWrapper{ServiceID: 7})
+		if !errors.Is(err, apiErr) {
+			t.Fatalf("Update: got err %v, want the client error", err)
+		}
+	})
 }
 
 func TestAccServiceVariableResource(t *testing.T) {

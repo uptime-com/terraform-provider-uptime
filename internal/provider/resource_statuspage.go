@@ -455,6 +455,24 @@ func (c StatusPageResourceModelAdapter) FromAPIResult(api upapi.StatusPage) (*St
 	return &model, nil
 }
 
+// PreservePlanValues keeps auth_password from the plan (or, on refresh, from prior
+// state) because the API accepts the password on write but never returns it on read.
+// Without this the empty API response would overwrite the known planned value, and
+// Terraform would reject the apply with "inconsistent values for sensitive attribute".
+// A password changed out-of-band in the UI is therefore not detected as drift - that
+// is inherent to a write-only secret the API does not return.
+func (c StatusPageResourceModelAdapter) PreservePlanValues(
+	result *StatusPageResourceModel, plan *StatusPageResourceModel,
+) *StatusPageResourceModel {
+	if result == nil || plan == nil {
+		return result
+	}
+	if !plan.AuthPassword.IsNull() && !plan.AuthPassword.IsUnknown() {
+		result.AuthPassword = plan.AuthPassword
+	}
+	return result
+}
+
 type StatusPageResourceAPI struct {
 	provider *providerImpl
 }

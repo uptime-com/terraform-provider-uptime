@@ -1,5 +1,19 @@
 # Uptime.com Terraform provider changelog
 
+## v2.31.0
+
+Bug Fixes:
+* `uptime_service_variable` now fails the apply when a create or update returns no resource ID,
+  instead of writing id 0 into state. The endpoint answers a rejected write with HTTP 200 and an
+  empty results object; because `id` is Computed, Terraform accepted id 0 as a valid apply result,
+  so a rejected write reported success and did nothing. The empty-result handling added in the
+  SYS-1284 follow-up then reads such an entry as gone on every refresh, leaving the plan proposing
+  the same create on every run (SYS-1284 follow-up).
+* `uptime_statuspage` no longer fails the apply with "Provider produced inconsistent result after
+  apply: .auth_password: inconsistent values for sensitive attribute" when `auth_password` is set.
+  The password is a write-only secret the API never returns, so the provider now preserves the
+  planned value instead of writing the empty API response back to state (SYS-1301).
+
 ## v2.30.0
 
 Bug Fixes:
