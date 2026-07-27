@@ -1,6 +1,6 @@
 # Uptime.com Terraform provider changelog
 
-## Unreleased
+## v2.31.0
 
 Bug Fixes:
 * `uptime_service_variable` now fails the apply when a create or update returns no resource ID,
