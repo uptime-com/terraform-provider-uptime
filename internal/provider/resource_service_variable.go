@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -19,11 +20,13 @@ import (
 // Service variables allow you to securely inject credential properties into check configurations
 // without exposing sensitive values. This is useful for authentication, API tokens, certificates,
 // and other sensitive data that checks need to access.
+//
+// Import uses the composite ID "service_id:variable_id"; see importServiceVariableState.
 func NewServiceVariableResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[ServiceVariableResourceModel, ServiceVariableWrapper, ServiceVariableWrapper]{
-		api: ServiceVariableResourceAPI{provider: p},
-		mod: ServiceVariableResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[ServiceVariableResourceModel, ServiceVariableWrapper, ServiceVariableWrapper](
+		ServiceVariableResourceAPI{provider: p},
+		ServiceVariableResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "service_variable",
 			Schema: schema.Schema{
 				Description: "Links a credential property to a check/service, allowing secure injection of sensitive values into check configurations.",
@@ -59,6 +62,57 @@ func NewServiceVariableResource(_ context.Context, p *providerImpl) resource.Res
 				},
 			},
 		},
+		importServiceVariableState(p),
+	)
+}
+
+// importServiceVariableState imports a service variable by "service_id:variable_id".
+//
+// The composite form is required because the API never returns service_id: Read sources
+// it from state, and it is Required + RequiresReplace, so importing by variable ID alone
+// would leave it at zero and make the very next plan propose a replacement.
+//
+// Nothing server-side ties the two halves together - the GET is keyed by variable ID
+// alone - so a mistyped service_id would otherwise be accepted and only surface later as
+// that same silent replacement, destroying and recreating the link. Two extra reads at
+// import time buy that check: the variable names its owning check in `service`, and the
+// check named by service_id reports its own name, so a mismatch is caught up front.
+// Import is a one-off operation, so the extra requests do not affect plan or apply.
+func importServiceVariableState(
+	p *providerImpl,
+) func(context.Context, resource.ImportStateRequest, *resource.ImportStateResponse) {
+	return func(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+		serviceID, variableID, err := ParseCompositeID(req.ID, "service_id")
+		if err != nil {
+			resp.Diagnostics.AddError("Invalid Import ID", err.Error())
+			return
+		}
+
+		variable, err := p.api.ServiceVariables().Get(ctx, upapi.PrimaryKey(variableID))
+		if err != nil {
+			resp.Diagnostics.AddError("Service Variable Not Found",
+				fmt.Sprintf("could not read service variable %d: %s", variableID, err.Error()))
+			return
+		}
+		check, err := p.api.Checks().Get(ctx, upapi.PrimaryKey(serviceID))
+		if err != nil {
+			resp.Diagnostics.AddError("Check Not Found",
+				fmt.Sprintf("could not read check %d named by service_id: %s", serviceID, err.Error()))
+			return
+		}
+
+		// Only a positive mismatch is rejected: `service` is omitempty on both sides, and
+		// refusing an import because a name came back blank would be worse than importing.
+		if variable.Service != "" && check.Name != "" && variable.Service != check.Name {
+			resp.Diagnostics.AddError("Import ID Mismatch", fmt.Sprintf(
+				"service variable %d belongs to check %q, but service_id %d is check %q. "+
+					"Use the ID of the check that owns the variable.",
+				variableID, variable.Service, serviceID, check.Name))
+			return
+		}
+
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("service_id"), serviceID)...)
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), variableID)...)
 	}
 }
 
@@ -186,8 +240,13 @@ func (c ServiceVariableResourceAPI) Create(ctx context.Context, arg ServiceVaria
 }
 
 func (c ServiceVariableResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*ServiceVariableWrapper, error) {
-	// Extract ServiceID from the wrapper
-	wrapper := pk.(ServiceVariableResourceModel)
+	// service_id is not part of the API response, so it can only come from state - which
+	// is why import must carry it. ServiceVariableWrapper also implements PrimaryKeyable,
+	// so assert rather than panic if a caller ever passes the wrong one.
+	model, ok := pk.(ServiceVariableResourceModel)
+	if !ok {
+		return nil, fmt.Errorf("service variable read: expected %T, got %T", model, pk)
+	}
 	result, err := c.provider.api.ServiceVariables().Get(ctx, pk)
 	if err != nil {
 		return nil, err
@@ -207,7 +266,7 @@ func (c ServiceVariableResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKe
 	}
 	return &ServiceVariableWrapper{
 		ServiceVariable: *result,
-		ServiceID:       wrapper.ServiceID.ValueInt64(),
+		ServiceID:       model.ServiceID.ValueInt64(),
 	}, nil
 }
 
@@ -237,8 +296,4 @@ func (c ServiceVariableResourceAPI) Update(ctx context.Context, pk upapi.Primary
 
 func (c ServiceVariableResourceAPI) Delete(ctx context.Context, pk upapi.PrimaryKeyable) error {
 	return c.provider.api.ServiceVariables().Delete(ctx, pk)
-}
-
-func (c ServiceVariableResourceAPI) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
