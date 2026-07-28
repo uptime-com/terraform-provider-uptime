@@ -74,6 +74,18 @@ func TestParseCompositeID(t *testing.T) {
 			id:      "-7:456",
 			wantErr: true,
 		},
+		{
+			// upapi.PrimaryKey is an int and the provider ships 386/arm builds, so an
+			// oversized id would truncate and address a different record.
+			name:    "parent ID beyond int64",
+			id:      "99999999999999999999:456",
+			wantErr: true,
+		},
+		{
+			name:    "resource ID beyond int64",
+			id:      "123:99999999999999999999",
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {

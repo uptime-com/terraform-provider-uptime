@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 
@@ -23,22 +24,35 @@ func ParseCompositeID(id string, parentAttr string) (parentID int64, resourceID 
 	if err != nil {
 		return 0, 0, fmt.Errorf("invalid %s '%s': %w", parentAttr, parts[0], err)
 	}
-	if parentID < 1 {
-		return 0, 0, fmt.Errorf("invalid %s '%s': must be a positive integer", parentAttr, parts[0])
+	if err := checkIDRange(parentID, parentAttr, parts[0]); err != nil {
+		return 0, 0, err
 	}
 
 	resourceID, err = strconv.ParseInt(parts[1], 10, 64)
 	if err != nil {
 		return 0, 0, fmt.Errorf("invalid resource_id '%s': %w", parts[1], err)
 	}
-	// Database primary keys start at 1, so a non-positive half is always a typo. Rejecting
-	// it here matters most for the resource id: 0 is the value that reads back as "gone",
-	// so an unvalidated 0 would import a resource that every later plan proposes recreating.
-	if resourceID < 1 {
-		return 0, 0, fmt.Errorf("invalid resource_id '%s': must be a positive integer", parts[1])
+	if err := checkIDRange(resourceID, "resource_id", parts[1]); err != nil {
+		return 0, 0, err
 	}
 
 	return parentID, resourceID, nil
+}
+
+// checkIDRange rejects import IDs that cannot be used as a primary key.
+//
+// Database keys start at 1, so a non-positive half is always a typo. It matters most for
+// the resource id: 0 is the value that reads back as "gone", so an unvalidated 0 would
+// import a resource that every later plan proposes recreating.
+//
+// The upper bound is the platform int, not int64, because upapi.PrimaryKey is an int and
+// the provider ships 386 and arm builds - on those a larger id would silently truncate and
+// address a different record.
+func checkIDRange(id int64, attr string, raw string) error {
+	if id < 1 || id > math.MaxInt {
+		return fmt.Errorf("invalid %s '%s': must be a positive integer no larger than %d", attr, raw, math.MaxInt)
+	}
+	return nil
 }
 
 // ImportStateSimpleID handles import for resources with a simple numeric ID.
