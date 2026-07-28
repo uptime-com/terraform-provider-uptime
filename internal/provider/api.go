@@ -209,6 +209,7 @@ func (r APIResource[M, A, R]) Read(ctx context.Context, rq resource.ReadRequest,
 	}
 
 	diags = rs.State.Set(ctx, resultModel)
+	rs.Diagnostics.Append(diags...)
 	if rs.Diagnostics.HasError() {
 		return
 	}

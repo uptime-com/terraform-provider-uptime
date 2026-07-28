@@ -11,6 +11,11 @@ Enhancements:
   replacement. The import verifies that `service_id` names the check that owns the variable, since
   the API keys the lookup on the variable ID alone and would otherwise accept a mistyped parent.
 
+Bug Fixes:
+* Resource refresh no longer discards diagnostics raised while writing the refreshed state. `Read`
+  assigned the result of `State.Set` without appending it, so a failure there was silent, unlike
+  `Create` and `Update`. Affects all resources (SYS-1304).
+
 ## v2.31.0
 
 Bug Fixes:
