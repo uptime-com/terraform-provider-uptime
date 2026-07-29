@@ -1,6 +1,6 @@
 # Uptime.com Terraform provider changelog
 
-## Unreleased
+## v2.32.0
 
 Enhancements:
 * `uptime_service_variable` now supports `terraform import`, using the composite ID
@@ -15,6 +15,9 @@ Bug Fixes:
 * Resource refresh no longer discards diagnostics raised while writing the refreshed state. `Read`
   assigned the result of `State.Set` without appending it, so a failure there was silent, unlike
   `Create` and `Update`. Affects all resources (SYS-1304).
+
+Dependency Updates:
+* Bump `google.golang.org/grpc` from 1.79.3 to 1.82.1 (#254).
 
 ## v2.31.0
 
