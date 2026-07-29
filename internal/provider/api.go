@@ -289,6 +289,12 @@ func NewImportableAPIResource[M APIModel, A, R any](
 	meta APIResourceMetadata,
 	importHandler func(context.Context, resource.ImportStateRequest, *resource.ImportStateResponse),
 ) ImportableAPIResource[M, A, R] {
+	// A nil handler still satisfies resource.ResourceWithImportState, so the resource would
+	// advertise import and panic on the first attempt. Fail at construction, where the
+	// provider's own tests reach it, rather than in a user's terminal.
+	if importHandler == nil {
+		panic("NewImportableAPIResource: nil import handler for " + meta.TypeNameSuffix)
+	}
 	return ImportableAPIResource[M, A, R]{
 		APIResource: APIResource[M, A, R]{
 			api:  api,

@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -12,6 +14,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 )
+
+// exampleResourcesDir holds the per-resource example trees, relative to this package.
+// go test runs the binary in the package directory, so the relative base is stable.
+const exampleResourcesDir = "../../examples/resources"
 
 // resourceImportSupport reports, for every registered resource, whether it implements
 // resource.ResourceWithImportState and whether the docs advertise import for it.
@@ -24,6 +30,14 @@ func resourceImportSupport(t *testing.T) map[string]struct{ implemented, documen
 	ctx := context.Background()
 	p := &providerImpl{}
 
+	// Without this the checks degrade silently: if the examples tree moves, every resource
+	// reads as undocumented, "documented && !implemented" is never true, and the guard that
+	// matters passes green while checking nothing.
+	if _, err := os.Stat(exampleResourcesDir); err != nil {
+		t.Fatalf("cannot locate %s: %v - the import checks derive documented support from "+
+			"that tree and would silently pass if it moved", exampleResourcesDir, err)
+	}
+
 	out := make(map[string]struct{ implemented, documented bool })
 	for _, newResource := range p.Resources(ctx) {
 		r := newResource()
@@ -31,7 +45,7 @@ func resourceImportSupport(t *testing.T) map[string]struct{ implemented, documen
 		r.Metadata(ctx, fwresource.MetadataRequest{ProviderTypeName: "uptime"}, &metaResp)
 
 		_, implemented := r.(fwresource.ResourceWithImportState)
-		_, err := os.Stat(filepath.Join("..", "..", "examples", "resources", metaResp.TypeName, "import.sh"))
+		_, err := os.Stat(filepath.Join(exampleResourcesDir, metaResp.TypeName, "import.sh"))
 		if err != nil && !os.IsNotExist(err) {
 			t.Fatalf("stat import example for %s: %v", metaResp.TypeName, err)
 		}
@@ -60,10 +74,76 @@ func TestResourceImportDocsMatchCode(t *testing.T) {
 	}
 }
 
-// TestSimpleImportWritesKeyAttribute runs the import handler of the resources that key on a
-// single numeric attribute against their real schema. uptime_check_maintenance is the reason
-// this is worth asserting: it keys on check_id and has no id attribute, so the generic "id"
-// handler would write to an attribute that does not exist and fail only at import time.
+// importsNeedingLiveAPI lists resources whose import handler calls the API, so it cannot be
+// exercised against a zero-value provider. uptime_service_variable cross-checks that the
+// service_id half of its composite ID really owns the variable (SYS-1303), which is two live
+// reads. Its handler is covered by TestServiceVariableImportState with a stubbed client.
+var importsNeedingLiveAPI = map[string]bool{"uptime_service_variable": true}
+
+// documentedImportID returns the ID argument from a resource's import.sh, i.e. the exact
+// string the docs tell a user to run.
+func documentedImportID(t *testing.T, typeName string) (string, bool) {
+	t.Helper()
+	body, err := os.ReadFile(filepath.Join(exampleResourcesDir, typeName, "import.sh"))
+	if err != nil {
+		return "", false
+	}
+	for _, line := range strings.Split(string(body), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) >= 3 && fields[0] == "terraform" && fields[1] == "import" {
+			return fields[len(fields)-1], true
+		}
+	}
+	t.Errorf("%s: import.sh contains no `terraform import` command", typeName)
+	return "", false
+}
+
+// TestDocumentedImportIDIsAccepted feeds each resource the ID its own documentation tells
+// users to run, through its real handler and real schema.
+//
+// The docs-vs-code check above only proves import exists. This proves the documented call
+// actually works - it is what catches a resource being switched between a simple and a
+// composite key while its example keeps the old shape, which reproduces the SYS-1303
+// experience exactly: the docs say run X, the terminal rejects X.
+func TestDocumentedImportIDIsAccepted(t *testing.T) {
+	ctx := context.Background()
+	p := &providerImpl{}
+
+	for _, newResource := range p.Resources(ctx) {
+		r := newResource()
+		metaResp := fwresource.MetadataResponse{}
+		r.Metadata(ctx, fwresource.MetadataRequest{ProviderTypeName: "uptime"}, &metaResp)
+
+		importer, ok := r.(fwresource.ResourceWithImportState)
+		if !ok || importsNeedingLiveAPI[metaResp.TypeName] {
+			continue
+		}
+		id, ok := documentedImportID(t, metaResp.TypeName)
+		if !ok {
+			continue
+		}
+
+		t.Run(metaResp.TypeName, func(t *testing.T) {
+			schemaResp := fwresource.SchemaResponse{}
+			r.Schema(ctx, fwresource.SchemaRequest{}, &schemaResp)
+			resp := &fwresource.ImportStateResponse{State: tfsdk.State{
+				Schema: schemaResp.Schema,
+				Raw:    tftypes.NewValue(schemaResp.Schema.Type().TerraformType(ctx), nil),
+			}}
+
+			importer.ImportState(ctx, fwresource.ImportStateRequest{ID: id}, resp)
+			if resp.Diagnostics.HasError() {
+				t.Errorf("documented import ID %q rejected: %v", id, resp.Diagnostics.Errors())
+			}
+		})
+	}
+}
+
+// TestSimpleImportWritesKeyAttribute pins that the key lands in the attribute the resource
+// actually uses. uptime_check_maintenance is why this is worth asserting separately: it keys
+// on check_id and has no id attribute, so the generic "id" handler would write to an
+// attribute that does not exist. The negative cases pin the diagnostics, which must name the
+// resource's own key attribute - the whole reason ImportStateSimpleIDFor takes one.
 func TestSimpleImportWritesKeyAttribute(t *testing.T) {
 	ctx := context.Background()
 	p := &providerImpl{}
@@ -76,24 +156,22 @@ func TestSimpleImportWritesKeyAttribute(t *testing.T) {
 		{func() fwresource.Resource { return NewCredentialResource(ctx, p) }, "uptime_credential", "id"},
 		{func() fwresource.Resource { return NewCheckMaintenanceResource(ctx, p) }, "uptime_check_maintenance", "check_id"},
 	} {
-		t.Run(tc.typeName, func(t *testing.T) {
-			r := tc.newResource()
+		newState := func() *fwresource.ImportStateResponse {
 			schemaResp := fwresource.SchemaResponse{}
-			r.Schema(ctx, fwresource.SchemaRequest{}, &schemaResp)
-			resp := &fwresource.ImportStateResponse{State: tfsdk.State{
+			tc.newResource().Schema(ctx, fwresource.SchemaRequest{}, &schemaResp)
+			return &fwresource.ImportStateResponse{State: tfsdk.State{
 				Schema: schemaResp.Schema,
 				Raw:    tftypes.NewValue(schemaResp.Schema.Type().TerraformType(ctx), nil),
 			}}
+		}
+		importer := tc.newResource().(fwresource.ResourceWithImportState)
 
-			importer, ok := r.(fwresource.ResourceWithImportState)
-			if !ok {
-				t.Fatalf("%s does not implement resource.ResourceWithImportState", tc.typeName)
-			}
+		t.Run(tc.typeName+"/writes the key", func(t *testing.T) {
+			resp := newState()
 			importer.ImportState(ctx, fwresource.ImportStateRequest{ID: "123"}, resp)
 			if resp.Diagnostics.HasError() {
 				t.Fatalf("import failed: %v", resp.Diagnostics.Errors())
 			}
-
 			var got types.Int64
 			if diags := resp.State.GetAttribute(ctx, path.Root(tc.keyAttr), &got); diags.HasError() {
 				t.Fatalf("reading %s: %v", tc.keyAttr, diags.Errors())
@@ -102,6 +180,21 @@ func TestSimpleImportWritesKeyAttribute(t *testing.T) {
 				t.Errorf("%s = %d, want 123", tc.keyAttr, got.ValueInt64())
 			}
 		})
+
+		// "0" matters most: it is the id that reads back as "gone", so importing it would
+		// leave a resource every later plan proposes recreating.
+		for _, bad := range []string{"0", "-1", "abc", "", "99999999999999999999"} {
+			t.Run(tc.typeName+"/rejects "+strconv.Quote(bad), func(t *testing.T) {
+				resp := newState()
+				importer.ImportState(ctx, fwresource.ImportStateRequest{ID: bad}, resp)
+				if !resp.Diagnostics.HasError() {
+					t.Fatalf("import ID %q was accepted", bad)
+				}
+				if detail := resp.Diagnostics.Errors()[0].Detail(); !strings.Contains(detail, tc.keyAttr) {
+					t.Errorf("diagnostic should name %s, got: %s", tc.keyAttr, detail)
+				}
+			})
+		}
 	}
 }
 

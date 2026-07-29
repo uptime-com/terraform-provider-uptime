@@ -370,11 +370,15 @@ func (a CheckMaintenanceResourceAPI) Read(ctx context.Context, arg upapi.Primary
 	if err != nil {
 		return nil, err
 	}
-	var m upapi.CheckMaintenance
-	if obj.Maintenance != nil {
-		m = *obj.Maintenance
+	// The API answers every check with a maintenance object - state ACTIVE and an empty
+	// schedule when nothing is configured - so a missing one means the check is not
+	// readable as this resource. Substituting a zero value would put state "" into state,
+	// which this resource's own validator rejects, and on import would fabricate a window
+	// that does not exist rather than failing the import.
+	if obj.Maintenance == nil {
+		return nil, errResourceGone
 	}
-	return &CheckMaintenanceWrapper{CheckMaintenance: m, CheckID: obj.PK}, nil
+	return &CheckMaintenanceWrapper{CheckMaintenance: *obj.Maintenance, CheckID: obj.PK}, nil
 }
 
 func (a CheckMaintenanceResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg CheckMaintenanceWrapper) (*CheckMaintenanceWrapper, error) {
