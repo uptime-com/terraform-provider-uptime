@@ -49,6 +49,9 @@ func TestAccCheckMaintenanceResource_Basic(t *testing.T) {
 			ResourceName:      "uptime_check_maintenance.test",
 			ImportState:       true,
 			ImportStateVerify: true,
+			// The harness compares the imported and prior resources by "id" unless told
+			// otherwise, and this resource has no such attribute.
+			ImportStateVerifyIdentifierAttribute: "check_id",
 			ImportStateIdFunc: func(s *terraform.State) (string, error) {
 				rs := s.RootModule().Resources["uptime_check_maintenance.test"]
 				if rs == nil {
