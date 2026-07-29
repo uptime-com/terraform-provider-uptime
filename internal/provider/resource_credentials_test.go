@@ -60,6 +60,21 @@ func TestAccCredentialResource(t *testing.T) {
 				}),
 			),
 		},
+		{
+			// The docs promised import long before the resource implemented it (SYS-1305).
+			// secret is ignored because it is write-only: the API never returns it, so the
+			// imported state holds empty strings and the first plan sets it from config.
+			ConfigDirectory: config.StaticDirectory("testdata/resource_credential/_basic"),
+			ConfigVariables: config.Variables{
+				"display_name":    config.StringVariable(names[1]),
+				"credential_type": config.StringVariable("BASIC"),
+				"password":        config.StringVariable(passwords[1]),
+			},
+			ResourceName:            "uptime_credential.test",
+			ImportState:             true,
+			ImportStateVerify:       true,
+			ImportStateVerifyIgnore: []string{"secret"},
+		},
 	}))
 }
 

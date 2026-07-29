@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"fmt"
 	"regexp"
 	"testing"
 	"time"
@@ -8,6 +9,7 @@ import (
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 )
 
 func TestAccCheckMaintenanceResource_Basic(t *testing.T) {
@@ -34,6 +36,29 @@ func TestAccCheckMaintenanceResource_Basic(t *testing.T) {
 				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "state", "ACTIVE"),
 				resource.TestCheckResourceAttr("uptime_check_maintenance.test", "schedule.#", "0"),
 			),
+		},
+		{
+			// The docs promised import long before the resource implemented it (SYS-1305).
+			// The import ID is the check ID: this resource keys on check_id and has no id
+			// attribute, so a handler writing to "id" would fail here.
+			ConfigVariables: config.Variables{
+				"name":  config.StringVariable(name),
+				"state": config.StringVariable("ACTIVE"),
+			},
+			ConfigDirectory:   config.StaticDirectory("testdata/resource_check_maintenance/_basic"),
+			ResourceName:      "uptime_check_maintenance.test",
+			ImportState:       true,
+			ImportStateVerify: true,
+			// The harness compares the imported and prior resources by "id" unless told
+			// otherwise, and this resource has no such attribute.
+			ImportStateVerifyIdentifierAttribute: "check_id",
+			ImportStateIdFunc: func(s *terraform.State) (string, error) {
+				rs := s.RootModule().Resources["uptime_check_maintenance.test"]
+				if rs == nil {
+					return "", fmt.Errorf("uptime_check_maintenance.test not found in state")
+				}
+				return rs.Primary.Attributes["check_id"], nil
+			},
 		},
 		{
 			ConfigDirectory: config.StaticDirectory("testdata/resource_check_maintenance/_basic"),

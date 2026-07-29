@@ -1,5 +1,31 @@
 # Uptime.com Terraform provider changelog
 
+## v2.33.0
+
+Enhancements:
+* `uptime_credential` and `uptime_check_maintenance` now support `terraform import` (SYS-1305).
+  Both shipped an import example, so the generated docs stated that import was supported, while
+  the resources were registered without it and answered "Resource Import Not Implemented" - the
+  same defect as SYS-1303. `uptime_check_maintenance` imports by the ID of the check the window
+  belongs to, since it keys on `check_id` and has no `id` attribute; its import example previously
+  said "maintenance window ID", which no such ID exists for.
+
+Bug Fixes:
+* `uptime_check_maintenance` now reports a check whose maintenance object is missing as gone,
+  instead of substituting a zero value that put the invalid `state = ""` into state (SYS-1305).
+
+**Behavior change:** `terraform import` of a resource keyed on a plain numeric ID now rejects
+zero, negative and out-of-range IDs, as composite-ID import already did. Zero in particular reads
+back as "gone", so importing it produced a resource every later plan proposed recreating.
+
+Documentation:
+* Added the missing import examples for `uptime_user`, `uptime_check_pagespeed`,
+  `uptime_maintenance_schedule`, `uptime_maintenance_notification` and the
+  `uptime_integration_*` resources. All of them supported import already, but the generated docs
+  omitted the Import section (SYS-1305).
+* The `uptime_credential` import example now notes that the secret is write-only, so the first
+  plan after importing proposes setting it from configuration.
+
 ## v2.32.0
 
 Enhancements:

@@ -18,10 +18,10 @@ import (
 )
 
 func NewCredentialResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CredentialResourceModel, upapi.Credential, upapi.Credential]{
-		api: CredentialResourceAPI{provider: p},
-		mod: CredentialResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[CredentialResourceModel, upapi.Credential, upapi.Credential](
+		CredentialResourceAPI{provider: p},
+		CredentialResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "credential",
 			Schema: schema.Schema{
 				Attributes: map[string]schema.Attribute{
@@ -98,7 +98,8 @@ func NewCredentialResource(_ context.Context, p *providerImpl) resource.Resource
 				return []resource.ConfigValidator{NewCredentialTypeValidator()}
 			},
 		},
-	}
+		ImportStateSimpleID,
+	)
 }
 
 type CredentialResourceModel struct {
