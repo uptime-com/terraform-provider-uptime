@@ -2,6 +2,22 @@
 
 ## v2.32.0
 
+Bug Fixes:
+* `uptime_credential` and `uptime_check_maintenance` now actually support `terraform import`
+  (SYS-1305). Both shipped an import example, so the generated docs stated that import was
+  supported, while the resources were registered without it and answered "Resource Import Not
+  Implemented" - the same defect as SYS-1303. `uptime_check_maintenance` imports by the ID of the
+  check the window belongs to, since it keys on `check_id` and has no `id` attribute; its import
+  example previously said "maintenance window ID", which no such ID exists for.
+
+Documentation:
+* Added the missing import examples for `uptime_user`, `uptime_check_pagespeed`,
+  `uptime_maintenance_schedule`, `uptime_maintenance_notification` and the
+  `uptime_integration_*` resources. All of them supported import already, but the generated docs
+  omitted the Import section (SYS-1305).
+* The `uptime_credential` import example now notes that the secret is write-only, so the first
+  plan after importing proposes setting it from configuration.
+
 Enhancements:
 * `uptime_service_variable` now supports `terraform import`, using the composite ID
   `service_id:variable_id` (SYS-1303). The resource was registered without import support while

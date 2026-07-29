@@ -22,10 +22,10 @@ import (
 )
 
 func NewCheckMaintenanceResource(_ context.Context, p *providerImpl) resource.Resource {
-	return APIResource[CheckMaintenanceResourceModel, CheckMaintenanceWrapper, CheckMaintenanceWrapper]{
-		api: &CheckMaintenanceResourceAPI{provider: p},
-		mod: CheckMaintenanceResourceModelAdapter{},
-		meta: APIResourceMetadata{
+	return NewImportableAPIResource[CheckMaintenanceResourceModel, CheckMaintenanceWrapper, CheckMaintenanceWrapper](
+		&CheckMaintenanceResourceAPI{provider: p},
+		CheckMaintenanceResourceModelAdapter{},
+		APIResourceMetadata{
 			TypeNameSuffix: "check_maintenance",
 			Schema: schema.Schema{
 				Description: "Set maintenance windows for a check",
@@ -127,7 +127,10 @@ func NewCheckMaintenanceResource(_ context.Context, p *providerImpl) resource.Re
 				},
 			},
 		},
-	}
+		// This resource keys on check_id and has no id attribute, so the generic
+		// "id" handler would write to an attribute that does not exist.
+		ImportStateSimpleIDFor("check_id"),
+	)
 }
 
 type CheckMaintenanceWrapper struct {

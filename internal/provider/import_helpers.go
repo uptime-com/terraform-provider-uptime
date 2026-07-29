@@ -55,16 +55,32 @@ func checkIDRange(id int64, attr string, raw string) error {
 	return nil
 }
 
+// ImportStateSimpleIDFor returns an import handler for resources with a single numeric
+// key, writing it into idAttr. Most resources key on "id", but a resource whose schema
+// names its key differently (uptime_check_maintenance keys on check_id and has no id
+// attribute at all) must name that attribute here, or the write finds no such attribute.
+func ImportStateSimpleIDFor(
+	idAttr string,
+) func(context.Context, resource.ImportStateRequest, *resource.ImportStateResponse) {
+	return func(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+		id, err := strconv.ParseInt(req.ID, 10, 64)
+		if err != nil {
+			resp.Diagnostics.AddError("Invalid Import ID",
+				fmt.Sprintf("expected numeric %s, got '%s': %s", idAttr, req.ID, err.Error()))
+			return
+		}
+		if err := checkIDRange(id, idAttr, req.ID); err != nil {
+			resp.Diagnostics.AddError("Invalid Import ID", err.Error())
+			return
+		}
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root(idAttr), id)...)
+	}
+}
+
 // ImportStateSimpleID handles import for resources with a simple numeric ID.
 // It parses the import ID string and sets it as an int64 "id" attribute.
 func ImportStateSimpleID(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	id, err := strconv.ParseInt(req.ID, 10, 64)
-	if err != nil {
-		resp.Diagnostics.AddError("Invalid Import ID",
-			fmt.Sprintf("expected numeric ID, got '%s': %s", req.ID, err.Error()))
-		return
-	}
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
+	ImportStateSimpleIDFor("id")(ctx, req, resp)
 }
 
 // ImportStateCompositeIDFor returns an import handler for child resources whose
