@@ -3,15 +3,110 @@ package provider
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
 	petname "github.com/dustinkirkland/golang-petname"
+	fwresource "github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
 )
+
+// TestServiceVariableSupportsImport pins that the resource is wired up as importable.
+// It previously returned a bare APIResource while carrying an ImportState method on the
+// API struct - which APIResource holds in a named field, so the method was never promoted
+// and terraform import failed with "Resource Import Not Implemented" (SYS-1303).
+func TestServiceVariableSupportsImport(t *testing.T) {
+	r := NewServiceVariableResource(context.Background(), &providerImpl{})
+	if _, ok := r.(fwresource.ResourceWithImportState); !ok {
+		t.Fatalf("%T does not implement resource.ResourceWithImportState", r)
+	}
+}
+
+// importStateForTest runs the resource's import handler against its real schema, so a
+// parent attribute that is misnamed or retyped fails in the test rather than at the
+// customer's terminal.
+func importStateForTest(t *testing.T, api upapi.API, id string) (*fwresource.ImportStateResponse, ServiceVariableResourceModel) {
+	t.Helper()
+	ctx := context.Background()
+	r := NewServiceVariableResource(ctx, &providerImpl{api: api})
+
+	schemaResp := fwresource.SchemaResponse{}
+	r.Schema(ctx, fwresource.SchemaRequest{}, &schemaResp)
+	resp := &fwresource.ImportStateResponse{State: tfsdk.State{
+		Schema: schemaResp.Schema,
+		Raw:    tftypes.NewValue(schemaResp.Schema.Type().TerraformType(ctx), nil),
+	}}
+
+	importer, ok := r.(fwresource.ResourceWithImportState)
+	if !ok {
+		t.Fatalf("%T does not implement resource.ResourceWithImportState", r)
+	}
+	importer.ImportState(ctx, fwresource.ImportStateRequest{ID: id}, resp)
+
+	var got ServiceVariableResourceModel
+	if !resp.Diagnostics.HasError() {
+		if diags := resp.State.Get(ctx, &got); diags.HasError() {
+			t.Fatalf("reading imported state: %v", diags.Errors())
+		}
+	}
+	return resp, got
+}
+
+// TestServiceVariableImportState covers the composite import: service_id must land in
+// state because the API does not return it (Read sources it from the model, and it is
+// Required + RequiresReplace, so an unset one makes the next plan propose a replacement),
+// and a service_id naming some other check must be rejected rather than silently accepted
+// - nothing server-side ties the two halves together (SYS-1303).
+func TestServiceVariableImportState(t *testing.T) {
+	api := stubServiceVariablesAPI{
+		get:   &upapi.ServiceVariable{ID: 41218, Service: "arya-sanity-euw"},
+		check: &upapi.Check{PK: 5891524, Name: "arya-sanity-euw"},
+	}
+
+	t.Run("writes both halves into state", func(t *testing.T) {
+		resp, got := importStateForTest(t, api, "5891524:41218")
+		if resp.Diagnostics.HasError() {
+			t.Fatalf("import failed: %v", resp.Diagnostics.Errors())
+		}
+		if got.ServiceID.ValueInt64() != 5891524 {
+			t.Errorf("service_id = %d, want 5891524", got.ServiceID.ValueInt64())
+		}
+		if got.ID.ValueInt64() != 41218 {
+			t.Errorf("id = %d, want 41218", got.ID.ValueInt64())
+		}
+	})
+
+	t.Run("rejects a service_id owned by another check", func(t *testing.T) {
+		mismatched := api
+		mismatched.check = &upapi.Check{PK: 999, Name: "some-other-check"}
+		resp, _ := importStateForTest(t, mismatched, "999:41218")
+		if !resp.Diagnostics.HasError() {
+			t.Fatal("expected an error: service_id names a check that does not own the variable")
+		}
+		if summary := resp.Diagnostics.Errors()[0].Summary(); summary != "Import ID Mismatch" {
+			t.Errorf("summary = %q, want \"Import ID Mismatch\"", summary)
+		}
+	})
+
+	t.Run("imports when the API omits either name", func(t *testing.T) {
+		blank := api
+		blank.get = &upapi.ServiceVariable{ID: 41218}
+		resp, got := importStateForTest(t, blank, "5891524:41218")
+		if resp.Diagnostics.HasError() {
+			t.Fatalf("a blank name must not block import: %v", resp.Diagnostics.Errors())
+		}
+		if got.ServiceID.ValueInt64() != 5891524 {
+			t.Errorf("service_id = %d, want 5891524", got.ServiceID.ValueInt64())
+		}
+	})
+}
 
 // TestServiceVariablePreservePlanValues verifies that Required attributes the update
 // endpoint may omit (credential_id, property_name, variable_name) are restored from the
@@ -104,11 +199,30 @@ type stubServiceVariablesAPI struct {
 	upapi.API
 	get   *upapi.ServiceVariable
 	write *upapi.ServiceVariable
+	check *upapi.Check
 	err   error
 }
 
 func (s stubServiceVariablesAPI) ServiceVariables() upapi.ServiceVariablesEndpoint {
 	return stubServiceVariablesEndpoint{get: s.get, write: s.write, err: s.err}
+}
+
+// Checks is reached only by the import handler, which cross-checks that service_id names
+// the check the variable reports as its owner.
+func (s stubServiceVariablesAPI) Checks() upapi.ChecksEndpoint {
+	return stubChecksEndpoint{get: s.check}
+}
+
+type stubChecksEndpoint struct {
+	upapi.ChecksEndpoint
+	get *upapi.Check
+}
+
+func (s stubChecksEndpoint) Get(context.Context, upapi.PrimaryKeyable) (*upapi.Check, error) {
+	if s.get == nil {
+		panic("stubChecksEndpoint: Get called but check is not set")
+	}
+	return s.get, nil
 }
 
 type stubServiceVariablesEndpoint struct {
@@ -359,6 +473,28 @@ func TestAccServiceVariableResource(t *testing.T) {
 					"uptime_credential.test", "id",
 				),
 			),
+		},
+		{
+			// ImportStateVerify is the only check that the composite import really
+			// reconstructs full state: service_id comes from the import ID, everything
+			// else has to be repopulated by the post-import Read (SYS-1303).
+			ConfigDirectory: config.StaticDirectory("testdata/resource_service_variable/_basic"),
+			ConfigVariables: config.Variables{
+				"credential_name": config.StringVariable(credentialName),
+				"password":        config.StringVariable(password),
+				"variable_name":   config.StringVariable("api_key"),
+			},
+			ResourceName:      "uptime_service_variable.test",
+			ImportState:       true,
+			ImportStateVerify: true,
+			ImportStateIdFunc: func(s *terraform.State) (string, error) {
+				rs := s.RootModule().Resources["uptime_service_variable.test"]
+				if rs == nil {
+					return "", fmt.Errorf("uptime_service_variable.test not found in state")
+				}
+				return fmt.Sprintf("%s:%s",
+					rs.Primary.Attributes["service_id"], rs.Primary.Attributes["id"]), nil
+			},
 		},
 	}))
 }
