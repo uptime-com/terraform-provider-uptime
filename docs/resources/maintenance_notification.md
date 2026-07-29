@@ -36,3 +36,14 @@ resource "uptime_maintenance_notification" "before_start" {
 - `created_at` (String)
 - `id` (Number) The ID of this resource.
 - `modified_at` (String)
+
+## Import
+
+Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
+```shell
+# Import using the maintenance notification ID
+terraform import uptime_maintenance_notification.example 123
+```

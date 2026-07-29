@@ -54,3 +54,14 @@ Optional:
 - `emulated_device` (String)
 - `exclude_urls` (String)
 - `uptime_grade_threshold` (String)
+
+## Import
+
+Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
+```shell
+# Import using the check ID
+terraform import uptime_check_pagespeed.example 123
+```

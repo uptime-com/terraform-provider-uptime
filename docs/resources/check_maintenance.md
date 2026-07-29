@@ -99,6 +99,7 @@ Import is supported using the following syntax:
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-# Import using the maintenance window ID
+# Import using the ID of the check the maintenance window belongs to.
+# This resource keys on check_id - there is no separate maintenance window ID.
 terraform import uptime_check_maintenance.example 123
 ```
