@@ -8,10 +8,11 @@ import (
 
 func UseIPVersionSchemaAttribute() schema.Attribute {
 	return schema.StringAttribute{
-		Optional:    true,
-		Computed:    true,
-		Description: "Whether to use IPv4 or IPv6 for the check.",
-		Default:     stringdefault.StaticString(""),
+		Optional: true,
+		Computed: true,
+		Description: "Internet Protocol version to use for the check. Valid values are \"IPV4\", \"IPV6\", " +
+			"and \"\" for Any. Defaults to \"\".",
+		Default: stringdefault.StaticString(""),
 		Validators: []validator.String{
 			OneOfStringValidator([]string{"", "IPV4", "IPV6"}),
 		},

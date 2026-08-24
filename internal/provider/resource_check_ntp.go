@@ -105,7 +105,7 @@ func (a CheckNTPResourceModelAdapter) ToAPIArgument(model CheckNTPResourceModel)
 		Threshold:              model.Threshold.ValueInt64(),
 		Sensitivity:            model.Sensitivity.ValueInt64(),
 		NumRetries:             model.NumRetries.ValueInt64(),
-		UseIPVersion:           model.UseIPVersion.ValueString(),
+		UseIPVersion:           stringOptionalAPIValue(model.UseIPVersion),
 		Notes:                  model.Notes.ValueString(),
 		IncludeInGlobalMetrics: upapi.BoolPtr(model.IncludeInGlobalMetrics.ValueBool()),
 	}

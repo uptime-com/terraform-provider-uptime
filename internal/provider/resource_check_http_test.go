@@ -307,3 +307,39 @@ func TestAccCheckHTTPResource_EmptyContactGroups(t *testing.T) {
 		},
 	}))
 }
+
+func TestAccCheckHTTPResource_UseIPVersion(t *testing.T) {
+	name := petname.Generate(3, "-")
+	resource.Test(t, testCaseFromSteps(t, []resource.TestStep{
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/use_ip_version"),
+			ConfigVariables: config.Variables{
+				"name":           config.StringVariable(name),
+				"use_ip_version": config.StringVariable("IPV4"),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_http.test", "use_ip_version", "IPV4"),
+			),
+		},
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/use_ip_version"),
+			ConfigVariables: config.Variables{
+				"name":           config.StringVariable(name),
+				"use_ip_version": config.StringVariable("IPV6"),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_http.test", "use_ip_version", "IPV6"),
+			),
+		},
+		{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/use_ip_version"),
+			ConfigVariables: config.Variables{
+				"name":           config.StringVariable(name),
+				"use_ip_version": config.StringVariable(""),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_http.test", "use_ip_version", ""),
+			),
+		},
+	}))
+}
