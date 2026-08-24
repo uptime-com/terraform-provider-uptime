@@ -68,7 +68,7 @@ Each account can have up to 3,000 unique tags, with a 100-character limit per ta
 Tags help categorize resources for filtering in Dashboards, Public Status Pages, and SLA Reports. 
 Common use cases include tagging by team ('dev-team', 'ops'), environment ('production', 'staging'), 
 or purpose ('api', 'customer-facing'). Defaults to an empty list if not specified.
-- `use_ip_version` (String) Whether to use IPv4 or IPv6 for the check.
+- `use_ip_version` (String) Internet Protocol version to use for the check. Valid values are "IPV4", "IPV6", and "" for Any. Defaults to "".
 
 ### Read-Only
 

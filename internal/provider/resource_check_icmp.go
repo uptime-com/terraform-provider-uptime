@@ -97,7 +97,7 @@ func (a CheckICMPResourceModelAdapter) ToAPIArgument(model CheckICMPResourceMode
 		IsPaused:               upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Interval:               model.Interval.ValueInt64(),
 		NumRetries:             model.NumRetries.ValueInt64(),
-		UseIPVersion:           model.UseIPVersion.ValueString(),
+		UseIPVersion:           stringOptionalAPIValue(model.UseIPVersion),
 		Notes:                  model.Notes.ValueString(),
 		IncludeInGlobalMetrics: upapi.BoolPtr(model.IncludeInGlobalMetrics.ValueBool()),
 		Sensitivity:            model.Sensitivity.ValueInt64(),

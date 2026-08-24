@@ -95,14 +95,14 @@ func SensitivitySchemaAttribute(defaultVal int64) schema.Int64Attribute {
 	}
 }
 
-func encryptionAPIValue(v types.String) *string {
+func stringOptionalAPIValue(v types.String) *string {
 	if v.IsNull() || v.IsUnknown() {
 		return nil
 	}
 	return upapi.StringPtr(v.ValueString())
 }
 
-func encryptionModelValue(v *string) types.String {
+func stringOptionalModelValue(v *string) types.String {
 	if v == nil {
 		return types.StringNull()
 	}

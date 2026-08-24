@@ -37,6 +37,7 @@ func NewCheckHTTPResource(_ context.Context, p *providerImpl) resource.Resource 
 					"threshold":                 ThresholdSchemaAttribute(40),
 					"sensitivity":               SensitivitySchemaAttribute(2),
 					"num_retries":               NumRetriesAttribute(2),
+					"use_ip_version":            UseIPVersionSchemaAttribute(),
 					"notes":                     NotesSchemaAttribute(),
 					"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
 					"sla":                       SLASchemaAttribute(),
@@ -138,6 +139,7 @@ type CheckHTTPResourceModel struct {
 	Version                types.Int64  `tfsdk:"version"`
 	Sensitivity            types.Int64  `tfsdk:"sensitivity"`
 	NumRetries             types.Int64  `tfsdk:"num_retries"`
+	UseIPVersion           types.String `tfsdk:"use_ip_version"`
 	Notes                  types.String `tfsdk:"notes"`
 	IncludeInGlobalMetrics types.Bool   `tfsdk:"include_in_global_metrics"`
 	SLA                    types.Object `tfsdk:"sla"`
@@ -193,11 +195,12 @@ func (a CheckHTTPResourceModelAdapter) ToAPIArgument(model CheckHTTPResourceMode
 		SendString:             model.SendString.ValueString(),
 		ExpectString:           model.ExpectString.ValueString(),
 		ExpectStringType:       model.ExpectStringType.ValueString(),
-		Encryption:             encryptionAPIValue(model.Encryption),
+		Encryption:             stringOptionalAPIValue(model.Encryption),
 		Threshold:              model.Threshold.ValueInt64(),
 		Version:                model.Version.ValueInt64(),
 		Sensitivity:            model.Sensitivity.ValueInt64(),
 		NumRetries:             model.NumRetries.ValueInt64(),
+		UseIPVersion:           stringOptionalAPIValue(model.UseIPVersion),
 		Notes:                  model.Notes.ValueString(),
 		IncludeInGlobalMetrics: upapi.BoolPtr(model.IncludeInGlobalMetrics.ValueBool()),
 	}
@@ -235,11 +238,12 @@ func (a CheckHTTPResourceModelAdapter) FromAPIResult(api upapi.Check) (*CheckHTT
 		SendString:             types.StringValue(api.SendString),
 		ExpectString:           types.StringValue(api.ExpectString),
 		ExpectStringType:       types.StringValue(api.ExpectStringType),
-		Encryption:             encryptionModelValue(api.Encryption),
+		Encryption:             stringOptionalModelValue(api.Encryption),
 		Threshold:              types.Int64Value(api.Threshold),
 		Version:                types.Int64Value(api.Version),
 		Sensitivity:            types.Int64Value(api.Sensitivity),
 		NumRetries:             types.Int64Value(api.NumRetries),
+		UseIPVersion:           types.StringValue(api.UseIPVersion),
 		Notes:                  types.StringValue(api.Notes),
 		IncludeInGlobalMetrics: types.BoolValue(api.IncludeInGlobalMetrics),
 		SLA: a.SLAAttributeValue(SLAAttribute{

@@ -113,6 +113,7 @@ Tags help categorize resources for filtering in Dashboards, Public Status Pages,
 Common use cases include tagging by team ('dev-team', 'ops'), environment ('production', 'staging'), 
 or purpose ('api', 'customer-facing'). Defaults to an empty list if not specified.
 - `threshold` (Number) A timeout alert will be issued if the check takes longer than this many seconds to complete
+- `use_ip_version` (String) Internet Protocol version to use for the check. Valid values are "IPV4", "IPV6", and "" for Any. Defaults to "".
 - `username` (String)
 - `version` (Number) Check version to use. Keep default value unless you are absolutely sure you need to change it
 

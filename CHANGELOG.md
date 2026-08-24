@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+Enhancements:
+* `uptime_check_http` and `uptime_check_api` now expose `use_ip_version`, so a check can be
+  pinned to IPv4 or IPv6 from Terraform (SYS-1329). The API has accepted
+  `msp_use_ip_version` for both check types all along, and the eight other check resources
+  that support it already exposed the attribute, so these two were the only provider
+  resources missing it. The backend also supports the field on Network checks, which have
+  no Terraform resource and no client endpoint at all, so they remain uncovered.
+* `use_ip_version` can now be reset to Any on every check resource that has it (SYS-1329).
+  Previously the value was sent with `omitempty`, so an empty string was dropped from the
+  PATCH body and the stored value survived. Removing the attribute from configuration then
+  planned `""` but applied the old value, and Terraform aborted with "Provider produced
+  inconsistent result after apply". This required uptime-client-go v2.15.0, which sends the
+  field as a pointer.
+
+**Behavior change:** a check whose IP version was pinned outside Terraform, but whose
+configuration does not set `use_ip_version`, is now reset to Any on the next apply. On the
+eight resources that already had the attribute that apply previously failed with "Provider
+produced inconsistent result after apply", so the reset replaces a hard error; on
+`uptime_check_http` and `uptime_check_api` the attribute is new, so the reset is new too.
+Set `use_ip_version` explicitly to keep a value pinned outside Terraform, and read
+`terraform plan` before applying.
+
 Bug Fixes:
 * `uptime_credential` and `uptime_check_maintenance` now actually support `terraform import`
   (SYS-1305). Both shipped an import example, so the generated docs stated that import was
@@ -17,6 +39,10 @@ zero, negative and out-of-range IDs, as composite-ID import already did. Zero in
 back as "gone", so importing it produced a resource every later plan proposed recreating.
 
 Documentation:
+* The `use_ip_version` description now names the accepted values and the default, on all ten
+  check resources that have the attribute (SYS-1329). It previously read only "Whether to use
+  IPv4 or IPv6 for the check", which left the uppercase `IPV4` / `IPV6` spelling and the
+  empty-string default undocumented.
 * Added the missing import examples for `uptime_user`, `uptime_check_pagespeed`,
   `uptime_maintenance_schedule`, `uptime_maintenance_notification` and the
   `uptime_integration_*` resources. All of them supported import already, but the generated docs
