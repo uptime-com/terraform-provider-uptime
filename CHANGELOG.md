@@ -1,6 +1,6 @@
 # Uptime.com Terraform provider changelog
 
-## Unreleased
+## v2.34.0
 
 Enhancements:
 * `uptime_check_http` and `uptime_check_api` now expose `use_ip_version`, so a check can be
