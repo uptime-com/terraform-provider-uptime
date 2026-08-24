@@ -24,13 +24,23 @@ produced inconsistent result after apply", so the reset replaces a hard error; o
 Set `use_ip_version` explicitly to keep a value pinned outside Terraform, and read
 `terraform plan` before applying.
 
+Documentation:
+* The `use_ip_version` description now names the accepted values and the default, on all ten
+  check resources that have the attribute (SYS-1329). It previously read only "Whether to use
+  IPv4 or IPv6 for the check", which left the uppercase `IPV4` / `IPV6` spelling and the
+  empty-string default undocumented.
+
+## v2.33.0
+
+Enhancements:
+* `uptime_credential` and `uptime_check_maintenance` now support `terraform import` (SYS-1305).
+  Both shipped an import example, so the generated docs stated that import was supported, while
+  the resources were registered without it and answered "Resource Import Not Implemented" - the
+  same defect as SYS-1303. `uptime_check_maintenance` imports by the ID of the check the window
+  belongs to, since it keys on `check_id` and has no `id` attribute; its import example previously
+  said "maintenance window ID", which no such ID exists for.
+
 Bug Fixes:
-* `uptime_credential` and `uptime_check_maintenance` now actually support `terraform import`
-  (SYS-1305). Both shipped an import example, so the generated docs stated that import was
-  supported, while the resources were registered without it and answered "Resource Import Not
-  Implemented" - the same defect as SYS-1303. `uptime_check_maintenance` imports by the ID of the
-  check the window belongs to, since it keys on `check_id` and has no `id` attribute; its import
-  example previously said "maintenance window ID", which no such ID exists for.
 * `uptime_check_maintenance` now reports a check whose maintenance object is missing as gone,
   instead of substituting a zero value that put the invalid `state = ""` into state (SYS-1305).
 
@@ -39,10 +49,6 @@ zero, negative and out-of-range IDs, as composite-ID import already did. Zero in
 back as "gone", so importing it produced a resource every later plan proposed recreating.
 
 Documentation:
-* The `use_ip_version` description now names the accepted values and the default, on all ten
-  check resources that have the attribute (SYS-1329). It previously read only "Whether to use
-  IPv4 or IPv6 for the check", which left the uppercase `IPV4` / `IPV6` spelling and the
-  empty-string default undocumented.
 * Added the missing import examples for `uptime_user`, `uptime_check_pagespeed`,
   `uptime_maintenance_schedule`, `uptime_maintenance_notification` and the
   `uptime_integration_*` resources. All of them supported import already, but the generated docs
