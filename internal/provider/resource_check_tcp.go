@@ -72,7 +72,7 @@ type CheckTCPResourceModel struct {
 	IsPaused               types.Bool   `tfsdk:"is_paused"`
 	Interval               types.Int64  `tfsdk:"interval"`
 	NumRetries             types.Int64  `tfsdk:"num_retries"`
-	UseIpVersion           types.String `tfsdk:"use_ip_version"`
+	UseIPVersion           types.String `tfsdk:"use_ip_version"`
 	Notes                  types.String `tfsdk:"notes"`
 	IncludeInGlobalMetrics types.Bool   `tfsdk:"include_in_global_metrics"`
 	SLA                    types.Object `tfsdk:"sla"`
@@ -118,10 +118,10 @@ func (a CheckTCPResourceModelAdapter) ToAPIArgument(model CheckTCPResourceModel)
 		IsPaused:               upapi.BoolPtr(model.IsPaused.ValueBool()),
 		Interval:               model.Interval.ValueInt64(),
 		NumRetries:             model.NumRetries.ValueInt64(),
-		UseIpVersion:           model.UseIpVersion.ValueString(),
+		UseIPVersion:           stringOptionalAPIValue(model.UseIPVersion),
 		Notes:                  model.Notes.ValueString(),
 		IncludeInGlobalMetrics: upapi.BoolPtr(model.IncludeInGlobalMetrics.ValueBool()),
-		Encryption:             encryptionAPIValue(model.Encryption),
+		Encryption:             stringOptionalAPIValue(model.Encryption),
 	}
 
 	if model.sla != nil {
@@ -151,14 +151,14 @@ func (a CheckTCPResourceModelAdapter) FromAPIResult(api upapi.Check) (*CheckTCPR
 		IsPaused:               types.BoolValue(api.IsPaused),
 		Interval:               types.Int64Value(api.Interval),
 		NumRetries:             types.Int64Value(api.NumRetries),
-		UseIpVersion:           types.StringValue(api.UseIPVersion),
+		UseIPVersion:           types.StringValue(api.UseIPVersion),
 		Notes:                  types.StringValue(api.Notes),
 		IncludeInGlobalMetrics: types.BoolValue(api.IncludeInGlobalMetrics),
 		SLA: a.SLAAttributeValue(SLAAttribute{
 			Latency: DurationValueFromDecimalSeconds(api.ResponseTimeSLA),
 			Uptime:  DecimalValue(api.UptimeSLA),
 		}),
-		Encryption: encryptionModelValue(api.Encryption),
+		Encryption: stringOptionalModelValue(api.Encryption),
 	}
 	return &model, nil
 }

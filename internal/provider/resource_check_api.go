@@ -31,6 +31,7 @@ func NewCheckAPIResource(_ context.Context, p *providerImpl) resource.Resource {
 					"threshold":                 ThresholdSchemaAttribute(30),
 					"sensitivity":               SensitivitySchemaAttribute(2),
 					"num_retries":               NumRetriesAttribute(2),
+					"use_ip_version":            UseIPVersionSchemaAttribute(),
 					"notes":                     NotesSchemaAttribute(),
 					"include_in_global_metrics": IncludeInGlobalMetricsSchemaAttribute(),
 					"script":                    ScriptSchemaAttribute(),
@@ -58,6 +59,7 @@ type CheckAPIResourceModel struct {
 	Threshold              types.Int64  `tfsdk:"threshold"`
 	Sensitivity            types.Int64  `tfsdk:"sensitivity"`
 	NumRetries             types.Int64  `tfsdk:"num_retries"`
+	UseIPVersion           types.String `tfsdk:"use_ip_version"`
 	Notes                  types.String `tfsdk:"notes"`
 	IncludeInGlobalMetrics types.Bool   `tfsdk:"include_in_global_metrics"`
 
@@ -104,6 +106,7 @@ func (a CheckAPIResourceModelAdapter) ToAPIArgument(model CheckAPIResourceModel)
 		Script:                 model.Script.ValueString(),
 		Sensitivity:            model.Sensitivity.ValueInt64(),
 		NumRetries:             model.NumRetries.ValueInt64(),
+		UseIPVersion:           stringOptionalAPIValue(model.UseIPVersion),
 		Notes:                  model.Notes.ValueString(),
 		IncludeInGlobalMetrics: upapi.BoolPtr(model.IncludeInGlobalMetrics.ValueBool()),
 	}
@@ -134,6 +137,7 @@ func (a CheckAPIResourceModelAdapter) FromAPIResult(api upapi.Check) (_ *CheckAP
 		Script:                 RawJsonValue(api.Script),
 		Sensitivity:            types.Int64Value(api.Sensitivity),
 		NumRetries:             types.Int64Value(api.NumRetries),
+		UseIPVersion:           types.StringValue(api.UseIPVersion),
 		Notes:                  types.StringValue(api.Notes),
 		IncludeInGlobalMetrics: types.BoolValue(api.IncludeInGlobalMetrics),
 		SLA: a.SLAAttributeValue(SLAAttribute{

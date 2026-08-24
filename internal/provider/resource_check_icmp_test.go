@@ -6,6 +6,7 @@ import (
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 )
 
 func TestAccCheckICMPResource(t *testing.T) {
@@ -186,4 +187,27 @@ func TestAccCheckICMPResource_Sensitivity(t *testing.T) {
 			),
 		},
 	}))
+}
+
+func TestAccCheckICMPResource_UseIPVersion(t *testing.T) {
+	name := petname.Generate(3, "-")
+	steps := make([]resource.TestStep, 0, 3)
+	for _, value := range []string{"IPV4", "IPV6", ""} {
+		steps = append(steps, resource.TestStep{
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_icmp/use_ip_version"),
+			ConfigVariables: config.Variables{
+				"name":           config.StringVariable(name),
+				"use_ip_version": config.StringVariable(value),
+			},
+			ConfigPlanChecks: resource.ConfigPlanChecks{
+				PostApplyPostRefresh: []plancheck.PlanCheck{
+					plancheck.ExpectEmptyPlan(),
+				},
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_icmp.test", "use_ip_version", value),
+			),
+		})
+	}
+	resource.Test(t, testCaseFromSteps(t, steps))
 }

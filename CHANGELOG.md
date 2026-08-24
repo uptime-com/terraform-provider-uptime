@@ -1,5 +1,35 @@
 # Uptime.com Terraform provider changelog
 
+## v2.34.0
+
+Enhancements:
+* `uptime_check_http` and `uptime_check_api` now expose `use_ip_version`, so a check can be
+  pinned to IPv4 or IPv6 from Terraform (SYS-1329). The API has accepted
+  `msp_use_ip_version` for both check types all along, and the eight other check resources
+  that support it already exposed the attribute, so these two were the only provider
+  resources missing it. The backend also supports the field on Network checks, which have
+  no Terraform resource and no client endpoint at all, so they remain uncovered.
+* `use_ip_version` can now be reset to Any on every check resource that has it (SYS-1329).
+  Previously the value was sent with `omitempty`, so an empty string was dropped from the
+  PATCH body and the stored value survived. Removing the attribute from configuration then
+  planned `""` but applied the old value, and Terraform aborted with "Provider produced
+  inconsistent result after apply". This required uptime-client-go v2.15.0, which sends the
+  field as a pointer.
+
+**Behavior change:** a check whose IP version was pinned outside Terraform, but whose
+configuration does not set `use_ip_version`, is now reset to Any on the next apply. On the
+eight resources that already had the attribute that apply previously failed with "Provider
+produced inconsistent result after apply", so the reset replaces a hard error; on
+`uptime_check_http` and `uptime_check_api` the attribute is new, so the reset is new too.
+Set `use_ip_version` explicitly to keep a value pinned outside Terraform, and read
+`terraform plan` before applying.
+
+Documentation:
+* The `use_ip_version` description now names the accepted values and the default, on all ten
+  check resources that have the attribute (SYS-1329). It previously read only "Whether to use
+  IPv4 or IPv6 for the check", which left the uppercase `IPV4` / `IPV6` spelling and the
+  empty-string default undocumented.
+
 ## v2.33.0
 
 Enhancements:
