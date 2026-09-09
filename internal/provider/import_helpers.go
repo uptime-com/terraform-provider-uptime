@@ -57,8 +57,8 @@ func checkIDRange(id int64, attr string, raw string) error {
 
 // ImportStateSimpleIDFor returns an import handler for resources with a single numeric
 // key, writing it into idAttr. Most resources key on "id", but a resource whose schema
-// names its key differently (uptime_check_maintenance keys on check_id and has no id
-// attribute at all) must name that attribute here, or the write finds no such attribute.
+// names its key differently must name that attribute here, or the write finds no such
+// attribute.
 func ImportStateSimpleIDFor(
 	idAttr string,
 ) func(context.Context, resource.ImportStateRequest, *resource.ImportStateResponse) {
