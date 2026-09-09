@@ -1,6 +1,6 @@
 # Uptime.com Terraform provider changelog
 
-## Unreleased
+## v3.0.0
 
 **Breaking change:** the `uptime_check_maintenance` resource has been removed (SYS-1346).
 It was the only consumer of the legacy per-check maintenance endpoint
@@ -31,6 +31,10 @@ still on v2.x:
 `ONE_OFF`. A check left `SUPPRESSED` before the upgrade stays suppressed indefinitely with
 nothing in Terraform pointing at it, so end that suppression in the UI or through the API,
 or replace it with a bounded `ONE_OFF` schedule.
+
+Dependency Updates:
+* Bump `google.golang.org/grpc` from 1.82.1 to 1.83.2 (#268).
+* Bump `github.com/stretchr/testify` from 1.11.1 to 1.12.1 (#262).
 
 ## v2.34.0
 
