@@ -1,5 +1,22 @@
 # Uptime.com Terraform provider changelog
 
+## Unreleased
+
+**Breaking change:** the `uptime_check_maintenance` resource has been removed (SYS-1346).
+It was the only consumer of the legacy per-check maintenance endpoint
+`PATCH /api/v1/checks/{id}/maintenance/`, which the API deprecated and shuts off on
+2026-09-28. Manage maintenance windows with `uptime_maintenance_schedule` instead, which
+targets checks by ID or by tag, and with `uptime_maintenance_notification` for the
+notifications around a window. Both have been available since v2.28.0.
+
+Migration: remove every `uptime_check_maintenance` block from configuration and run
+`terraform state rm` for each of them, then declare the equivalent windows as
+`uptime_maintenance_schedule` resources. `state = "SUPPRESSED"` maps to an active `ONE_OFF`
+schedule covering the check, and `schedule` entries of type `WEEKLY`, `MONTHLY` and `ONCE`
+map to `RRULE` or `ONE_OFF` schedules with a `duration_minutes`. Existing windows created
+through the old resource keep working server-side, but the provider can no longer read or
+change them, so they will show up as drift until they are re-declared or expire.
+
 ## v2.34.0
 
 Enhancements:

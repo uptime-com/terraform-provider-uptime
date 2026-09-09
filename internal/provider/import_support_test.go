@@ -140,10 +140,8 @@ func TestDocumentedImportIDIsAccepted(t *testing.T) {
 }
 
 // TestSimpleImportWritesKeyAttribute pins that the key lands in the attribute the resource
-// actually uses. uptime_check_maintenance is why this is worth asserting separately: it keys
-// on check_id and has no id attribute, so the generic "id" handler would write to an
-// attribute that does not exist. The negative cases pin the diagnostics, which must name the
-// resource's own key attribute - the whole reason ImportStateSimpleIDFor takes one.
+// actually uses. The negative cases pin the diagnostics, which must name the resource's own
+// key attribute - the whole reason ImportStateSimpleIDFor takes one.
 func TestSimpleImportWritesKeyAttribute(t *testing.T) {
 	ctx := context.Background()
 	p := &providerImpl{}
@@ -154,7 +152,6 @@ func TestSimpleImportWritesKeyAttribute(t *testing.T) {
 		keyAttr     string
 	}{
 		{func() fwresource.Resource { return NewCredentialResource(ctx, p) }, "uptime_credential", "id"},
-		{func() fwresource.Resource { return NewCheckMaintenanceResource(ctx, p) }, "uptime_check_maintenance", "check_id"},
 	} {
 		newState := func() *fwresource.ImportStateResponse {
 			schemaResp := fwresource.SchemaResponse{}
