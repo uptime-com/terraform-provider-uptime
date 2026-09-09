@@ -1,6 +1,6 @@
 # Uptime.com Terraform provider changelog
 
-## Unreleased
+## v3.0.0
 
 **Breaking change:** the `uptime_check_maintenance` resource has been removed (SYS-1346).
 It was the only consumer of the legacy per-check maintenance endpoint
