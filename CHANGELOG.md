@@ -9,13 +9,28 @@ It was the only consumer of the legacy per-check maintenance endpoint
 targets checks by ID or by tag, and with `uptime_maintenance_notification` for the
 notifications around a window. Both have been available since v2.28.0.
 
-Migration: remove every `uptime_check_maintenance` block from configuration and run
-`terraform state rm` for each of them, then declare the equivalent windows as
-`uptime_maintenance_schedule` resources. `state = "SUPPRESSED"` maps to an active `ONE_OFF`
-schedule covering the check, and `schedule` entries of type `WEEKLY`, `MONTHLY` and `ONCE`
-map to `RRULE` or `ONE_OFF` schedules with a `duration_minutes`. Existing windows created
-through the old resource keep working server-side, but the provider can no longer read or
-change them, so they will show up as drift until they are re-declared or expire.
+Upgrading with `uptime_check_maintenance` still in configuration or in state is a hard stop:
+`terraform plan` fails with "does not support resource type", and it keeps failing for an
+orphaned state entry because Terraform cannot refresh it without the schema. Migrate while
+still on v2.x:
+
+1. Decide per window. To drop it, remove the block and apply on v2.x: the delete sets the
+   check back to `ACTIVE`, which ends the window server-side. To keep it, remove the block
+   and run `terraform state rm` instead, so the window survives untouched.
+2. Upgrade to v3.
+3. Re-adopt kept windows. The API already stores every window written through the old
+   endpoint as a maintenance schedule: `WEEKLY` and `MONTHLY` entries became `RRULE`
+   schedules, `ONCE` entries became `ONE_OFF`, and `state = "SUPPRESSED"` became an
+   open-ended `MANUAL` schedule. List them with `GET /api/v1/maintenance/schedules/`, then
+   declare each `RRULE` or `ONE_OFF` one as `uptime_maintenance_schedule` and import it by
+   its schedule ID. Old `weekdays` integers (0 = Sunday) correspond to `BYDAY` names in
+   `rrule`, `once_start_date` and `once_end_date` to `starts_at` and `ends_at`, and
+   `pause_on_scheduled_maintenance` to `pause_checks_during_maintenance`.
+
+`MANUAL` schedules cannot be managed by the provider, which only supports `RRULE` and
+`ONE_OFF`. A check left `SUPPRESSED` before the upgrade stays suppressed indefinitely with
+nothing in Terraform pointing at it, so end that suppression in the UI or through the API,
+or replace it with a bounded `ONE_OFF` schedule.
 
 ## v2.34.0
 

@@ -187,7 +187,9 @@ func TestSimpleImportWritesKeyAttribute(t *testing.T) {
 				if !resp.Diagnostics.HasError() {
 					t.Fatalf("import ID %q was accepted", bad)
 				}
-				if detail := resp.Diagnostics.Errors()[0].Detail(); !strings.Contains(detail, tc.keyAttr) {
+				detail := resp.Diagnostics.Errors()[0].Detail()
+				if !strings.Contains(detail, "numeric "+tc.keyAttr+",") &&
+					!strings.Contains(detail, "invalid "+tc.keyAttr+" '") {
 					t.Errorf("diagnostic should name %s, got: %s", tc.keyAttr, detail)
 				}
 			})
