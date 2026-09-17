@@ -2,8 +2,14 @@ package provider
 
 import (
 	"context"
+	"sync/atomic"
 	"testing"
 
+	petname "github.com/dustinkirkland/golang-petname"
+	"github.com/hashicorp/terraform-plugin-framework/providerserver"
+	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
+	"github.com/hashicorp/terraform-plugin-testing/config"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uptime-com/uptime-client-go/v2/pkg/upapi"
@@ -117,4 +123,58 @@ func TestProviderGetCheck_UsesGetWithoutBulkRead(t *testing.T) {
 	require.NoError(t, err)
 	assert.Empty(t, ep.listCalls)
 	assert.Equal(t, []upapi.PrimaryKey{1}, ep.getCalls)
+}
+
+type countingAPI struct {
+	upapi.API
+	lists, gets *atomic.Int64
+}
+
+func (a countingAPI) Checks() upapi.ChecksEndpoint {
+	return countingChecks{ChecksEndpoint: a.API.Checks(), lists: a.lists, gets: a.gets}
+}
+
+type countingChecks struct {
+	upapi.ChecksEndpoint
+	lists, gets *atomic.Int64
+}
+
+func (c countingChecks) List(ctx context.Context, opts upapi.CheckListOptions) (*upapi.ListResult[upapi.Check], error) {
+	c.lists.Add(1)
+	return c.ChecksEndpoint.List(ctx, opts)
+}
+
+func (c countingChecks) Get(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
+	c.gets.Add(1)
+	return c.ChecksEndpoint.Get(ctx, pk)
+}
+
+// The test framework starts a new provider server for every Terraform command, so a fresh
+// providerImpl per factory call gives the cache the same one-walk lifetime as a real run.
+func TestAccBulkRead_CheckHTTP(t *testing.T) {
+	var lists, gets atomic.Int64
+	factories := map[string]func() (tfprotov6.ProviderServer, error){
+		"uptime": func() (tfprotov6.ProviderServer, error) {
+			api := countingAPI{API: testAccAPIClient(t), lists: &lists, gets: &gets}
+			p := &providerImpl{version: "test", api: api, checks: &checkCache{api: api}}
+			return providerserver.NewProtocol6WithError(p)()
+		},
+	}
+	names := [2]string{petname.Generate(3, "-"), petname.Generate(3, "-")}
+	steps := make([]resource.TestStep, 0, 2)
+	for _, name := range names {
+		steps = append(steps, resource.TestStep{
+			ConfigVariables: config.Variables{"name": config.StringVariable(name)},
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/_basic"),
+			Check:           resource.TestCheckResourceAttr("uptime_check_http.test", "name", name),
+		})
+	}
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { _ = testAccAPIClient(t) },
+		ProtoV6ProviderFactories: factories,
+		Steps:                    steps,
+	})
+
+	assert.Positive(t, lists.Load(), "checks must be loaded from the list endpoint")
+	assert.Zero(t, gets.Load(), "no per-check GET must be needed for checks the list returned")
 }
