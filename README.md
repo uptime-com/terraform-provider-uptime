@@ -7,8 +7,12 @@ Registry](https://registry.terraform.io/providers/uptime-com/uptime/latest/docs)
 
 ## Rate Limits
 
-Terraform has a tendency to use many API requests when managing a large group of Uptime.com checks. If this becomes a
-problem, please contact Uptime.com support to request a rate limit increase.
+Terraform has a tendency to use many API requests when managing a large group of Uptime.com checks.
+Every plan refreshes each check with its own request, so a large account can exhaust its hourly
+rate limit, and overlapping runs make this worse. Set `bulk_read = true` on the provider, or the
+environment variable `UPTIME_BULK_READ` to any non-empty value, to refresh checks from the paginated
+list endpoint instead: a few requests per run regardless of the number of checks. If this is still
+not enough, please contact Uptime.com support to request a rate limit increase.
 
 ## Contribution guidelines
 

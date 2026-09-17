@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+Enhancements:
+* New provider option `bulk_read`, also settable through `UPTIME_BULK_READ`, off by default
+  (SYS-1352, #270). With it on, the first check refresh loads every page of
+  `GET /api/v1/checks/` with `page_size=250` into a cache that lives for one plan or apply,
+  and every check resource refreshes from that cache instead of its own
+  `GET /api/v1/checks/{id}/`. A plan with 580 checks makes 3 list calls instead of 580, which
+  keeps large accounts under the hourly rate limit when runs overlap. A check missing from the
+  cache is still fetched on its own, so out-of-band deletions are detected exactly as before.
+  A check changed outside Terraform while a run is in progress is seen on the next run.
+
+Bug Fixes:
+* The `uptime_check_groups` data source now returns paused groups too (SYS-1352). It always
+  sent `is_paused=false` to the list endpoint, because uptime-client-go never omitted that
+  filter, so paused groups were silently missing. Fixed by uptime-client-go v2.17.0.
+
+**Behavior change:** users of `uptime_check_groups` who iterate over the result will see
+paused groups appear; filter on the `is_paused` attribute to keep the old set.
+
 **Breaking change:** the `uptime_check_maintenance` resource has been removed (SYS-1346).
 It was the only consumer of the legacy per-check maintenance endpoint
 `PATCH /api/v1/checks/{id}/maintenance/`, which the API deprecated and shuts off on

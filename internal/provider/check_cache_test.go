@@ -160,13 +160,21 @@ func TestAccBulkRead_CheckHTTP(t *testing.T) {
 			return providerserver.NewProtocol6WithError(p)()
 		},
 	}
-	names := [2]string{petname.Generate(3, "-"), petname.Generate(3, "-")}
 	steps := make([]resource.TestStep, 0, 2)
-	for _, name := range names {
+	for _, header := range []string{"Bar", "Baz"} {
+		name := petname.Generate(3, "-")
 		steps = append(steps, resource.TestStep{
-			ConfigVariables: config.Variables{"name": config.StringVariable(name)},
-			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/_basic"),
-			Check:           resource.TestCheckResourceAttr("uptime_check_http.test", "name", name),
+			ConfigDirectory: config.StaticDirectory("testdata/resource_check_http/headers"),
+			ConfigVariables: config.Variables{
+				"name": config.StringVariable(name),
+				"headers": config.MapVariable(map[string]config.Variable{
+					"Foo": config.ListVariable(config.StringVariable(header)),
+				}),
+			},
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("uptime_check_http.test", "name", name),
+				resource.TestCheckResourceAttr("uptime_check_http.test", "headers.Foo.0", header),
+			),
 		})
 	}
 	resource.Test(t, resource.TestCase{
