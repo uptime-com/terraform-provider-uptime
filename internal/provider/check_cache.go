@@ -22,26 +22,20 @@ type checkCache struct {
 
 func (c *checkCache) load(ctx context.Context) map[upapi.PrimaryKey]upapi.Check {
 	items := make(map[upapi.PrimaryKey]upapi.Check)
-	// The client always sends is_paused, so both values are listed to cover every check.
-	for _, paused := range []bool{false, true} {
-		for page := int64(1); ; page++ {
-			res, err := c.api.Checks().List(ctx, upapi.CheckListOptions{
-				Page: page, PageSize: checkListPageSize, IsPaused: paused,
-			})
-			if err != nil {
-				tflog.Warn(ctx, "bulk_read: listing checks failed, missing checks are read one by one",
-					map[string]any{"error": err.Error()})
-				return items
-			}
-			for _, item := range res.Items {
-				items[item.PrimaryKey()] = item
-			}
-			if page*checkListPageSize >= res.TotalCount {
-				break
-			}
+	for page := int64(1); ; page++ {
+		res, err := c.api.Checks().List(ctx, upapi.CheckListOptions{Page: page, PageSize: checkListPageSize})
+		if err != nil {
+			tflog.Warn(ctx, "bulk_read: listing checks failed, missing checks are read one by one",
+				map[string]any{"error": err.Error()})
+			return items
+		}
+		for _, item := range res.Items {
+			items[item.PrimaryKey()] = item
+		}
+		if page*checkListPageSize >= res.TotalCount {
+			return items
 		}
 	}
-	return items
 }
 
 func (c *checkCache) Get(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
