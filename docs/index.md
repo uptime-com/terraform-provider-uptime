@@ -51,6 +51,7 @@ resource "uptime_check_http" "http" {
 
 ### Optional
 
+- `bulk_read` (Boolean) Refresh checks from the paginated list endpoint instead of one request per check. Checks changed during a run are seen on the next run. Defaults to false
 - `endpoint` (String)
 - `rate_limit` (Number) The rate limit to use for API calls in requests per second, defaults to 0.5
 - `subaccount` (Number) Subaccount ID to use for API calls

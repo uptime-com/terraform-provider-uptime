@@ -109,7 +109,7 @@ func (a CheckRUM2ResourceAPI) Create(ctx context.Context, arg upapi.CheckRUM2) (
 }
 
 func (a CheckRUM2ResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return a.provider.api.Checks().Get(ctx, pk)
+	return a.provider.getCheck(ctx, pk)
 }
 
 func (a CheckRUM2ResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckRUM2) (*upapi.Check, error) {

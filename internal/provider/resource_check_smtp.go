@@ -162,7 +162,7 @@ func (c CheckSMTPResourceAPI) Create(ctx context.Context, arg upapi.CheckSMTP) (
 }
 
 func (c CheckSMTPResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return c.provider.api.Checks().Get(ctx, pk)
+	return c.provider.getCheck(ctx, pk)
 }
 
 func (c CheckSMTPResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckSMTP) (*upapi.Check, error) {

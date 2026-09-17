@@ -232,7 +232,7 @@ func (c CheckPageSpeedResourceAPI) Create(ctx context.Context, arg upapi.CheckPa
 }
 
 func (c CheckPageSpeedResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	resp, err := c.provider.api.Checks().Get(ctx, pk)
+	resp, err := c.provider.getCheck(ctx, pk)
 	if err != nil {
 		return nil, err
 	}
