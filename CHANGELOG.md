@@ -1,6 +1,6 @@
 # Uptime.com Terraform provider changelog
 
-## Unreleased
+## v3.1.0
 
 Enhancements:
 * New provider option `bulk_read`, also settable through `UPTIME_BULK_READ`, off by default
