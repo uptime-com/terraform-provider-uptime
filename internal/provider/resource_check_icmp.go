@@ -148,7 +148,7 @@ func (c CheckICMPResourceAPI) Create(ctx context.Context, arg upapi.CheckICMP) (
 }
 
 func (c CheckICMPResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return c.provider.api.Checks().Get(ctx, pk)
+	return c.provider.getCheck(ctx, pk)
 }
 
 func (c CheckICMPResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckICMP) (*upapi.Check, error) {

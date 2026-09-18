@@ -162,7 +162,7 @@ func (c CheckPOPResourceAPI) Create(ctx context.Context, arg upapi.CheckPOP) (*u
 }
 
 func (c CheckPOPResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return c.provider.api.Checks().Get(ctx, pk)
+	return c.provider.getCheck(ctx, pk)
 }
 
 func (c CheckPOPResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckPOP) (*upapi.Check, error) {

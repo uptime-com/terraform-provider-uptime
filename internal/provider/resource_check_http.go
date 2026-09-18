@@ -268,7 +268,7 @@ func (a CheckHTTPResourceAPI) Create(ctx context.Context, arg upapi.CheckHTTP) (
 }
 
 func (a CheckHTTPResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	resp, err := a.provider.api.Checks().Get(ctx, pk)
+	resp, err := a.provider.getCheck(ctx, pk)
 	if err != nil {
 		return nil, err
 	}

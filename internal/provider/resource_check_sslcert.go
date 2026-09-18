@@ -313,7 +313,7 @@ func (c CheckSSLCertResourceAPI) Create(ctx context.Context, arg upapi.CheckSSLC
 }
 
 func (c CheckSSLCertResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return c.provider.api.Checks().Get(ctx, pk)
+	return c.provider.getCheck(ctx, pk)
 }
 
 func (c CheckSSLCertResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckSSLCert) (*upapi.Check, error) {

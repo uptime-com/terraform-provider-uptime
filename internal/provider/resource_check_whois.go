@@ -139,7 +139,7 @@ func (c CheckWHOISResourceAPI) Create(ctx context.Context, arg upapi.CheckWHOIS)
 }
 
 func (c CheckWHOISResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return c.provider.api.Checks().Get(ctx, pk)
+	return c.provider.getCheck(ctx, pk)
 }
 
 func (c CheckWHOISResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckWHOIS) (*upapi.Check, error) {

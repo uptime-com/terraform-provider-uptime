@@ -159,7 +159,7 @@ func (a CheckAPIResourceAPI) Create(ctx context.Context, arg upapi.CheckAPI) (*u
 }
 
 func (a CheckAPIResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return a.provider.api.Checks().Get(ctx, pk)
+	return a.provider.getCheck(ctx, pk)
 }
 
 func (a CheckAPIResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckAPI) (*upapi.Check, error) {
