@@ -80,7 +80,7 @@ func (c TagResourceAPI) Create(ctx context.Context, arg upapi.Tag) (*upapi.Tag, 
 }
 
 func (c TagResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Tag, error) {
-	obj, err := c.provider.api.Tags().Get(ctx, pk)
+	obj, err := c.provider.getTag(ctx, pk)
 	return obj, err
 }
 

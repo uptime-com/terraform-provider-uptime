@@ -1,6 +1,6 @@
 # Uptime.com Terraform provider changelog
 
-## v3.0.0
+## Unreleased
 
 Enhancements:
 * New provider option `bulk_read`, also settable through `UPTIME_BULK_READ`, off by default
@@ -11,6 +11,9 @@ Enhancements:
   keeps large accounts under the hourly rate limit when runs overlap. A check missing from the
   cache is still fetched on its own, so out-of-band deletions are detected exactly as before.
   A check changed outside Terraform while a run is in progress is seen on the next run.
+* `bulk_read` covers `uptime_tag` too (SYS-1355, #242): one `GET /api/v1/check-tags/` per
+  page of 250 tags per run instead of one `GET /api/v1/check-tags/{id}/` per tag, with the
+  same cache lifetime and the same fallback for a tag missing from the list.
 
 Bug Fixes:
 * The `uptime_check_groups` data source now returns paused groups too (SYS-1352). It always
@@ -19,6 +22,8 @@ Bug Fixes:
 
 **Behavior change:** users of `uptime_check_groups` who iterate over the result will see
 paused groups appear; filter on the `is_paused` attribute to keep the old set.
+
+## v3.0.0
 
 **Breaking change:** the `uptime_check_maintenance` resource has been removed (SYS-1346).
 It was the only consumer of the legacy per-check maintenance endpoint
