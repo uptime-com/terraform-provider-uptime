@@ -155,7 +155,7 @@ func (a CheckTransactionResourceAPI) Create(ctx context.Context, arg upapi.Check
 }
 
 func (a CheckTransactionResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return a.provider.api.Checks().Get(ctx, pk)
+	return a.provider.getCheck(ctx, pk)
 }
 
 func (a CheckTransactionResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckTransaction) (*upapi.Check, error) {

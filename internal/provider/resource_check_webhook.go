@@ -128,7 +128,7 @@ func (c CheckWebookResourceAPI) Create(ctx context.Context, arg upapi.CheckWebho
 }
 
 func (c CheckWebookResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return c.provider.api.Checks().Get(ctx, pk)
+	return c.provider.getCheck(ctx, pk)
 }
 
 func (c CheckWebookResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckWebhook) (*upapi.Check, error) {

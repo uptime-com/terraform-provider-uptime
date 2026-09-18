@@ -330,7 +330,7 @@ func (a CheckGroupResourceAPI) Create(ctx context.Context, arg upapi.CheckGroup)
 }
 
 func (a CheckGroupResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return a.provider.api.Checks().Get(ctx, pk)
+	return a.provider.getCheck(ctx, pk)
 }
 
 func (a CheckGroupResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckGroup) (*upapi.Check, error) {

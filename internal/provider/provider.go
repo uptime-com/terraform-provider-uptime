@@ -25,6 +25,7 @@ type providerImpl struct {
 	version       string
 	locations     map[string]struct{}
 	locationsOnce sync.Once
+	checks        *checkCache
 }
 
 type providerConfig struct {
@@ -33,6 +34,7 @@ type providerConfig struct {
 	Token      types.String  `tfsdk:"token"`
 	RateLimit  types.Float64 `tfsdk:"rate_limit"`
 	Trace      types.Bool    `tfsdk:"trace"`
+	BulkRead   types.Bool    `tfsdk:"bulk_read"`
 }
 
 func (p *providerImpl) Metadata(_ context.Context, _ provider.MetadataRequest, rs *provider.MetadataResponse) {
@@ -60,6 +62,11 @@ func (p *providerImpl) Schema(_ context.Context, _ provider.SchemaRequest, rs *p
 			},
 			"trace": schema.BoolAttribute{
 				Optional: true,
+			},
+			"bulk_read": schema.BoolAttribute{
+				Optional: true,
+				Description: "Refresh checks from the paginated list endpoint instead of one request per check. " +
+					"Checks changed during a run are seen on the next run. Defaults to false",
 			},
 		},
 	}
@@ -95,6 +102,9 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 	if cfg.Trace.IsNull() {
 		cfg.Trace = types.BoolValue(os.Getenv("UPTIME_TRACE") != "")
 	}
+	if cfg.BulkRead.IsNull() {
+		cfg.BulkRead = types.BoolValue(os.Getenv("UPTIME_BULK_READ") != "")
+	}
 	if cfg.RateLimit.IsNull() {
 		rateLimit := 0.5
 		if val := os.Getenv("UPTIME_RATE_LIMIT"); val != "" {
@@ -123,6 +133,16 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 		return
 	}
 	p.api = api
+	if cfg.BulkRead.ValueBool() {
+		p.checks = &checkCache{api: api}
+	}
+}
+
+func (p *providerImpl) getCheck(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
+	if p.checks != nil {
+		return p.checks.Get(ctx, pk)
+	}
+	return p.api.Checks().Get(ctx, pk)
 }
 
 func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.DataSource {

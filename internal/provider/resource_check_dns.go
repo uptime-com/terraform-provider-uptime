@@ -178,7 +178,7 @@ func (a CheckDNSResourceAPI) Create(ctx context.Context, arg upapi.CheckDNS) (*u
 }
 
 func (a CheckDNSResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return a.provider.api.Checks().Get(ctx, pk)
+	return a.provider.getCheck(ctx, pk)
 }
 
 func (a CheckDNSResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckDNS) (*upapi.Check, error) {

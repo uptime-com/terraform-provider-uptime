@@ -109,7 +109,7 @@ func (a CheckBlacklistResourceAPI) Create(ctx context.Context, arg upapi.CheckBl
 }
 
 func (a CheckBlacklistResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return a.provider.api.Checks().Get(ctx, pk)
+	return a.provider.getCheck(ctx, pk)
 }
 
 func (a CheckBlacklistResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckBlacklist) (*upapi.Check, error) {

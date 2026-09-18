@@ -156,7 +156,7 @@ func (c CheckSSHResourceAPI) Create(ctx context.Context, arg upapi.CheckSSH) (*u
 }
 
 func (c CheckSSHResourceAPI) Read(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Check, error) {
-	return c.provider.api.Checks().Get(ctx, pk)
+	return c.provider.getCheck(ctx, pk)
 }
 
 func (c CheckSSHResourceAPI) Update(ctx context.Context, pk upapi.PrimaryKeyable, arg upapi.CheckSSH) (*upapi.Check, error) {
