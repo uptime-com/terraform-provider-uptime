@@ -25,7 +25,8 @@ type providerImpl struct {
 	version       string
 	locations     map[string]struct{}
 	locationsOnce sync.Once
-	checks        *checkCache
+	checks        *listCache[upapi.Check]
+	tags          *listCache[upapi.Tag]
 }
 
 type providerConfig struct {
@@ -65,8 +66,8 @@ func (p *providerImpl) Schema(_ context.Context, _ provider.SchemaRequest, rs *p
 			},
 			"bulk_read": schema.BoolAttribute{
 				Optional: true,
-				Description: "Refresh checks from the paginated list endpoint instead of one request per check. " +
-					"Checks changed during a run are seen on the next run. Defaults to false",
+				Description: "Refresh checks and tags from their paginated list endpoints instead of one request per " +
+					"resource. Resources changed during a run are seen on the next run. Defaults to false",
 			},
 		},
 	}
@@ -134,7 +135,8 @@ func (p *providerImpl) Configure(ctx context.Context, rq provider.ConfigureReque
 	}
 	p.api = api
 	if cfg.BulkRead.ValueBool() {
-		p.checks = &checkCache{api: api}
+		p.checks = newCheckCache(api)
+		p.tags = newTagCache(api)
 	}
 }
 
@@ -143,6 +145,13 @@ func (p *providerImpl) getCheck(ctx context.Context, pk upapi.PrimaryKeyable) (*
 		return p.checks.Get(ctx, pk)
 	}
 	return p.api.Checks().Get(ctx, pk)
+}
+
+func (p *providerImpl) getTag(ctx context.Context, pk upapi.PrimaryKeyable) (*upapi.Tag, error) {
+	if p.tags != nil {
+		return p.tags.Get(ctx, pk)
+	}
+	return p.api.Tags().Get(ctx, pk)
 }
 
 func (p *providerImpl) DataSources(ctx context.Context) []func() datasource.DataSource {
