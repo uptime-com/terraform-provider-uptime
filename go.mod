@@ -15,7 +15,7 @@ require (
 	github.com/nsf/jsondiff v0.0.0-20230430225905-43f6cf3098c1
 	github.com/shopspring/decimal v1.6.0
 	github.com/stretchr/testify v1.12.1
-	github.com/uptime-com/uptime-client-go/v2 v2.17.0
+	github.com/uptime-com/uptime-client-go/v2 v2.18.0
 )
 
 require (
