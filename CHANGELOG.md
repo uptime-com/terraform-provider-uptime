@@ -1,5 +1,12 @@
 # Uptime.com Terraform provider changelog
 
+## v3.1.1
+
+Dependency Updates:
+* Bump `github.com/uptime-com/uptime-client-go/v2` from 2.17.0 to 2.18.0 (SYS-1401, #278).
+* Bump `github.com/hashicorp/terraform-plugin-log` from 0.10.0 to 0.11.0 (#274).
+* Bump `github.com/shopspring/decimal` from 1.4.0 to 1.6.0 (#276).
+
 ## v3.1.0
 
 Enhancements:
